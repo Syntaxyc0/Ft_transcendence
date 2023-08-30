@@ -3,8 +3,9 @@ import { IsEmail, IsNotEmpty, IsString} from "class-validator"
 export class signinDto
 {
     @IsString()
+    @IsEmail()
     @IsNotEmpty()
-    login: string
+    mail: string
 
     @IsString()
     @IsNotEmpty()

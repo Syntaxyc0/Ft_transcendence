@@ -4,7 +4,7 @@ export declare class UserController {
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        login: string;
+        mail: string;
         hash: string;
     };
 }

@@ -16,7 +16,7 @@ export class AuthService
     {
         const user = await this.prisma.user.findUnique({
             where: {
-                login : dto.login,
+                mail : dto.mail,
             },
         });
         if (!user)
@@ -25,7 +25,7 @@ export class AuthService
         const pwMatches = await argon.verify(user.hash, dto.password);
         if (!pwMatches)
             throw new ForbiddenException("credentials incorrect");
-        return this.signToken(user.id, user.login);
+        return this.signToken(user.id, user.mail);
 
     }
 
@@ -36,16 +36,16 @@ export class AuthService
         {
             const user = await this.prisma.user.create({
                 data: {
-                    login: dto.login,
+                    mail: dto.mail,
                     hash,
                 },
                 select: {
                     id: true,
-                    login: true,
+                    mail: true,
                     createdAt: true,
                 }
             })
-            return this.signToken(user.id, user.login);
+            return this.signToken(user.id, user.mail);
         }
         catch(error)
         {
@@ -57,15 +57,15 @@ export class AuthService
             throw error 
           }	
     }
-    async signToken(userId: number, login: string): Promise<{access_token: string}>
+    async signToken(userId: number, mail: string): Promise<{access_token: string}>
     {
         const payload = {
             sub: userId,
-            login,
+            mail,
         };
         const secret = this.config.get("JWT_SECRET");
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '15m',
+            expiresIn: '90m',
             secret: secret
         },);
         return { access_token: token };

@@ -7,8 +7,9 @@ import { Match } from "../decorator"
 export class signupDto
 {
     @IsString()
+    @IsEmail()
     @IsNotEmpty()
-    login: string
+    mail: string
 
     @IsString()
     @IsNotEmpty()
