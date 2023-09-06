@@ -13,7 +13,7 @@ export declare class AuthService {
     signup(dto: signupDto): Promise<{
         access_token: string;
     }>;
-    signToken(userId: number, mail: string): Promise<{
+    signToken(userId: number, login: string): Promise<{
         access_token: string;
     }>;
 }

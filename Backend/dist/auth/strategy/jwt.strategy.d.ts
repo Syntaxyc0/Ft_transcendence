@@ -12,7 +12,7 @@ export declare class JwtStrategy extends JwtStrategy_base {
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        mail: string;
+        login: string;
         hash: string;
     }>;
 }

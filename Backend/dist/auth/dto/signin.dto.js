@@ -16,10 +16,9 @@ class signinDto {
 exports.signinDto = signinDto;
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsEmail)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], signinDto.prototype, "mail", void 0);
+], signinDto.prototype, "login", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
