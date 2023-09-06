@@ -4,11 +4,9 @@ services:
       image:  postgres:13
       ports:
         - 5434:5432
-      environment:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD:  123
-        POSTGRES_DB:  nest
+      env_file:
+        - .env
       networks:
         - backend
 networks:
-  jbesnier:
+  backend:
