@@ -6,6 +6,10 @@ export const routes: Routes = [{
     pathMatch:    'full'
 },
 {
+	path:	'signup',
+	loadComponent:    () => import('./signup/signup.component').then(m => m.SignupComponent),
+},
+{
 	path:    'home',
 	loadComponent:    () => import('./home/home.component').then(m => m.HomeComponent),
 },
