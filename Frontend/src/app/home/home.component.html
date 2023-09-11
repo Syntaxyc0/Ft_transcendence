@@ -3,8 +3,8 @@
 <main class ="grid place-items-center h-screen bg-gradient-to-r from-cyan-600 to-blue-600 flex-row">
 	<div class="grid place-items-center">
 		<img class="mx-auto object-cover rounded-full h-20 w-20 " alt="avatar" src="https://bellard.org/bpg/2.png"/>
-		<section class="">
-			J'adore la vie
+		<section *ngIf="login" class="">
+			{{login}}
 		</section>
 	</div>
 	<div class="space-y-20">

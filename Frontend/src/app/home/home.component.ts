@@ -11,5 +11,10 @@ import { HeaderbarComponent } from '../components/headerbar/headerbar.component'
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
+	login: string = '';
+
+	ngOnInit() {
+		this.login = localStorage.getItem('login')?? '';
+	  }
 
 }

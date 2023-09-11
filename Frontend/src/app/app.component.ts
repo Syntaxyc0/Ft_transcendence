@@ -12,4 +12,9 @@ import { RouterModule } from '@angular/router';
 })
 export class AppComponent {
   title = 'Frontend';
+
+  getLogin()
+  {
+	localStorage.getItem('login');
+  }
 }
