@@ -22,7 +22,7 @@ export class SignupComponent {
     password: new FormControl(null, [Validators.required]),
     confirmpassword: new FormControl(null,[Validators.required]),
 },
-{validators: CustomValidators.passwordMatching});
+{validators: [CustomValidators.passwordMatching, CustomValidators.logintoolong]});
 
 	signup(): void{
 		console.log(
@@ -30,14 +30,14 @@ export class SignupComponent {
 			this.signupForm.controls.password.value,
 			this.signupForm.controls.confirmpassword.value,
 			);
-			this.http.post<any>('http://localhost:3333/auth/signup', {login: this.signupForm.controls.login.value, password:this.signupForm.controls.password.value, confirm_password:this.signupForm.controls.confirmpassword.value}).subscribe(
+			this.http.post<any>('http://localhost:3333/auth/signup', {login: this.login.value, password:this.password.value, confirm_password:this.confirm_password.value}).subscribe(
 				res => {
 					localStorage.setItem('token', res.stringify);
 					localStorage.setItem('login', this.login.value);
 					this.router.navigate(['/home'])
 				},
 				err => {
-					console.log("failure")
+					alert("This login is already taken")
 				})
 	}
 

@@ -17,4 +17,21 @@ export class CustomValidators
 		}
 
 	}
+	static	logintoolong(control: AbstractControl): ValidationErrors | null
+	{
+		const login = control.get('login')?.value;
+		if (login)
+		{
+			if (login.length < 15)
+			{
+				return null;
+			}
+			else
+			{
+				return {logintoolong: true};
+			}
+		}
+		else return null
+
+	}
 }
