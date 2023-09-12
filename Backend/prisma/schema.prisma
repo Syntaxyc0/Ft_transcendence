@@ -11,12 +11,14 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
+  id Int @id @default(autoincrement()) @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   login String @unique
   hash String
+
+  avatar	String
 
   @@map("users")
 }

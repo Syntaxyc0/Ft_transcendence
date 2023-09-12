@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,5 +9,14 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./friend.component.scss']
 })
 export class FriendComponent {
+	 @Input() current: Friend = new Friend('','')
+}
 
+export class Friend {
+	name:string =''
+	avatar:string = ''
+	constructor(input1:string, input2:string) {
+		this.name = input1;
+		this.avatar = input2
+	}
 }

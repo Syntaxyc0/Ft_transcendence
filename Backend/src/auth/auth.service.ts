@@ -57,7 +57,7 @@ export class AuthService
             throw error 
           }	
     }
-    async signToken(userId: number, login: string): Promise<{access_token: string}>
+    async signToken(userId: number, login: string): Promise<{access_token: string, id: number}>
     {
         const payload = {
             sub: userId,
@@ -68,6 +68,6 @@ export class AuthService
             expiresIn: '15m',
             secret: secret
         },);
-        return { access_token: token };
+        return { access_token: token, id: userId };
     }
 }

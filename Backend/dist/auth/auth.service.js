@@ -69,7 +69,7 @@ let AuthService = exports.AuthService = class AuthService {
             expiresIn: '15m',
             secret: secret
         });
-        return { access_token: token };
+        return { access_token: token, id: userId };
     }
 };
 exports.AuthService = AuthService = __decorate([
