@@ -33,6 +33,7 @@ export class SignupComponent {
 			this.http.post<any>('http://localhost:3333/auth/signup', {login: this.login.value, password:this.password.value, confirm_password:this.confirm_password.value}).subscribe(
 				res => {
 					localStorage.setItem('token', res.stringify);
+					localStorage.setItem('id', JSON.stringify(res['id']));
 					localStorage.setItem('login', this.login.value);
 					this.router.navigate(['/home'])
 				},

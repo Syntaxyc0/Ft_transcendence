@@ -6,11 +6,11 @@ export class UserService
 {
 	constructor(private prisma: PrismaService) {}
 
-	getMe(login:string) {
-        return this.prisma.user.findUnique(
+	async getUserFromId(id: number) {
+        return await this.prisma.user.findUnique(
 			{
 				where: {
-					login: login
+					id: id
 				},
 			},
 		)

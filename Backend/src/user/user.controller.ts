@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UseGuards, Request, Body, Post, Param } from '@nestjs/common';
+import { Controller, Get, Req, UseGuards, Request, Body, Post, Param, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
 import { getMetadataStorage } from 'class-validator';
@@ -13,10 +13,15 @@ import { UserService } from './user.service';
 export class UserController {
 	constructor(private userService: UserService) {}
 
-	@Get(':login')
-	getMe(@Param('login') login)
+	@Get(':uid')
+	getUserFromId(@Param('uid', ParseIntPipe) uid: number)
 	{
-		return this.userService.getMe(login)
+		const user = this.userService.getUserFromId(uid)
+		if (!user)
+		{
+            throw new NotFoundException('User not found');
+        }
+		return user;
 	}
     
 }

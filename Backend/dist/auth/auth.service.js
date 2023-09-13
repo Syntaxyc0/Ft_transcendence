@@ -46,7 +46,6 @@ let AuthService = exports.AuthService = class AuthService {
                 select: {
                     id: true,
                     login: true,
-                    createdAt: true,
                 }
             });
             return this.signToken(user.id, user.login);

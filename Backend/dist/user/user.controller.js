@@ -19,17 +19,21 @@ let UserController = exports.UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
-    getMe(login) {
-        return this.userService.getMe(login);
+    getUserFromId(uid) {
+        const user = this.userService.getUserFromId(uid);
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        return user;
     }
 };
 __decorate([
-    (0, common_1.Get)(':login'),
-    __param(0, (0, common_1.Param)('login')),
+    (0, common_1.Get)(':uid'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
-], UserController.prototype, "getMe", null);
+], UserController.prototype, "getUserFromId", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])

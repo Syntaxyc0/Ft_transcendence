@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FriendlistComponent } from '../components/friendlist/friendlist.component';
 import { HeaderbarComponent } from '../components/headerbar/headerbar.component';
 import { ProfilePictureComponent } from '../components/profile-picture/profile-picture.component';
+import { User } from '../helpers/types';
 
 @Component({
   selector: 'app-home',
@@ -12,11 +13,8 @@ import { ProfilePictureComponent } from '../components/profile-picture/profile-p
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-	login: string = '';
-
 	ngOnInit() {
-		this.login = localStorage.getItem('login')?? '';
-		console.log(this.login)
+
 	  }
 
 }

@@ -16,10 +16,10 @@ let UserService = exports.UserService = class UserService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    getMe(login) {
-        return this.prisma.user.findUnique({
+    async getUserFromId(id) {
+        return await this.prisma.user.findUnique({
             where: {
-                login: login
+                id: id
             },
         });
     }

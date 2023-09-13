@@ -10,15 +10,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id Int @id @default(autoincrement()) @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum Status {
+  ONLINE
+  OFFLINE
+  INGAME
+}
 
+model User {
+  id Int @id @default(autoincrement())
   login String @unique
   hash String
+  avatar	String	@default("/assets/image.png")
+  userStatus Status	@default(OFFLINE)
+  friendList Int[] @default([])
+  FriendRequest	FriendRequest[]
+}
 
-  avatar	String
-
-  @@map("users")
+model FriendRequest {
+	id Int @id @default(autoincrement())
+	userId Int
+	User User	@relation(fields: [userId], references: [id])
+	Status Boolean @default(false)
 }

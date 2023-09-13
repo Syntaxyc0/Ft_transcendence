@@ -10,5 +10,13 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./headerbar.component.scss']
 })
 export class HeaderbarComponent {
-
+	id:number=0;
+	ngOnInit()
+	{
+		this.getId();
+	}
+	getId()
+	{
+		this.id = JSON.parse(localStorage.getItem('id')!);
+	}
 }

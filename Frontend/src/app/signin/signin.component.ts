@@ -27,7 +27,7 @@ export class SigninComponent {
 		this.http.post<any>('http://localhost:3333/auth/signin', {login: this.login.value, password:this.password.value}).subscribe(
 				res => {
 					localStorage.setItem('token', res['access_token'].stringify);
-					localStorage.setItem('id', res['id']);
+					localStorage.setItem('id', JSON.stringify(res['id']));
 					localStorage.setItem('login', this.login.value);
 					this.router.navigate(['/home'])
 				},
