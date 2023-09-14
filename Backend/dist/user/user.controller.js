@@ -26,6 +26,20 @@ let UserController = exports.UserController = class UserController {
         }
         return user;
     }
+    getUserFromLogin(login) {
+        const user = this.userService.getUserFromLogin(login);
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        return user;
+    }
+    updateUserStatus(uid, status) {
+        console.log(status);
+        return this.userService.updateUserStatus(uid, status);
+    }
+    GetUserStatus(uid) {
+        return this.userService.GetUserStatus(uid);
+    }
 };
 __decorate([
     (0, common_1.Get)(':uid'),
@@ -34,6 +48,27 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "getUserFromId", null);
+__decorate([
+    (0, common_1.Get)(':login'),
+    __param(0, (0, common_1.Param)('login')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "getUserFromLogin", null);
+__decorate([
+    (0, common_1.Patch)(':uid/status'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "updateUserStatus", null);
+__decorate([
+    (0, common_1.Get)(':uid/status'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "GetUserStatus", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])

@@ -13,7 +13,10 @@ import { User } from '../helpers/types';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
+
+	id:number = 1;
 	ngOnInit() {
+		this.id = JSON.parse(localStorage.getItem('id')!)
 
 	  }
 

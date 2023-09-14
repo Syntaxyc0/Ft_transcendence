@@ -13,7 +13,7 @@ export declare class JwtStrategy extends JwtStrategy_base {
         login: string;
         hash: string;
         avatar: string;
-        userStatus: import(".prisma/client").$Enums.Status;
+        userStatus: string;
         friendList: number[];
     }>;
 }

@@ -1,6 +1,8 @@
-<main class="">
-	<div class="box-border w-44 h-20 bg-blue-600 py-5 px-4 flex space-y-2 cursor-pointer rounded-md hover:bg-blue-700 hover:smooth-hover font-serif">
-		<img src={{current.avatar}} alt="avatar" class="object-cover rounded-full h-10 w-10 mx-2">
-		<a href= "/profile/{{current.name}}"class="my-2">{{ current.name }}</a>
+<main >
+	<a href="/profile/?id={{id}}" >
+	<div class="box-border w-44 h-20 bg-blue-600 py-5 px-4 flex space-y-2 cursor-pointer rounded-md hover:bg-[#2555C2] shadow  font-serif" >
+		<img src={{avatar_url}} alt="avatar" class="object-cover rounded-full h-10 w-10 mx-2">
+		<a class="px-4">{{ name }}</a>
 	</div>
+	</a>
 </main>

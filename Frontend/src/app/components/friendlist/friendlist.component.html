@@ -1,11 +1,9 @@
 <!-- component -->
-<aside class=" box-border w-1/8 h-full absolute right-0  bg-[#2052e8] flex flex-col items-center pt-5 pb-2 space-y-2 overflow-auto">
-	<header>
-		Friendlist 
-	</header>
+<aside class=" box-border h-full absolute right-0  bg-[#1D5DE8] flex flex-col items-center pt-5 pb-2 space-y-2 overflow-auto">
+	<app-add-friend></app-add-friend>
 	<li *ngFor="let friend of friendList" class="flex">
 		<div>
-			<app-friend [current]="friend"></app-friend>
+			<app-friend [id]="friend"></app-friend>
 		</div>
 	</li>
 </aside>

@@ -7,7 +7,17 @@ export declare class UserController {
         login: string;
         hash: string;
         avatar: string;
-        userStatus: import(".prisma/client").$Enums.Status;
+        userStatus: string;
         friendList: number[];
     }>;
+    getUserFromLogin(login: string): Promise<{
+        id: number;
+        login: string;
+        hash: string;
+        avatar: string;
+        userStatus: string;
+        friendList: number[];
+    }>;
+    updateUserStatus(uid: number, status: string): Promise<void>;
+    GetUserStatus(uid: number): Promise<string>;
 }
