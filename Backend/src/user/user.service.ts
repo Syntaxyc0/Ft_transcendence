@@ -1,5 +1,6 @@
 import { PrismaService } from "src/prisma/prisma.service";
 import { Body, Injectable } from "@nestjs/common";
+import { NotFoundException } from "@nestjs/common";
 import { stat } from "fs";
 
 
@@ -10,37 +11,51 @@ export class UserService
 	constructor(private prisma: PrismaService) {}
 
 	async getUserFromId(id: number) {
-        return await this.prisma.user.findUnique(
+        const user = await this.prisma.user.findUnique(
 			{
 				where: {
 					id: id
 				},
 			},
 		)
+		if (!user) {
+			throw new NotFoundException('User not found')
+		}
+		return user;
     }
 
 	async getUserFromLogin(login: string) {
-        return await this.prisma.user.findUnique(
+        const user = await this.prisma.user.findUnique(
 			{
 				where: {
 					login: login
 				},
 			},
 		)
-    }
+		if (!user) {
+			throw new NotFoundException("User not found")
+    	}
+		return user
+	}
 
-	async updateUserStatus(id: number, @Body() status:	string)
+	async updateUserStatus(id: number, @Body() status)
 	{
-		console.log(status);
+		const user = await this.prisma.user.findUnique({
+			where: {
+				id: id,
+			}
+		})
+		if (!user) {
+            throw new NotFoundException('User not found')
+        }
 		await this.prisma.user.update({
 				data: {
-					userStatus: "ONLINE" ,
+					userStatus: status['status'] ,
 				},
 				where: {
 					id: id,
 				}
 			})
-			
 	}
 
 	async GetUserStatus(id: number)
@@ -52,7 +67,84 @@ export class UserService
 				},
 			},
 		)
+		if (!user) {
+            throw new NotFoundException('User not found')
+        }
 		return user.userStatus
+	}
+
+	async GetUserFriendlist(uid: number)
+	{
+		const user = await this.prisma.user.findUnique(
+		{
+			where: {
+				id: uid
+			},
+		})
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		return user.friendList
+	}
+
+	async AddFriend(uid:number, userName: string)
+	{
+		const friend = await this.prisma.user.findUnique({
+			where: {
+				login: userName
+			},
+		})
+		if (!friend)
+		{
+			throw new NotFoundException('User not found')
+		}
+		const user = await this.prisma.user.findUnique({
+			where: {
+                id: uid
+            },
+		})
+		if (!user)
+		{
+            throw new NotFoundException('User not found')
+        }
+		await this.prisma.user.update({
+			data: {
+				friendList :{
+					push: friend.id
+						}	
+					},
+			where: {
+				id: uid,
+			}
+		})
+		
+
+	}
+
+	async uploadFile(uid:number, file: Express.Multer.File)
+	{
+		console.log(file)
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        })
+		if (!user)
+		{
+            throw new NotFoundException('User not found')
+        }
+		await this.prisma.user.update({
+			where: {
+				id: uid,
+            },
+			data: {
+                avatar: file['path']
+            }
+		});
+		console.log(user)
+
+
 	}
 }
 

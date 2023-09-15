@@ -14,7 +14,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
+const multer_1 = require("multer");
 const user_service_1 = require("./user.service");
+const platform_express_1 = require("@nestjs/platform-express");
 let UserController = exports.UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -34,11 +36,20 @@ let UserController = exports.UserController = class UserController {
         return user;
     }
     updateUserStatus(uid, status) {
-        console.log(status);
         return this.userService.updateUserStatus(uid, status);
     }
     GetUserStatus(uid) {
         return this.userService.GetUserStatus(uid);
+    }
+    GetUserFriendlist(uid) {
+        return this.userService.GetUserFriendlist(uid);
+    }
+    AddFriend(uid, userName) {
+        return this.userService.AddFriend(uid, userName['userName']);
+    }
+    uploadFile(uid, file) {
+        console.log(file);
+        return this.userService.uploadFile(uid, file);
     }
 };
 __decorate([
@@ -58,6 +69,7 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':uid/status'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", void 0)
@@ -69,6 +81,37 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUserStatus", null);
+__decorate([
+    (0, common_1.Get)(':uid/friendlist'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "GetUserFriendlist", null);
+__decorate([
+    (0, common_1.Patch)(':uid/AddFriend'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "AddFriend", null);
+__decorate([
+    (0, common_1.Post)(':uid/upload'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+        storage: (0, multer_1.diskStorage)({
+            destination: 'public/img',
+            filename: (req, file, cb) => {
+                cb(null, file.originalname);
+            },
+        }),
+    })),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.UploadedFile)('file')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "uploadFile", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])

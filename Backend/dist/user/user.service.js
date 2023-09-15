@@ -15,29 +15,45 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const prisma_service_1 = require("../prisma/prisma.service");
 const common_1 = require("@nestjs/common");
+const common_2 = require("@nestjs/common");
 let UserService = exports.UserService = class UserService {
     constructor(prisma) {
         this.prisma = prisma;
     }
     async getUserFromId(id) {
-        return await this.prisma.user.findUnique({
+        const user = await this.prisma.user.findUnique({
             where: {
                 id: id
             },
         });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        return user;
     }
     async getUserFromLogin(login) {
-        return await this.prisma.user.findUnique({
+        const user = await this.prisma.user.findUnique({
             where: {
                 login: login
             },
         });
+        if (!user) {
+            throw new common_2.NotFoundException("User not found");
+        }
+        return user;
     }
     async updateUserStatus(id, status) {
-        console.log(status);
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            }
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
         await this.prisma.user.update({
             data: {
-                userStatus: "ONLINE",
+                userStatus: status['status'],
             },
             where: {
                 id: id,
@@ -50,13 +66,75 @@ let UserService = exports.UserService = class UserService {
                 id: id
             },
         });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
         return user.userStatus;
+    }
+    async GetUserFriendlist(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        return user.friendList;
+    }
+    async AddFriend(uid, userName) {
+        const friend = await this.prisma.user.findUnique({
+            where: {
+                login: userName
+            },
+        });
+        if (!friend) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        await this.prisma.user.update({
+            data: {
+                friendList: {
+                    push: friend.id
+                }
+            },
+            where: {
+                id: uid,
+            }
+        });
+    }
+    async uploadFile(uid, file) {
+        console.log(file);
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                avatar: file['path']
+            }
+        });
+        console.log(user);
     }
 };
 __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], UserService.prototype, "updateUserStatus", null);
 exports.UserService = UserService = __decorate([

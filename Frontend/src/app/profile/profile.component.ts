@@ -30,12 +30,11 @@ export class ProfileComponent {
 		this.route.queryParams.subscribe(params => {
 			this.id = params['id'];
 		})
-		console.log(this.id);
 		this.http.get<any>("http://localhost:3333/users/" + this.id).subscribe(
 			res => {
+				console.log(res);
 				this.name = res['login'];
 				this.avatar_url = "https://bellard.org/bpg/2.png"; //todo: ajouter l'avatar depuis dossier statique
-				console.log(res);
 			},
 			err => {
 				alert("user doesn't exist");

@@ -1,16 +1,18 @@
 <app-headerbar></app-headerbar>
-<app-friendlist></app-friendlist>
+<app-friendlist [id] = "id"></app-friendlist>
 <main class ="grid place-items-center h-screen w-full bg-gradient-to-r from-[#1187BF] to-[#2052F1] flex-row">
-	<app-profile-picture [id]="id"></app-profile-picture>
-	<div class="space-y-20">
-		<section class=" text-9xl h-28 font-fett flex tracking-wide text-gray-800">
+	<div class="">
+		<div class=" text-[150px] h-28 font-fett flex tracking-wide text-gray-800">
 			PONG
-		</section>
-		<section class="grid place-items-center">
+		</div>
+		<div class="my-auto">
+			<app-profile-picture [id]="id"></app-profile-picture>
+		</div>
+		<div class="grid place-items-center my-36">
 			<button class=" bg-blue-300 px-16 py-10  transition ease-in duration-200 uppercase rounded-full hover:bg-slate-600 hover:text-white border-2 border-slate-600 focus:outline-none">
 				Play
 			</button>	
-		</section>
+		</div>
 	</div>
 	<div></div>
 	<div></div>

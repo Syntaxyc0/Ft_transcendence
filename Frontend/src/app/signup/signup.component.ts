@@ -24,7 +24,7 @@ export class SignupComponent {
 },
 {validators: [CustomValidators.passwordMatching, CustomValidators.logintoolong]});
 
-	id:number = 0;
+	id:number = 1;
 	signup(): void{
 		console.log(
 			this.signupForm.controls.login.value,
@@ -34,17 +34,17 @@ export class SignupComponent {
 			this.http.post<any>('http://localhost:3333/auth/signup', {login: this.login.value, password:this.password.value, confirm_password:this.confirm_password.value}).subscribe(
 				res => {
 					this.id = res.id;
+					this.http.patch<any>('http://localhost:3333/users/' + this.id + '/status', {status: "ONLINE"}).subscribe()
 					localStorage.setItem('token', res.stringify);
 					localStorage.setItem('id', JSON.stringify(res['id']));
 					localStorage.setItem('login', this.login.value);
-					this.http.patch<any>('http://localhost:3333/users/' + this.id + '/status', {status: "ONLINE"})
 					this.router.navigate(['/home'])
 				},
 				err => {
 					alert("This login is already taken")
 				})
-	}
-
+			}
+			
 	get	login(): FormControl
 	{
 		return this.signupForm.get('login') as FormControl;

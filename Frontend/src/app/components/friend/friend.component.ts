@@ -25,7 +25,6 @@ export class FriendComponent {
 		res => {
 			this.name = res['login'];
 			this.avatar_url = res['avatar'];
-			console.log(res);
 		},
 		err => {
 			alert("user doesn't exist");

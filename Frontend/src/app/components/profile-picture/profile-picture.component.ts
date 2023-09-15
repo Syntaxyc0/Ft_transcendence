@@ -6,7 +6,7 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-profile-picture',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, ],
   templateUrl: './profile-picture.component.html',
   styleUrls: ['./profile-picture.component.scss']
 })
@@ -24,9 +24,9 @@ export class ProfilePictureComponent {
 	retrieveUser() {
 	 this.http.get<any>("http://localhost:3333/users/" + this.id).subscribe(
 		res => {
-			console.log(res)
 			this.name = res['login'];
-			this.avatar_url = res['avatar'];
+			this.avatar_url = "http://localhost:3333/" + res['avatar'];
+			console.log(this.avatar_url);
 		},
 		err => {
 			alert("user doesn't exist");
