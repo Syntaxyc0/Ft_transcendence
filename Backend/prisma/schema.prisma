@@ -20,7 +20,7 @@ model User {
   id Int @id @default(autoincrement())
   login String @unique
   hash String
-  avatar	String	@default("https://bellard.org/bpg/2.png")
+  avatar	String	@default("image.png")
   userStatus String	@default("OFFLINE")
   friendList Int[] @default([])
   FriendRequest	FriendRequest[]

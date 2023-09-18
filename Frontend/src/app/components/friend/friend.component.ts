@@ -15,7 +15,7 @@ export class FriendComponent {
 	@Input() id:number = 0
 
 	 name:string = 'undefined';
-	 avatar_url:string = '';
+	 avatar;
 
 	ngOnInit() {
         this.retrieveFriend();
@@ -24,11 +24,28 @@ export class FriendComponent {
 	 this.http.get<any>("http://localhost:3333/users/" + this.id).subscribe(
 		res => {
 			this.name = res['login'];
-			this.avatar_url = res['avatar'];
 		},
 		err => {
 			alert("user doesn't exist");
 		})
+		this.get_avatar().subscribe (data => {
+			this.createImageFromBlob(data)
+		})
+	}
+
+	createImageFromBlob(image: Blob) {
+		let reader = new FileReader();
+		reader.addEventListener("load", () => {
+			this.avatar = reader.result;
+		 }, false);
+
+		if (image) {
+		   reader.readAsDataURL(image);
+		}
+	 }
+
+	get_avatar() {
+		return this.http.get<Blob>("http://localhost:3333/users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
 	}
 
 

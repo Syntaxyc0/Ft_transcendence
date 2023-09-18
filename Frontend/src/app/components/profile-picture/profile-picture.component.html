@@ -1,5 +1,10 @@
 <div class="grid place-items-center">
-	<img class="mx-auto object-cover rounded-full h-20 w-20 " alt="avatar" src={{avatar_url}}/>
+	
+	<input
+  style="display: none"
+  type="file" (change)="onFileChanged($event)"
+  #fileInput>
+	<img (click)="fileInput.click()" class="mx-auto object-cover rounded-full h-20 w-20 hover:cursor-pointer" alt="avatar" src={{avatar}}/>
 	<section *ngIf="name" class="font-serif">
 		{{name}}
 	</section>

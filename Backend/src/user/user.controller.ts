@@ -1,11 +1,12 @@
-import { Controller, Get, Req, UseGuards, Request, Body, Post, Param, ParseIntPipe, NotFoundException, Patch, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, Request, Body, Post, Param, ParseIntPipe, NotFoundException, Patch, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
 import { getMetadataStorage } from 'class-validator';
 import { get } from 'http';
-import { Express } from 'express';
+import { Express, Response } from 'express';
 import { diskStorage } from 'multer'
 import { userInfo } from 'os';
+import path from 'path';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { UserService } from './user.service';
@@ -68,17 +69,31 @@ export class UserController {
 	@Post(':uid/upload')
 	@UseInterceptors(FileInterceptor('file', {
 		storage: diskStorage({
-			destination: 'public/img',
+			destination: './assets',
 			filename: (req, file, cb) => {
 			  cb(null, file.originalname);
 			},
 		  }),
 		}),
 	  )
-	uploadFile(@Param('uid', ParseIntPipe) uid: number, @UploadedFile('file') file: Express.Multer.File)
+	  
+	uploadFile(@Param('uid', ParseIntPipe) uid: number, @UploadedFile() file: Express.Multer.File)
 	{
 		console.log(file);
 		return this.userService.uploadFile(uid, file);
 	}
 
+	@Get('/:uid/avatar')
+	async getAvatar(@Param('uid', ParseIntPipe) uid: number, @Res() res: Response) {
+		try {
+			const user = await this.userService.getUserFromId(uid);
+			if (user.avatar) {
+				const fileName = user.avatar
+				const result = res.sendFile(fileName, { root: "./assets" });
+				return result
+			}
+		} catch {
+			throw new NotFoundException('Image not Found');
+		}
+	}
 }

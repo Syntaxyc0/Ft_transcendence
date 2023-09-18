@@ -51,6 +51,19 @@ let UserController = exports.UserController = class UserController {
         console.log(file);
         return this.userService.uploadFile(uid, file);
     }
+    async getAvatar(uid, res) {
+        try {
+            const user = await this.userService.getUserFromId(uid);
+            if (user.avatar) {
+                const fileName = user.avatar;
+                const result = res.sendFile(fileName, { root: "./assets" });
+                return result;
+            }
+        }
+        catch {
+            throw new common_1.NotFoundException('Image not Found');
+        }
+    }
 };
 __decorate([
     (0, common_1.Get)(':uid'),
@@ -100,18 +113,26 @@ __decorate([
     (0, common_1.Post)(':uid/upload'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
         storage: (0, multer_1.diskStorage)({
-            destination: 'public/img',
+            destination: './assets',
             filename: (req, file, cb) => {
                 cb(null, file.originalname);
             },
         }),
     })),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
-    __param(1, (0, common_1.UploadedFile)('file')),
+    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "uploadFile", null);
+__decorate([
+    (0, common_1.Get)('/:uid/avatar'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getAvatar", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])

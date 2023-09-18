@@ -1,4 +1,5 @@
 /// <reference types="multer" />
+import { Response } from 'express';
 import { UserService } from './user.service';
 export declare class UserController {
     private userService;
@@ -24,4 +25,5 @@ export declare class UserController {
     GetUserFriendlist(uid: number): Promise<number[]>;
     AddFriend(uid: number, userName: any): Promise<void>;
     uploadFile(uid: number, file: Express.Multer.File): Promise<void>;
+    getAvatar(uid: number, res: Response): Promise<void>;
 }

@@ -139,12 +139,10 @@ export class UserService
 				id: uid,
             },
 			data: {
-                avatar: file['path']
+                avatar: file['originalname']
             }
 		});
 		console.log(user)
-
-
 	}
 }
 
