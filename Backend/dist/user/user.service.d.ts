@@ -8,7 +8,9 @@ export declare class UserService {
         login: string;
         hash: string;
         avatar: string;
+        elo: number;
         userStatus: string;
+        gameHistory: number[];
         friendList: number[];
     }>;
     getUserFromLogin(login: string): Promise<{
@@ -16,7 +18,9 @@ export declare class UserService {
         login: string;
         hash: string;
         avatar: string;
+        elo: number;
         userStatus: string;
+        gameHistory: number[];
         friendList: number[];
     }>;
     updateUserStatus(id: number, status: any): Promise<void>;
@@ -24,4 +28,7 @@ export declare class UserService {
     GetUserFriendlist(uid: number): Promise<number[]>;
     AddFriend(uid: number, userName: string): Promise<void>;
     uploadFile(uid: number, file: Express.Multer.File): Promise<void>;
+    getelo(uid: number): Promise<number>;
+    updateUserElo(uid: number, elo: number): Promise<void>;
+    getlogin(uid: number): Promise<string>;
 }

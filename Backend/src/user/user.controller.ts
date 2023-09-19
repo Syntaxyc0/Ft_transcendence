@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res, UseGuards, Request, Body, Post, Param, ParseIntPipe, NotFoundException, Patch, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, Request, Body, Post, Param, ParseIntPipe, NotFoundException, Patch, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
 import { getMetadataStorage } from 'class-validator';
@@ -60,11 +60,31 @@ export class UserController {
 		return this.userService.GetUserFriendlist(uid);
 	}
 
+	@Get(":uid/login")
+	getUserLogin(@Param('uid', ParseIntPipe) uid: number)
+	{
+		return this.userService.getlogin(uid) 
+	}
+	
+	@Get(":uid/elo")
+	getUserElo(@Param('uid', ParseIntPipe) uid: number)
+	{
+		return this.userService.getelo(uid) 
+	}
+
+	@Patch(':uid/elo')
+	updateUserElo(@Param('uid', ParseIntPipe) uid: number, @Body() elo: number)
+	{
+		return this.userService.updateUserElo(uid, elo);
+	}
+
 	@Patch(':uid/AddFriend')
     AddFriend(@Param('uid', ParseIntPipe) uid:number, @Body() userName)
 	{
 		return this.userService.AddFriend(uid, userName['userName']);
 	}
+
+	
 
 	@Post(':uid/upload')
 	@UseInterceptors(FileInterceptor('file', {
@@ -74,9 +94,9 @@ export class UserController {
 			  cb(null, file.originalname);
 			},
 		  }),
+		  fileFilter: imageFileFilter,
 		}),
 	  )
-	  
 	uploadFile(@Param('uid', ParseIntPipe) uid: number, @UploadedFile() file: Express.Multer.File)
 	{
 		console.log(file);
@@ -92,8 +112,20 @@ export class UserController {
 				const result = res.sendFile(fileName, { root: "./assets" });
 				return result
 			}
+			else if (user.avatar === "")
+			{
+				const result = res.sendFile("homer.png", { root: "../public" });
+				return result
+			}
 		} catch {
 			throw new NotFoundException('Image not Found');
 		}
 	}
 }
+
+export const imageFileFilter = (req, file, callback) => {
+	if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+		return callback(new Error('Only image files are allowed!'), false);
+	}
+	callback(null, true);
+  };

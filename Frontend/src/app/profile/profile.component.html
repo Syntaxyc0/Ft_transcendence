@@ -1,7 +1,10 @@
 
-<main class ="h-screen bg-gradient-to-r from-cyan-600 to-blue-600n" >
+<div class =" bg-gradient-to-r from-cyan-600 to-blue-600 h-full overflow-auto" >
 	<app-headerbar></app-headerbar>
-	<div class="my-8">
-		<app-profile-picture [id]="id"></app-profile-picture>
+	<div class="my-8 grid place-items-center">
+		<app-picture [id]="id"></app-picture>
 	</div>
-</main>
+	<div>
+		<app-gamehistory [id]="id"></app-gamehistory>
+	</div>
+</div>

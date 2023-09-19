@@ -130,6 +130,46 @@ let UserService = exports.UserService = class UserService {
         });
         console.log(user);
     }
+    async getelo(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        return user.elo;
+    }
+    async updateUserElo(uid, elo) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                elo: elo
+            }
+        });
+    }
+    async getlogin(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        return user.login;
+    }
 };
 __decorate([
     __param(1, (0, common_1.Body)()),
