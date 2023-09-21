@@ -2,8 +2,12 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [{
 	path:	'',
-    redirectTo:    '/signup',
+    redirectTo:    '/landing',
     pathMatch:    'full'
+},
+{
+	path:	'landing',
+	loadComponent:    () => import('./landing-page/landing-page.component').then(m => m.LandingPageComponent),
 },
 {
 	path:	'signup',
