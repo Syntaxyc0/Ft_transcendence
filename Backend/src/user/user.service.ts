@@ -108,6 +108,10 @@ export class UserService
 		{
             throw new NotFoundException('User not found')
         }
+		if (user.login === friend.login)
+		{
+			throw new NotFoundException('You cannot add yourself to your friend list')
+		}
 		await this.prisma.user.update({
 			data: {
 				friendList :{

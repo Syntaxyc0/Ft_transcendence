@@ -22,7 +22,7 @@ export class CustomValidators
 		const login = control.get('login')?.value;
 		if (login)
 		{
-			if (login.length < 15)
+			if (login.length < 10)
 			{
 				return null;
 			}

@@ -33,7 +33,7 @@ export class AddFriendComponent {
 				window.location.reload()
 			},
             err => {
-				alert("user not found")
+				alert(err.error.message);
 			}
 			);
 		this.AddFriendForm.reset();
