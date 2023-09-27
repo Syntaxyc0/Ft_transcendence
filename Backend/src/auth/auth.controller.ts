@@ -1,17 +1,18 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Options, Param, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { signinDto, signupDto } from "./dto";
 import { dot } from "node:test/reporters";
 import { HttpService } from "@nestjs/axios";
-import { FortyTwoAuthGuard } from "./guard/42.guard";
 import { map } from "rxjs";
 import { Response } from "express";
+
 
 @Controller('auth')
 export class AuthController
 {
     constructor(private authService: AuthService, private http: HttpService) {}
 
+	token: string
     @Post('signup')
     signup(@Body() dto: signupDto) {
         return this.authService.signup(dto);
@@ -25,23 +26,34 @@ export class AuthController
     }
 
 	@Get('42auth')
-	@UseGuards(FortyTwoAuthGuard)
 	get42auth(@Res() res: Response)
 	{
 		const clientID = process.env.FOURTYTWO_CLIENT_ID;
 		const clientSecret = process.env.FOURTYTWO_CLIENT_SECRET;
 		const callbackURL = process.env.FOURTYTWO_CALLBACK_URL;
-		res.redirect("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-000e4b8f9307f65844fe94cf2de9ad19e124143666cadeb78d8a1b7755a42b3f&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fhome&response_type=code")
 	}
 	
 	@Get('42redirect')
-	@UseGuards(FortyTwoAuthGuard)
-	get42redirect(@Res() res: Response) {
+	async get42redirect(@Res({passthrough: true}) res: Response, @Req() request)  {
 
-		res.redirect(process.env.FOURTYTWO_CALLBACK_URL)
-		return 
+		const payload = {
+			grant_type: 'authorization_code',
+			client_id: process.env.FOURTYTWO_CLIENT_ID,
+			client_secret: process.env.FOURTYTWO_CLIENT_SECRET,
+			code: res.req.query.code,
+			redirect_uri: "http://localhost:3333/auth/42redirect"
+
+		}
+		this.http.post("https://api.intra.42.fr/oauth/token", payload).subscribe(
+			ret => {
+				this.token = ret.data.access_token;
+			},
+			err => console.log(err)
+		)
+		res.cookie('access_token', this.token )
+		res.redirect("http://localhost:4200/home")
+		return 	
+
+		
 	}
-
-
-
 }

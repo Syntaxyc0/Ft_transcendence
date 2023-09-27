@@ -17,7 +17,6 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const dto_1 = require("./dto");
 const axios_1 = require("@nestjs/axios");
-const _42_guard_1 = require("./guard/42.guard");
 let AuthController = exports.AuthController = class AuthController {
     constructor(authService, http) {
         this.authService = authService;
@@ -33,10 +32,20 @@ let AuthController = exports.AuthController = class AuthController {
         const clientID = process.env.FOURTYTWO_CLIENT_ID;
         const clientSecret = process.env.FOURTYTWO_CLIENT_SECRET;
         const callbackURL = process.env.FOURTYTWO_CALLBACK_URL;
-        res.redirect("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-000e4b8f9307f65844fe94cf2de9ad19e124143666cadeb78d8a1b7755a42b3f&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fhome&response_type=code");
     }
-    get42redirect(res) {
-        res.redirect(process.env.FOURTYTWO_CALLBACK_URL);
+    async get42redirect(res, request) {
+        const payload = {
+            grant_type: 'authorization_code',
+            client_id: process.env.FOURTYTWO_CLIENT_ID,
+            client_secret: process.env.FOURTYTWO_CLIENT_SECRET,
+            code: res.req.query.code,
+            redirect_uri: "http://localhost:3333/auth/42redirect"
+        };
+        this.http.post("https://api.intra.42.fr/oauth/token", payload).subscribe(ret => {
+            this.token = ret.data.access_token;
+        }, err => console.log(err));
+        res.cookie('access_token', this.token);
+        res.redirect("http://localhost:4200/home");
         return;
     }
 };
@@ -57,7 +66,6 @@ __decorate([
 ], AuthController.prototype, "signin", null);
 __decorate([
     (0, common_1.Get)('42auth'),
-    (0, common_1.UseGuards)(_42_guard_1.FortyTwoAuthGuard),
     __param(0, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -65,11 +73,11 @@ __decorate([
 ], AuthController.prototype, "get42auth", null);
 __decorate([
     (0, common_1.Get)('42redirect'),
-    (0, common_1.UseGuards)(_42_guard_1.FortyTwoAuthGuard),
-    __param(0, (0, common_1.Res)()),
+    __param(0, (0, common_1.Res)({ passthrough: true })),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "get42redirect", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
