@@ -30,25 +30,25 @@ let AuthController = exports.AuthController = class AuthController {
     signin(dto) {
         return this.authService.signin(dto);
     }
-    get42auth(res) {
-        const clientID = process.env.FOURTYTWO_CLIENT_ID;
-        const clientSecret = process.env.FOURTYTWO_CLIENT_SECRET;
-        const callbackURL = process.env.FOURTYTWO_CALLBACK_URL;
-    }
-    async get42redirect(request) {
-        console.log(request.body);
+    async get42redirect(request, res) {
         const formData = new FormData();
         formData.append('grant_type', 'authorization_code');
         formData.append('client_id', process.env.FOURTYTWO_CLIENT_ID);
         formData.append('client_secret', process.env.FOURTYTWO_CLIENT_SECRET);
         formData.append('redirect_uri', process.env.FOURTYTWO_CALLBACK_URL);
-        formData.append('code', 'fa60d58d6f8c5b42cb6e3350d4a775c51752c7062d05fed80f06c0cce410ae2a');
+        formData.append('code', request.body.code);
         const response = await (0, node_fetch_1.default)('https://api.intra.42.fr/oauth/token', {
             method: 'POST',
-            body: JSON.stringify(formData)
+            body: formData
         });
         const tokens = await response.json();
-        console.log(tokens);
+        const headers = { Authorization: 'Bearer ' + tokens.access_token };
+        const resp2 = await (0, node_fetch_1.default)('https://api.intra.42.fr/v2/me', { headers });
+        if (!resp2.ok)
+            throw new Error('user not found');
+        const data = await resp2.json();
+        console.log(data.login);
+        console.log(data.email);
         return;
     }
 };
@@ -68,17 +68,11 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "signin", null);
 __decorate([
-    (0, common_1.Get)('42auth'),
-    __param(0, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "get42auth", null);
-__decorate([
     (0, common_1.Post)('42redirect'),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "get42redirect", null);
 exports.AuthController = AuthController = __decorate([

@@ -26,25 +26,17 @@ export class AuthController
     {
         return this.authService.signin(dto) ;
     }
-
-	@Get('42auth')
-	get42auth(@Res() res: Response)
-	{
-		const clientID = process.env.FOURTYTWO_CLIENT_ID;
-		const clientSecret = process.env.FOURTYTWO_CLIENT_SECRET;
-		const callbackURL = process.env.FOURTYTWO_CALLBACK_URL;
-	}
 	
-	@Post('42redirect')
-	async get42redirect(@Req() request)  {
 
-		console.log(request.body)
+	@Post('42redirect')
+	async get42redirect(@Req() request, @Res() res)  {
+
 		const formData = new FormData();
 		formData.append('grant_type', 'authorization_code');
 		formData.append('client_id', process.env.FOURTYTWO_CLIENT_ID);
 		formData.append('client_secret', process.env.FOURTYTWO_CLIENT_SECRET);
 		formData.append('redirect_uri', process.env.FOURTYTWO_CALLBACK_URL);
-		formData.append('code', 'fa60d58d6f8c5b42cb6e3350d4a775c51752c7062d05fed80f06c0cce410ae2a' );
+		formData.append('code', request.body.code );
 		// const payload = {
 		// 	grant_type: 'authorization_code',
 		// 	client_id: process.env.FOURTYTWO_CLIENT_ID,
@@ -55,13 +47,21 @@ export class AuthController
 		// }
 		const response = await fetch('https://api.intra.42.fr/oauth/token', {
 			method: 'POST',
-			body: JSON.stringify(formData)
+			body: formData
 		})
 
 		const tokens = await response.json();
-		console.log(tokens);
+		const headers = {Authorization: 'Bearer ' + tokens.access_token}
+
+		const resp2 = await fetch('https://api.intra.42.fr/v2/me', {headers})
+		if (!resp2.ok)
+			throw new Error('user not found')
+		const data = await resp2.json();
+		console.log(data.login)
+		console.log(data.email)
+		// console.log(tokens);
 		// res.cookie('access_token', this.token )
-		// res.redirect("http://localhost:4200/home")
+		// res.send(tokens)
 		return 	
 
 		

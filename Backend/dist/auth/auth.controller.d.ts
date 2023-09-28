@@ -1,7 +1,6 @@
 import { AuthService } from "./auth.service";
 import { signinDto, signupDto } from "./dto";
 import { HttpService } from "@nestjs/axios";
-import { Response } from "express";
 export declare class AuthController {
     private authService;
     private http;
@@ -15,6 +14,5 @@ export declare class AuthController {
         access_token: string;
         id: number;
     }>;
-    get42auth(res: Response): void;
-    get42redirect(request: any): Promise<void>;
+    get42redirect(request: any, res: any): Promise<void>;
 }

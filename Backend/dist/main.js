@@ -9,7 +9,7 @@ async function bootstrap() {
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true
     }));
-    app.enableCors({ origin: "http://localhost:4200	" });
+    app.enableCors({ origin: "*" });
     app.use(cookieParser());
     await app.listen(3333);
 }

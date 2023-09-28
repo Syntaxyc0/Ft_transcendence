@@ -6,6 +6,7 @@ export declare class UserController {
     constructor(userService: UserService);
     getUserFromId(uid: number): Promise<{
         id: number;
+        email: string;
         login: string;
         hash: string;
         avatar: string;
@@ -16,6 +17,7 @@ export declare class UserController {
     }>;
     getUserFromLogin(login: string): Promise<{
         id: number;
+        email: string;
         login: string;
         hash: string;
         avatar: string;

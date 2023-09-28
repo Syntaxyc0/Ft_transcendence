@@ -18,6 +18,7 @@ import { Observable } from 'rxjs';
 export class SignupComponent {
 	constructor(public http: HttpClient, private router: Router) {}
 	public signupForm = new FormGroup({
+	mail: new FormControl(null, [Validators.required]),
     login: new FormControl(null, [Validators.required]),
     password: new FormControl(null, [Validators.required]),
     confirmpassword: new FormControl(null,[Validators.required]),
@@ -27,11 +28,12 @@ export class SignupComponent {
 	id:number = 1;
 	signup(): void{
 		console.log(
+			this.signupForm.controls.mail.value,
 			this.signupForm.controls.login.value,
 			this.signupForm.controls.password.value,
 			this.signupForm.controls.confirmpassword.value,
 			);
-			this.http.post<any>('http://localhost:3333/auth/signup', {login: this.login.value, password:this.password.value, confirm_password:this.confirm_password.value}).subscribe(
+			this.http.post<any>('http://localhost:3333/auth/signup', {email: this.mail.value, login: this.login.value, password:this.password.value, confirm_password:this.confirm_password.value}).subscribe(
 				res => {
 					this.id = res.id;
 					this.http.patch<any>('http://localhost:3333/users/' + this.id + '/status', {status: "ONLINE"}).subscribe()
@@ -41,10 +43,15 @@ export class SignupComponent {
 					this.router.navigate(['/home'])
 				},
 				err => {
-					alert("This login is already taken")
+					console.log(err)
 				})
 			}
 			
+	get	mail(): FormControl
+	{
+		return this.signupForm.get('mail') as FormControl;
+	}
+
 	get	login(): FormControl
 	{
 		return this.signupForm.get('login') as FormControl;

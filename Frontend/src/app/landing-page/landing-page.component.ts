@@ -24,12 +24,13 @@ export class LandingPageComponent {
 	async onClick() {
 		try {
 			console.log(this.code)
-			const response = await fetch("http://localhost:3333/auth/42redirect", 
-			{
-					method: 'POST',
-					body: "85877ffbf4c73d777c7a771ef3e3c0fa960158674ff24373772e6adb1a6b2945"
-				});
-			}
+			this.http.post("http://localhost:3333/auth/42redirect", {code: this.code}).subscribe(
+				response => {
+					
+				},
+				error => {console.log(error)}
+			)
+		}
 		catch (err) {
 			console.log(err)
 		}
