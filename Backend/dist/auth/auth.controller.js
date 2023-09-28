@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const dto_1 = require("./dto");
 const axios_1 = require("@nestjs/axios");
+const node_fetch_1 = require("node-fetch");
+const FormData = require("form-data");
 let AuthController = exports.AuthController = class AuthController {
     constructor(authService, http) {
         this.authService = authService;
@@ -33,19 +35,20 @@ let AuthController = exports.AuthController = class AuthController {
         const clientSecret = process.env.FOURTYTWO_CLIENT_SECRET;
         const callbackURL = process.env.FOURTYTWO_CALLBACK_URL;
     }
-    async get42redirect(res, request) {
-        const payload = {
-            grant_type: 'authorization_code',
-            client_id: process.env.FOURTYTWO_CLIENT_ID,
-            client_secret: process.env.FOURTYTWO_CLIENT_SECRET,
-            code: res.req.query.code,
-            redirect_uri: "http://localhost:3333/auth/42redirect"
-        };
-        this.http.post("https://api.intra.42.fr/oauth/token", payload).subscribe(ret => {
-            this.token = ret.data.access_token;
-        }, err => console.log(err));
-        res.cookie('access_token', this.token);
-        res.redirect("http://localhost:4200/home");
+    async get42redirect(request) {
+        console.log(request.body);
+        const formData = new FormData();
+        formData.append('grant_type', 'authorization_code');
+        formData.append('client_id', process.env.FOURTYTWO_CLIENT_ID);
+        formData.append('client_secret', process.env.FOURTYTWO_CLIENT_SECRET);
+        formData.append('redirect_uri', process.env.FOURTYTWO_CALLBACK_URL);
+        formData.append('code', 'fa60d58d6f8c5b42cb6e3350d4a775c51752c7062d05fed80f06c0cce410ae2a');
+        const response = await (0, node_fetch_1.default)('https://api.intra.42.fr/oauth/token', {
+            method: 'POST',
+            body: JSON.stringify(formData)
+        });
+        const tokens = await response.json();
+        console.log(tokens);
         return;
     }
 };
@@ -72,11 +75,10 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "get42auth", null);
 __decorate([
-    (0, common_1.Get)('42redirect'),
-    __param(0, (0, common_1.Res)({ passthrough: true })),
-    __param(1, (0, common_1.Req)()),
+    (0, common_1.Post)('42redirect'),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "get42redirect", null);
 exports.AuthController = AuthController = __decorate([

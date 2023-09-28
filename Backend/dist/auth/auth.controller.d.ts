@@ -16,5 +16,5 @@ export declare class AuthController {
         id: number;
     }>;
     get42auth(res: Response): void;
-    get42redirect(res: Response, request: any): Promise<void>;
+    get42redirect(request: any): Promise<void>;
 }

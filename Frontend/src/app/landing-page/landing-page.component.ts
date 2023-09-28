@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 
 @Component({
@@ -12,15 +12,27 @@ import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http'
 })
 export class LandingPageComponent {
 
-	constructor(public http: HttpClient) {}
-	onClick(): void {
-		this.http.get("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-000e4b8f9307f65844fe94cf2de9ad19e124143666cadeb78d8a1b7755a42b3f&redirect_uri=http%3A%2F%2Flocalhost%3A3333%2Fauth%2F42redirect&response_type=code").subscribe(
-			data => {
-				console.log(data)
-			},
-			err => console.error(err),
-		)
-		
+	constructor(public http: HttpClient, private route: ActivatedRoute) {}
+	code: any
+	ngOnInit()
+	{
+		this.route.queryParams.subscribe(params => {
+			this.code = params['code'];
+		})
+		console.log(this.code)
+	}
+	async onClick() {
+		try {
+			console.log(this.code)
+			const response = await fetch("http://localhost:3333/auth/42redirect", 
+			{
+					method: 'POST',
+					body: "85877ffbf4c73d777c7a771ef3e3c0fa960158674ff24373772e6adb1a6b2945"
+				});
+			}
+		catch (err) {
+			console.log(err)
+		}
 	}
 
 	name: string = "test"

@@ -5,7 +5,9 @@ import { dot } from "node:test/reporters";
 import { HttpService } from "@nestjs/axios";
 import { map } from "rxjs";
 import { Response } from "express";
+import fetch from 'node-fetch';
 
+import FormData = require('form-data');
 
 @Controller('auth')
 export class AuthController
@@ -33,25 +35,33 @@ export class AuthController
 		const callbackURL = process.env.FOURTYTWO_CALLBACK_URL;
 	}
 	
-	@Get('42redirect')
-	async get42redirect(@Res({passthrough: true}) res: Response, @Req() request)  {
+	@Post('42redirect')
+	async get42redirect(@Req() request)  {
 
-		const payload = {
-			grant_type: 'authorization_code',
-			client_id: process.env.FOURTYTWO_CLIENT_ID,
-			client_secret: process.env.FOURTYTWO_CLIENT_SECRET,
-			code: res.req.query.code,
-			redirect_uri: "http://localhost:3333/auth/42redirect"
+		console.log(request.body)
+		const formData = new FormData();
+		formData.append('grant_type', 'authorization_code');
+		formData.append('client_id', process.env.FOURTYTWO_CLIENT_ID);
+		formData.append('client_secret', process.env.FOURTYTWO_CLIENT_SECRET);
+		formData.append('redirect_uri', process.env.FOURTYTWO_CALLBACK_URL);
+		formData.append('code', 'fa60d58d6f8c5b42cb6e3350d4a775c51752c7062d05fed80f06c0cce410ae2a' );
+		// const payload = {
+		// 	grant_type: 'authorization_code',
+		// 	client_id: process.env.FOURTYTWO_CLIENT_ID,
+		// 	client_secret: process.env.FOURTYTWO_CLIENT_SECRET,
+		// 	code: res.req.query.code,
+		// 	redirect_uri: "http://localhost:3333/auth/42redirect"
 
-		}
-		this.http.post("https://api.intra.42.fr/oauth/token", payload).subscribe(
-			ret => {
-				this.token = ret.data.access_token;
-			},
-			err => console.log(err)
-		)
-		res.cookie('access_token', this.token )
-		res.redirect("http://localhost:4200/home")
+		// }
+		const response = await fetch('https://api.intra.42.fr/oauth/token', {
+			method: 'POST',
+			body: JSON.stringify(formData)
+		})
+
+		const tokens = await response.json();
+		console.log(tokens);
+		// res.cookie('access_token', this.token )
+		// res.redirect("http://localhost:4200/home")
 		return 	
 
 		
