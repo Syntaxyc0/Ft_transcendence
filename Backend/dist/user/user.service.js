@@ -99,8 +99,9 @@ let UserService = exports.UserService = class UserService {
         if (!user) {
             throw new common_2.NotFoundException('User not found');
         }
-        if (user.login === userName)
-            return;
+        if (user.login === friend.login) {
+            throw new common_2.NotFoundException('You cannot add yourself to your friend list');
+        }
         await this.prisma.user.update({
             data: {
                 friendList: {

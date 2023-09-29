@@ -5,6 +5,7 @@ export declare class UserService {
     constructor(prisma: PrismaService);
     getUserFromId(id: number): Promise<{
         id: number;
+        email: string;
         login: string;
         hash: string;
         avatar: string;
@@ -15,6 +16,7 @@ export declare class UserService {
     }>;
     getUserFromLogin(login: string): Promise<{
         id: number;
+        email: string;
         login: string;
         hash: string;
         avatar: string;

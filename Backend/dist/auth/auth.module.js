@@ -13,11 +13,12 @@ const auth_service_1 = require("./auth.service");
 const prisma_module_1 = require("../prisma/prisma.module");
 const jwt_1 = require("@nestjs/jwt");
 const strategy_1 = require("./strategy");
+const axios_1 = require("@nestjs/axios");
 let AuthModule = exports.AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, jwt_1.JwtModule.register({})],
+        imports: [prisma_module_1.PrismaModule, jwt_1.JwtModule, axios_1.HttpModule],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService, strategy_1.JwtStrategy],
     })

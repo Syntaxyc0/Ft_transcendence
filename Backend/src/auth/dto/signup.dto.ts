@@ -6,6 +6,10 @@ import { Match } from "../decorator"
 
 export class signupDto
 {
+	@IsEmail()
+    @IsNotEmpty()
+	email: string
+
     @IsString()
     @IsNotEmpty()
     login: string

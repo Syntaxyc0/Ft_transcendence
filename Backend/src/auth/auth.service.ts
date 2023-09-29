@@ -36,6 +36,7 @@ export class AuthService
         {
             const user = await this.prisma.user.create({
                 data: {
+					email: dto.email,
                     login: dto.login,
                     hash,
                 },
@@ -64,7 +65,7 @@ export class AuthService
         };
         const secret = this.config.get("JWT_SECRET");
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '15m',
+            expiresIn: '60m',
             secret: secret
         },);
         return { access_token: token, id: userId };
