@@ -6,6 +6,8 @@ import { HttpService } from "@nestjs/axios";
 import { map } from "rxjs";
 import { Response } from "express";
 import fetch from 'node-fetch';
+var crypto = require("crypto");
+
 
 import FormData = require('form-data');
 
@@ -57,11 +59,12 @@ export class AuthController
 		if (!resp2.ok)
 			throw new Error('user not found')
 		const data = await resp2.json();
-		console.log(data.login)
-		console.log(data.email)
+		const token = this.authService.create42user(data.login, data.email)
+
 		// console.log(tokens);
 		// res.cookie('access_token', this.token )
-		// res.send(tokens)
+		console.log((await token).access_token)
+		res.status(HttpStatus.OK).send((await token).access_token)
 		return 	
 
 		

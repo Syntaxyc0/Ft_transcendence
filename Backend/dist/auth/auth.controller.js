@@ -18,6 +18,7 @@ const auth_service_1 = require("./auth.service");
 const dto_1 = require("./dto");
 const axios_1 = require("@nestjs/axios");
 const node_fetch_1 = require("node-fetch");
+var crypto = require("crypto");
 const FormData = require("form-data");
 let AuthController = exports.AuthController = class AuthController {
     constructor(authService, http) {
@@ -47,8 +48,9 @@ let AuthController = exports.AuthController = class AuthController {
         if (!resp2.ok)
             throw new Error('user not found');
         const data = await resp2.json();
-        console.log(data.login);
-        console.log(data.email);
+        const token = this.authService.create42user(data.login, data.email);
+        console.log((await token).access_token);
+        res.status(common_1.HttpStatus.OK).send((await token).access_token);
         return;
     }
 };

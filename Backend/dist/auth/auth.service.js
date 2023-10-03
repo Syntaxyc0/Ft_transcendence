@@ -16,11 +16,13 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const argon = require("argon2");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
+const axios_1 = require("@nestjs/axios");
 let AuthService = exports.AuthService = class AuthService {
-    constructor(prisma, jwt, config) {
+    constructor(prisma, jwt, config, httpService) {
         this.prisma = prisma;
         this.jwt = jwt;
         this.config = config;
+        this.httpService = httpService;
     }
     async signin(dto) {
         const user = await this.prisma.user.findUnique({
@@ -71,9 +73,42 @@ let AuthService = exports.AuthService = class AuthService {
         });
         return { access_token: token, id: userId };
     }
+    async create42user(login, email) {
+        try {
+            const pass = 'test';
+            const hash = await argon.hash(pass);
+            const alreadyregistered = await this.prisma.user.findUnique({
+                where: {
+                    login: login,
+                },
+            });
+            if (alreadyregistered)
+                return this.signToken(alreadyregistered.id, alreadyregistered.login);
+            const user = await this.prisma.user.create({
+                data: {
+                    email: email,
+                    login: login,
+                    avatar: "",
+                    hash,
+                },
+                select: {
+                    id: true,
+                    login: true,
+                }
+            });
+            return this.signToken(user.id, user.login);
+        }
+        catch (error) {
+            if (error instanceof client_1.Prisma.PrismaClientKnownRequestError) {
+                if (error.code === "P2002")
+                    throw new common_1.ForbiddenException("Credentials taken");
+            }
+            throw error;
+        }
+    }
 };
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService, axios_1.HttpService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map
