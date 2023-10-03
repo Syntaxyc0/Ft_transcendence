@@ -11,11 +11,11 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'Frontend';
+  title = 'Pong';
 
   getLogin()
   {
-	localStorage.getItem('login');
+	  localStorage.getItem('login');
   }
 
 }

@@ -1,5 +1,5 @@
 import { PrismaService } from "src/prisma/prisma.service";
-import { Body, Injectable } from "@nestjs/common";
+import { BadRequestException, Body, Injectable } from "@nestjs/common";
 import { NotFoundException } from "@nestjs/common";
 import { stat } from "fs";
 

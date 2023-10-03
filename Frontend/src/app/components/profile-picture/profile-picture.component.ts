@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
@@ -13,7 +13,7 @@ import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http'
 })
 export class ProfilePictureComponent {
 
-	constructor(public http: HttpClient) {}
+	constructor(public http: HttpClient, private location: Location) {}
 
 	@Input() id:number = 0;
 	name:string = '';
@@ -29,6 +29,7 @@ export class ProfilePictureComponent {
 		},
 		err => {
 			alert("user doesn't exist");
+			this.location.back()
 		})
 		this.get_avatar().subscribe (data => {
 			this.createImageFromBlob(data)
