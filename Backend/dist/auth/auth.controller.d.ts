@@ -14,5 +14,6 @@ export declare class AuthController {
         access_token: string;
         id: number;
     }>;
+    check_token(req: any, res: any): boolean;
     get42redirect(request: any, res: any): Promise<void>;
 }

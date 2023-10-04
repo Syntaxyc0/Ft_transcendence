@@ -27,17 +27,17 @@ export class SignupComponent {
 
 	id:number = 1;
 	signup(): void{
-		console.log(
-			this.signupForm.controls.mail.value,
-			this.signupForm.controls.login.value,
-			this.signupForm.controls.password.value,
-			this.signupForm.controls.confirmpassword.value,
-			);
+		// console.log(
+		// 	this.signupForm.controls.mail.value,
+		// 	this.signupForm.controls.login.value,
+		// 	this.signupForm.controls.password.value,
+		// 	this.signupForm.controls.confirmpassword.value,
+		// 	);
 			this.http.post<any>('http://localhost:3333/auth/signup', {email: this.mail.value, login: this.login.value, password:this.password.value, confirm_password:this.confirm_password.value}).subscribe(
 				res => {
 					this.id = res.id;
 					this.http.patch<any>('http://localhost:3333/users/' + this.id + '/status', {status: "ONLINE"}).subscribe()
-					localStorage.setItem('token', res.stringify);
+					localStorage.setItem('access_token', res["access_token"]);
 					localStorage.setItem('id', JSON.stringify(res['id']));
 					localStorage.setItem('login', this.login.value);
 					this.router.navigate(['/home'])

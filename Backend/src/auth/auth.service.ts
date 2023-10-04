@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable, Req, Res } from "@nestjs/common";
 import { Prisma, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { signinDto, signupDto } from "./dto";
@@ -7,6 +7,8 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
+import { Response, Request } from "express";
+
 
 @Injectable()
 export class AuthService
@@ -74,7 +76,7 @@ export class AuthService
 
     async create42user(login: string, email: string) {
     try {
-        const pass = 'test'
+        const pass = this.generateRandomPassword()
         const hash = await argon.hash(pass);
         const alreadyregistered = await this.prisma.user.findUnique({
             where: {
@@ -107,4 +109,26 @@ export class AuthService
         throw error 
       }	
     }
+
+	generateRandomPassword ()
+	{
+		const password = Math.random().toString(36);
+		return password;
+	}
+
+	check_token(req: Request, res: Response): boolean {
+		const token: string = req['access_token'];
+		if (!token)
+			return false;
+		try {
+		  const payload = this.jwt.verify(token);
+		  if (!payload)
+		  	return false;
+		  if (!payload.isLogged)
+		  	return false;
+		} catch (e) {
+			console.log("token expired")
+		}
+		return true;
+	  }
 }

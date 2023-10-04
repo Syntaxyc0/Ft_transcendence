@@ -69,7 +69,7 @@ let UserController = exports.UserController = class UserController {
                 return result;
             }
             else if (user.avatar === "") {
-                const result = res.sendFile("homer.png", { root: "../public" });
+                const result = res.sendFile("stitch.png", { root: "../public" });
                 return result;
             }
         }

@@ -75,7 +75,7 @@ let AuthService = exports.AuthService = class AuthService {
     }
     async create42user(login, email) {
         try {
-            const pass = 'test';
+            const pass = this.generateRandomPassword();
             const hash = await argon.hash(pass);
             const alreadyregistered = await this.prisma.user.findUnique({
                 where: {
@@ -105,6 +105,26 @@ let AuthService = exports.AuthService = class AuthService {
             }
             throw error;
         }
+    }
+    generateRandomPassword() {
+        const password = Math.random().toString(36);
+        return password;
+    }
+    check_token(req, res) {
+        const token = req['access_token'];
+        if (!token)
+            return false;
+        try {
+            const payload = this.jwt.verify(token);
+            if (!payload)
+                return false;
+            if (!payload.isLogged)
+                return false;
+        }
+        catch (e) {
+            console.log("token expired");
+        }
+        return true;
     }
 };
 exports.AuthService = AuthService = __decorate([

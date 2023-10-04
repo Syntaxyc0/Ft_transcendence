@@ -31,6 +31,10 @@ let AuthController = exports.AuthController = class AuthController {
     signin(dto) {
         return this.authService.signin(dto);
     }
+    check_token(req, res) {
+        console.log(req.params);
+        return this.authService.check_token(req, res);
+    }
     async get42redirect(request, res) {
         const formData = new FormData();
         formData.append('grant_type', 'authorization_code');
@@ -69,6 +73,14 @@ __decorate([
     __metadata("design:paramtypes", [dto_1.signinDto]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "signin", null);
+__decorate([
+    (0, common_1.Get)('check'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "check_token", null);
 __decorate([
     (0, common_1.Post)('42redirect'),
     __param(0, (0, common_1.Req)()),

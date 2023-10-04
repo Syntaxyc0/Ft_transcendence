@@ -28,7 +28,13 @@ export class AuthController
     {
         return this.authService.signin(dto) ;
     }
-	
+
+	@Get('check')
+	check_token(@Req() req, @Res({ passthrough: true }) res)
+	{
+		console.log(req.params)
+		return this.authService.check_token(req, res)
+	}
 
 	@Post('42redirect')
 	async get42redirect(@Req() request, @Res() res)  {
