@@ -20,11 +20,10 @@ export class RedirectComponent {
 			this.code = params['code'];
 		})
     try {
-			console.log(this.code)
-			this.http.post("http://localhost:3333/auth/42redirect", {code: this.code}, {responseType: 'text'}).subscribe(
+			this.http.post("http://localhost:3333/auth/42redirect", {code: this.code}).subscribe(
 				response => {
-          localStorage.setItem('access_token', response)
-          console.log(response)
+          localStorage.setItem('access_token', response['access_token'])
+          localStorage.setItem('id', response['id'])
           this.router.navigate(['home']);
 				},
 				error => {console.log(error)}
@@ -33,6 +32,5 @@ export class RedirectComponent {
 		catch (err) {
 			console.log(err)
 		}
-		console.log(this.code)
 	}
 }

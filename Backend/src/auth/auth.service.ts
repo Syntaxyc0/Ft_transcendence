@@ -116,18 +116,16 @@ export class AuthService
 		return password;
 	}
 
-	check_token(req: Request, res: Response): boolean {
-		const token: string = req['access_token'];
+	check_token(token): boolean {
 		if (!token)
 			return false;
 		try {
-		  const payload = this.jwt.verify(token);
+		  const payload = this.jwt.verify(token.token, {secret: process.env.JWT_SECRET});
 		  if (!payload)
 		  	return false;
-		  if (!payload.isLogged)
-		  	return false;
 		} catch (e) {
-			console.log("token expired")
+			console.log(e)
+			return false
 		}
 		return true;
 	  }

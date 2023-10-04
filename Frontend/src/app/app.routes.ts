@@ -33,18 +33,21 @@ export const routes: Routes = [{
 	loadComponent:    () => import('./home/home.component').then(m => m.HomeComponent),
 },
 {
-    path:    'settings',
+	path:    'settings',
 	title:	'Settings',
+	canActivate: [AuthGuard],
     loadComponent:    () => import('./settings/settings.component').then(m => m.SettingsComponent),
 },
 {
 	path:    'profile',
 	title:	'Profile',
+	canActivate: [AuthGuard],
 	loadComponent:    () => import('./profile/profile.component').then(m => m.ProfileComponent),
 },
 {
 	path:    'profile/:id',
 	title:	'Profile',
+	canActivate: [AuthGuard],
 	loadComponent:    () => import('./profile/profile.component').then(m => m.ProfileComponent),
 },
 ];

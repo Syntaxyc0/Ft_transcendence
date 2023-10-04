@@ -31,9 +31,8 @@ let AuthController = exports.AuthController = class AuthController {
     signin(dto) {
         return this.authService.signin(dto);
     }
-    check_token(req, res) {
-        console.log(req.params);
-        return this.authService.check_token(req, res);
+    check_token(token) {
+        return this.authService.check_token(token);
     }
     async get42redirect(request, res) {
         const formData = new FormData();
@@ -53,8 +52,7 @@ let AuthController = exports.AuthController = class AuthController {
             throw new Error('user not found');
         const data = await resp2.json();
         const token = this.authService.create42user(data.login, data.email);
-        console.log((await token).access_token);
-        res.status(common_1.HttpStatus.OK).send((await token).access_token);
+        res.status(common_1.HttpStatus.OK).send((await token));
         return;
     }
 };
@@ -74,11 +72,10 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "signin", null);
 __decorate([
-    (0, common_1.Get)('check'),
-    __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Res)({ passthrough: true })),
+    (0, common_1.Post)('check'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "check_token", null);
 __decorate([

@@ -3,7 +3,6 @@ import { signinDto, signupDto } from "./dto";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
-import { Response, Request } from "express";
 export declare class AuthService {
     private prisma;
     private jwt;
@@ -27,5 +26,5 @@ export declare class AuthService {
         id: number;
     }>;
     generateRandomPassword(): string;
-    check_token(req: Request, res: Response): boolean;
+    check_token(token: any): boolean;
 }

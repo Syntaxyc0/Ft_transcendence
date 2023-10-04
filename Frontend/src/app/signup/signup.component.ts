@@ -39,7 +39,6 @@ export class SignupComponent {
 					this.http.patch<any>('http://localhost:3333/users/' + this.id + '/status', {status: "ONLINE"}).subscribe()
 					localStorage.setItem('access_token', res["access_token"]);
 					localStorage.setItem('id', JSON.stringify(res['id']));
-					localStorage.setItem('login', this.login.value);
 					this.router.navigate(['/home'])
 				},
 				err => {

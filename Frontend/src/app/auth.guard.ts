@@ -17,21 +17,21 @@ export class AuthGuard implements CanActivate {
     if (!localStorage.getItem('access_token'))
 	{
       localStorage.clear();
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl('/landing');
       return false;
     }
     try {
-      this.check_token().subscribe({
+      this.check_token(localStorage.getItem('access_token')).subscribe({
         next: (val) => {
           if (!val) {
-            this.router.navigateByUrl('/');
+            this.router.navigateByUrl('/landing');
             return false;
           }
           return true;
         },
         error: (e) => {
           localStorage.clear();
-          this.router.navigateByUrl('/');
+          this.router.navigateByUrl('/landing');
           return false;
         },
       });
@@ -39,13 +39,13 @@ export class AuthGuard implements CanActivate {
 	catch (e) {
       console.log('An error occured : ', e);
       localStorage.clear();
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl('/landing');
       return false;
     }
     return true;
   }
 
-  check_token() {
-    return this.http.get<boolean>("http://localhost:3333/auth/check")
+  check_token(token) {
+    return this.http.post("http://localhost:3333/auth/check", {token})
 	}
 }
