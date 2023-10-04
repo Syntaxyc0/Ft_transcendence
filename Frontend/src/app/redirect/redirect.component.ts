@@ -26,11 +26,32 @@ export class RedirectComponent {
           localStorage.setItem('id', response['id'])
           this.router.navigate(['home']);
 				},
-				error => {console.log(error)}
+				error => {
+					console.log(error)
+					this.redirect_timer()
+					
+				}
 			)
 		}
 		catch (err) {
 			console.log(err)
+			this.redirect_timer()
+		}
+	}
+
+	redirect_timer()
+	{
+		if (localStorage.getItem('access_token'))
+		{
+			setTimeout(() => {
+				this.router.navigate(['/home']);
+			}, 2000);
+		}
+		else
+		{
+				setTimeout(() => {
+					this.router.navigate(['/landing']);
+				}, 2000);
 		}
 	}
 }

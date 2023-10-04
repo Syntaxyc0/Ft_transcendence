@@ -18,4 +18,10 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class SettingsComponent {
 
+	onRightClick(event) {
+		console.log('test')
+		event.preventDefault() //this will disable default action of the context menu
+		//there will be your code for the expected right click action
+	   }
+
 }

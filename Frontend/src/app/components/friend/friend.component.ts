@@ -48,6 +48,11 @@ export class FriendComponent {
 		return this.http.get<Blob>("http://localhost:3333/users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
 	}
 
+	onRightClick(event) {
+		console.log('test')
+		event.preventDefault() //this will disable default action of the context menu
+		//there will be your code for the expected right click action
+	   }
 
 }
 
