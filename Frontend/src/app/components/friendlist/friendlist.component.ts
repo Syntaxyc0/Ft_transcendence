@@ -22,7 +22,8 @@ export class FriendlistComponent {
 		this.http.get<number[]>("http://localhost:3333/users/" + this.id + "/friendlist").subscribe(res => {
 			this.friendList = res;
 	})
-}
+	
+		}
 
 }
 

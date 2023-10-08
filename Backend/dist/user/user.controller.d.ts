@@ -33,6 +33,7 @@ export declare class UserController {
     getUserElo(uid: number): Promise<number>;
     updateUserElo(uid: number, elo: number): Promise<void>;
     AddFriend(uid: number, userName: any): Promise<void>;
+    RemoveFriend(uid: number, userName: any): Promise<void>;
     uploadFile(uid: number, file: Express.Multer.File): Promise<void>;
     getAvatar(uid: number, res: Response): Promise<void>;
 }

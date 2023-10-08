@@ -113,6 +113,32 @@ let UserService = exports.UserService = class UserService {
             }
         });
     }
+    async RemoveFriend(uid, userName) {
+        const friend = await this.prisma.user.findUnique({
+            where: {
+                login: userName
+            },
+        });
+        if (!friend) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        if (user.login === friend.login) {
+            throw new common_2.NotFoundException('You cannot add yourself to your friend list');
+        }
+        await this.prisma.user.delete({
+            where: {
+                id: uid,
+            }
+        });
+    }
     async uploadFile(uid, file) {
         console.log(file);
         const user = await this.prisma.user.findUnique({

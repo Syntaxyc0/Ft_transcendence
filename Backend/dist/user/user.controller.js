@@ -56,6 +56,9 @@ let UserController = exports.UserController = class UserController {
     AddFriend(uid, userName) {
         return this.userService.AddFriend(uid, userName['userName']);
     }
+    RemoveFriend(uid, userName) {
+        return this.userService.RemoveFriend(uid, userName['userName']);
+    }
     uploadFile(uid, file) {
         console.log(file);
         return this.userService.uploadFile(uid, file);
@@ -144,6 +147,14 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "AddFriend", null);
+__decorate([
+    (0, common_1.Patch)(':uid/RemoveFriend'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "RemoveFriend", null);
 __decorate([
     (0, common_1.Post)(':uid/upload'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {

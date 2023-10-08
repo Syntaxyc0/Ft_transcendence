@@ -1,18 +1,33 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Renderer2, ElementRef,ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { FriendMenuComponent } from '../friend-menu/friend-menu.component';
 
 @Component({
   selector: 'app-friend',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, FriendMenuComponent],
   templateUrl: './friend.component.html',
   styleUrls: ['./friend.component.scss']
 })
 export class FriendComponent {
-	constructor(public http: HttpClient) {}
+	@ViewChild('menu') menu: ElementRef;
+
+	constructor(public http: HttpClient, private renderer: Renderer2) {
+		this.renderer.listen('window', 'click',(e:Event)=>{
+			if(e.target!==this.menu.nativeElement)
+			{
+				this.showMenu=false;
+			}
+			else{
+				console.log("click inside")
+			}
+		}
+	)}
+
 
 	@Input() id:number = 0
+	showMenu = false
 
 	 name:string = 'undefined';
 	 avatar;
@@ -49,10 +64,13 @@ export class FriendComponent {
 	}
 
 	onRightClick(event) {
-		console.log('test')
-		event.preventDefault() //this will disable default action of the context menu
-		//there will be your code for the expected right click action
-	   }
+		event.preventDefault()
+		this.toggleMenu()
+	}
+
+	toggleMenu(){
+		this.showMenu = !this.showMenu;
+	  }
 
 }
 

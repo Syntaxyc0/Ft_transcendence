@@ -5,7 +5,7 @@ import { HeaderbarComponent } from '../components/headerbar/headerbar.component'
 import { ProfilePictureComponent } from '../components/profile-picture/profile-picture.component';
 import { User } from '../helpers/types';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +15,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-	constructor(public http: HttpClient, private route:ActivatedRoute) {}
+	constructor(public http: HttpClient, private route:ActivatedRoute, private router: Router) {}
 
 
 	id:number = 1;
@@ -25,5 +25,10 @@ export class HomeComponent {
 		  this.id = JSON.parse(localStorage.getItem('id')!)
 	
 	  }
+
+	LaunchGame()
+	{
+		this.router.navigate(['game']);
+	}
 
 }

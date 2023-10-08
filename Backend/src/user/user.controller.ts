@@ -84,6 +84,12 @@ export class UserController {
 		return this.userService.AddFriend(uid, userName['userName']);
 	}
 
+	@Patch(':uid/RemoveFriend')
+    RemoveFriend(@Param('uid', ParseIntPipe) uid:number, @Body() userName)
+	{
+		return this.userService.RemoveFriend(uid, userName['userName']);
+	}
+
 	
 
 	@Post(':uid/upload')

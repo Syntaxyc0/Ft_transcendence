@@ -126,6 +126,39 @@ export class UserService
 
 	}
 
+	async RemoveFriend(uid:number, userName: string) // TODO
+	{
+		const friend = await this.prisma.user.findUnique({
+			where: {
+				login: userName
+			},
+		})
+		if (!friend)
+		{
+			throw new NotFoundException('User not found')
+		}
+		const user = await this.prisma.user.findUnique({
+			where: {
+                id: uid
+            },
+		})
+		if (!user)
+		{
+            throw new NotFoundException('User not found')
+        }
+		if (user.login === friend.login)
+		{
+			throw new NotFoundException('You cannot add yourself to your friend list')
+		}
+		await this.prisma.user.delete({
+			where: {
+				id: uid,
+			}
+		})
+		
+
+	}
+
 	async uploadFile(uid:number, file: Express.Multer.File)
 	{
 		console.log(file)
