@@ -86,12 +86,3 @@ export class FriendComponent {
 	  }
 
 }
-
-export class Friend {
-	name:string =''
-	avatar:string = ''
-	constructor(input1:string, input2:string) {
-		this.name = input1;
-		this.avatar = input2
-	}
-}

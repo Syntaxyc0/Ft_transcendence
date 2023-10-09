@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FriendComponent, Friend } from '../friend/friend.component';
+import { FriendComponent } from '../friend/friend.component';
 import { AddFriendComponent } from '../add-friend/add-friend.component';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 
