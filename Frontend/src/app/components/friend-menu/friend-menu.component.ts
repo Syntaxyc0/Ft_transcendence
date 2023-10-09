@@ -1,5 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-friend-menu',
@@ -11,8 +14,14 @@ import { CommonModule } from '@angular/common';
 export class FriendMenuComponent {
 	@Input() id
 
-	ngOnInit(){
-		console.log(this.id)
+	constructor(public http: HttpClient, private route:ActivatedRoute, private router: Router) {}
+
+	deleteFriend()
+	{
+		this.http.patch('http://localhost:3333/users/' + localStorage.getItem('id') + '/RemoveFriend', {userId: this.id}).subscribe()
+		{
+			window.location.reload()
+		}
 	}
 
 }

@@ -14,20 +14,29 @@ export class FriendComponent {
 	@ViewChild('menu') menu: ElementRef;
 
 	constructor(public http: HttpClient, private renderer: Renderer2) {
+		
 		this.renderer.listen('window', 'click',(e:Event)=>{
-			if(e.target!==this.menu.nativeElement)
-			{
-				this.showMenu=false;
+		if(e.target!==this.menu.nativeElement)
+		{
+			this.showMenu=false;
 			}
-			else{
-				console.log("click inside")
-			}
+		})
+		this.renderer.listen('window', 'contextmenu',(e:Event)=>{
+		if(e.target!==this.menu.nativeElement)
+		{
+			if (this.toshow)
+				this.toshow = false
+			else
+				this.showMenu = false
 		}
-	)}
+		})
+		
+	}
 
 
 	@Input() id:number = 0
 	showMenu = false
+	toshow = false
 
 	 name:string = 'undefined';
 	 avatar;
@@ -65,6 +74,10 @@ export class FriendComponent {
 
 	onRightClick(event) {
 		event.preventDefault()
+		if (!this.showMenu)
+		{
+			this.toshow = true
+		}
 		this.toggleMenu()
 	}
 

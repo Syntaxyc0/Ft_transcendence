@@ -1,5 +1,5 @@
 import { PrismaService } from "src/prisma/prisma.service";
-import { BadRequestException, Body, Injectable } from "@nestjs/common";
+import { BadRequestException, Body, Injectable, ConflictException } from "@nestjs/common";
 import { NotFoundException } from "@nestjs/common";
 import { stat } from "fs";
 
@@ -108,9 +108,17 @@ export class UserService
 		{
             throw new NotFoundException('User not found')
         }
-		if (user.login === friend.login)
+		else if (user.login === friend.login)
 		{
 			throw new NotFoundException('You cannot add yourself to your friend list')
+		}
+		const friendlist = user.friendList
+		for (const i of friendlist)
+		{
+			{
+				if ( i == friend.id)
+					throw new ConflictException(friend.login + " is already a friend")
+			}
 		}
 		await this.prisma.user.update({
 			data: {
@@ -126,11 +134,12 @@ export class UserService
 
 	}
 
-	async RemoveFriend(uid:number, userName: string) // TODO
+	async RemoveFriend(uid:number, userId: number) // TODO
 	{
+		const newfriendlist = []
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				login: userName
+				id: userId
 			},
 		})
 		if (!friend)
@@ -146,13 +155,17 @@ export class UserService
 		{
             throw new NotFoundException('User not found')
         }
-		if (user.login === friend.login)
-		{
-			throw new NotFoundException('You cannot add yourself to your friend list')
+		const friendlist = user.friendList
+		for (const i of friendlist) {
+			if (i != userId)
+				newfriendlist.push(i)
 		}
-		await this.prisma.user.delete({
+		await this.prisma.user.update({
 			where: {
 				id: uid,
+			},
+			data: {
+				friendList : newfriendlist
 			}
 		})
 		

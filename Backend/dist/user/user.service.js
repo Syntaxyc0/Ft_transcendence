@@ -99,8 +99,15 @@ let UserService = exports.UserService = class UserService {
         if (!user) {
             throw new common_2.NotFoundException('User not found');
         }
-        if (user.login === friend.login) {
+        else if (user.login === friend.login) {
             throw new common_2.NotFoundException('You cannot add yourself to your friend list');
+        }
+        const friendlist = user.friendList;
+        for (const i of friendlist) {
+            {
+                if (i == friend.id)
+                    throw new common_1.ConflictException(friend.login + " is already a friend");
+            }
         }
         await this.prisma.user.update({
             data: {
@@ -113,10 +120,11 @@ let UserService = exports.UserService = class UserService {
             }
         });
     }
-    async RemoveFriend(uid, userName) {
+    async RemoveFriend(uid, userId) {
+        const newfriendlist = [];
         const friend = await this.prisma.user.findUnique({
             where: {
-                login: userName
+                id: userId
             },
         });
         if (!friend) {
@@ -130,12 +138,17 @@ let UserService = exports.UserService = class UserService {
         if (!user) {
             throw new common_2.NotFoundException('User not found');
         }
-        if (user.login === friend.login) {
-            throw new common_2.NotFoundException('You cannot add yourself to your friend list');
+        const friendlist = user.friendList;
+        for (const i of friendlist) {
+            if (i != userId)
+                newfriendlist.push(i);
         }
-        await this.prisma.user.delete({
+        await this.prisma.user.update({
             where: {
                 id: uid,
+            },
+            data: {
+                friendList: newfriendlist
             }
         });
     }

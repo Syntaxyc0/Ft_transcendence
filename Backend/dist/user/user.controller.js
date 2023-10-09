@@ -56,8 +56,8 @@ let UserController = exports.UserController = class UserController {
     AddFriend(uid, userName) {
         return this.userService.AddFriend(uid, userName['userName']);
     }
-    RemoveFriend(uid, userName) {
-        return this.userService.RemoveFriend(uid, userName['userName']);
+    RemoveFriend(uid, userId) {
+        return this.userService.RemoveFriend(uid, userId['userId']);
     }
     uploadFile(uid, file) {
         console.log(file);

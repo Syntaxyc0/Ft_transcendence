@@ -85,9 +85,9 @@ export class UserController {
 	}
 
 	@Patch(':uid/RemoveFriend')
-    RemoveFriend(@Param('uid', ParseIntPipe) uid:number, @Body() userName)
+    RemoveFriend(@Param('uid', ParseIntPipe) uid:number, @Body() userId)
 	{
-		return this.userService.RemoveFriend(uid, userName['userName']);
+		return this.userService.RemoveFriend(uid, userId['userId']);
 	}
 
 	
