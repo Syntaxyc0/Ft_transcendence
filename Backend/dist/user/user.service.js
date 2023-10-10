@@ -16,6 +16,7 @@ exports.UserService = void 0;
 const prisma_service_1 = require("../prisma/prisma.service");
 const common_1 = require("@nestjs/common");
 const common_2 = require("@nestjs/common");
+var path = require('path');
 let UserService = exports.UserService = class UserService {
     constructor(prisma) {
         this.prisma = prisma;
@@ -154,6 +155,15 @@ let UserService = exports.UserService = class UserService {
     }
     async uploadFile(uid, file) {
         console.log(file);
+        if (file.size > 1000000) {
+            console.log("file is too big");
+            console.log(file.size);
+            return;
+        }
+        else if (!this.validate_extension(path.extname(file.filename))) {
+            console.log('Wrong file extension');
+            return;
+        }
         const user = await this.prisma.user.findUnique({
             where: {
                 id: uid
@@ -170,7 +180,11 @@ let UserService = exports.UserService = class UserService {
                 avatar: file['originalname']
             }
         });
-        console.log(user);
+    }
+    validate_extension(ext) {
+        if (ext != '.png' && ext != '.jpeg' && ext != '.jpg' && ext != '.gif')
+            return false;
+        return true;
     }
     async getelo(uid) {
         const user = await this.prisma.user.findUnique({

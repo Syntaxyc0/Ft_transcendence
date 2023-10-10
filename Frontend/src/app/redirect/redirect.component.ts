@@ -24,6 +24,7 @@ export class RedirectComponent {
 				response => {
           localStorage.setItem('access_token', response['access_token'])
           localStorage.setItem('id', response['id'])
+		  this.http.patch<any>('http://localhost:3333/users/' + response['id'] + '/status', {status: "ONLINE"}).subscribe()
           this.router.navigate(['home']);
 				},
 				error => {
