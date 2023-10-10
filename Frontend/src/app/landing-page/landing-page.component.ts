@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
-import { environment } from 'src/environment/environment';
+import { env } from 'src/env/env';
 
 @Component({
   selector: 'app-landing-page',
@@ -15,5 +15,5 @@ export class LandingPageComponent {
 
 	constructor() {}
 	code: any
-	redirect_url = environment.redirect_url
+	redirect_url = env.redirect_url
 }
