@@ -53,7 +53,7 @@ export class Ball{
 
 	reset()
 	{
-		this.speed = 7;
+		this.speed = 15;
 		this.posx = this.gameBoard.width / 2;
 		this.posy = this.gameBoard.height / 2;
 		this.angle = Math.random() * 360;
