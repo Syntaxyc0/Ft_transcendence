@@ -6,11 +6,11 @@ import { get } from 'http';
 import { Express, Response } from 'express';
 import { diskStorage } from 'multer'
 import { userInfo } from 'os';
-import path from 'path';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+
 
 // @UseGuards(JwtGuard)
 @Controller('users')
@@ -100,12 +100,10 @@ export class UserController {
 			  cb(null, file.originalname);
 			},
 		  }),
-		  fileFilter: imageFileFilter,
 		}),
 	  )
 	uploadFile(@Param('uid', ParseIntPipe) uid: number, @UploadedFile() file: Express.Multer.File)
 	{
-		console.log(file);
 		return this.userService.uploadFile(uid, file);
 	}
 
@@ -128,10 +126,3 @@ export class UserController {
 		}
 	}
 }
-
-export const imageFileFilter = (req, file, callback) => {
-	if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-		return callback(new Error('Only image files are allowed!'), false);
-	}
-	callback(null, true);
-  };

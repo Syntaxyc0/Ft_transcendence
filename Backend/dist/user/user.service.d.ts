@@ -31,6 +31,7 @@ export declare class UserService {
     AddFriend(uid: number, userName: string): Promise<void>;
     RemoveFriend(uid: number, userId: number): Promise<void>;
     uploadFile(uid: number, file: Express.Multer.File): Promise<void>;
+    validate_extension(ext: string): boolean;
     getelo(uid: number): Promise<number>;
     updateUserElo(uid: number, elo: number): Promise<void>;
     getlogin(uid: number): Promise<string>;

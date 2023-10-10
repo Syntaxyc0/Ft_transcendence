@@ -8,11 +8,12 @@ import { Input } from '@angular/core';
 import { ProfilePictureComponent } from '../components/profile-picture/profile-picture.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import { LogoutButtonComponent } from '../components/logout-button/logout-button.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, HomeComponent, HeaderbarComponent, AddFriendComponent, GamehistoryComponent, ProfilePictureComponent, HttpClientModule],
+  imports: [CommonModule, HomeComponent, HeaderbarComponent, AddFriendComponent, GamehistoryComponent, ProfilePictureComponent, HttpClientModule, LogoutButtonComponent],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
 })

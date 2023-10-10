@@ -3,6 +3,7 @@ import { BadRequestException, Body, Injectable, ConflictException } from "@nestj
 import { NotFoundException } from "@nestjs/common";
 import { stat } from "fs";
 
+var path = require('path');
 
 
 @Injectable()
@@ -174,7 +175,19 @@ export class UserService
 
 	async uploadFile(uid:number, file: Express.Multer.File)
 	{
-		console.log(file)
+		console.log(file);
+		if (file.size > 1000000)
+		{
+			console.log("file is too big")
+			console.log(file.size)
+			return 
+
+		}
+		else if (!this.validate_extension(path.extname(file.filename)))
+		{
+			console.log('Wrong file extension')
+			return 
+		}
         const user = await this.prisma.user.findUnique({
             where: {
                 id: uid
@@ -192,7 +205,14 @@ export class UserService
                 avatar: file['originalname']
             }
 		});
-		console.log(user)
+		// console.log(user)
+	}
+
+	validate_extension(ext: string)
+	{
+		if (ext != '.png' && ext != '.jpeg' && ext != '.jpg' && ext != '.gif')
+			return false
+		return true
 	}
 
 	async	getelo(uid:number)

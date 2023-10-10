@@ -37,4 +37,3 @@ export declare class UserController {
     uploadFile(uid: number, file: Express.Multer.File): Promise<void>;
     getAvatar(uid: number, res: Response): Promise<void>;
 }
-export declare const imageFileFilter: (req: any, file: any, callback: any) => any;
