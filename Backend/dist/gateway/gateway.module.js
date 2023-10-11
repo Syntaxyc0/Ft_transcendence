@@ -6,19 +6,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppModule = void 0;
+exports.GatewayModule = void 0;
 const common_1 = require("@nestjs/common");
-const auth_module_1 = require("./auth/auth.module");
-const user_module_1 = require("./user/user.module");
-const prisma_module_1 = require("./prisma/prisma.module");
-const config_1 = require("@nestjs/config");
-const game_module_1 = require("./game/game.module");
-const gateway_module_1 = require("./gateway/gateway.module");
-let AppModule = exports.AppModule = class AppModule {
+const gateway_1 = require("./gateway");
+let GatewayModule = exports.GatewayModule = class GatewayModule {
 };
-exports.AppModule = AppModule = __decorate([
+exports.GatewayModule = GatewayModule = __decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule.forRoot({ isGlobal: true, }), auth_module_1.AuthModule, user_module_1.UserModule, prisma_module_1.PrismaModule, game_module_1.GameModule, gateway_module_1.GatewayModule],
+        providers: [gateway_1.MyGateway],
     })
-], AppModule);
-//# sourceMappingURL=app.module.js.map
+], GatewayModule);
+//# sourceMappingURL=gateway.module.js.map
