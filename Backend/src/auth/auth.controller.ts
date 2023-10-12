@@ -28,7 +28,12 @@ export class AuthController
     {
         return this.authService.signin(dto) ;
     }
-	
+
+	@Post('check')
+	check_token(@Body() token: string)
+	{
+		return this.authService.check_token(token)
+	}
 
 	@Post('42redirect')
 	async get42redirect(@Req() request, @Res() res)  {
@@ -39,14 +44,6 @@ export class AuthController
 		formData.append('client_secret', process.env.FOURTYTWO_CLIENT_SECRET);
 		formData.append('redirect_uri', process.env.FOURTYTWO_CALLBACK_URL);
 		formData.append('code', request.body.code );
-		// const payload = {
-		// 	grant_type: 'authorization_code',
-		// 	client_id: process.env.FOURTYTWO_CLIENT_ID,
-		// 	client_secret: process.env.FOURTYTWO_CLIENT_SECRET,
-		// 	code: res.req.query.code,
-		// 	redirect_uri: "http://localhost:3333/auth/42redirect"
-
-		// }
 		const response = await fetch('https://api.intra.42.fr/oauth/token', {
 			method: 'POST',
 			body: formData
@@ -61,10 +58,7 @@ export class AuthController
 		const data = await resp2.json();
 		const token = this.authService.create42user(data.login, data.email)
 
-		// console.log(tokens);
-		// res.cookie('access_token', this.token )
-		console.log((await token).access_token)
-		res.status(HttpStatus.OK).send((await token).access_token)
+		res.status(HttpStatus.OK).send((await token))
 		return 	
 
 		

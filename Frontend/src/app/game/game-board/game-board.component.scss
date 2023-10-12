@@ -1,0 +1,16 @@
+.game-board {
+	position: relative;
+	width: 65vh;
+	height: 40vh; /* Adjust as needed */
+	background-color: black; /* Set the background color */
+	// border: 0.5vh solid black; /* Add border styles */
+  }
+
+  .center-line {
+	width: 1vw;
+	height: 100%;
+	background-color: #fff;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+  }

@@ -17,6 +17,7 @@ export class CustomValidators
 		}
 
 	}
+	
 	static	logintoolong(control: AbstractControl): ValidationErrors | null
 	{
 		const login = control.get('login')?.value;
@@ -28,10 +29,11 @@ export class CustomValidators
 			}
 			else
 			{
-				return {logintoolong: true};
+				return {loginTooLong: true};
 			}
 		}
 		else return null
+
 
 	}
 }

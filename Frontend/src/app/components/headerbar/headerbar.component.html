@@ -1,22 +1,16 @@
 <header class="h-14 px-3 bg-gradient-to-r from-[#3169D0] via-[#254BA4] to-blue-600 text-black flex justify-between">
-	<span class=" px-2 py-3">Menu</span>
+	<span class=" px-2 py-3"></span>
 	<nav>
 		<ul class="flex gap-8 py-4 px-7 font-serif">
 			<li routerLinkActive="underline underline-offset-4" class="hover:underline hover:underline-offset-4 ">
 				<a routerLink="/home" routerLinkActive="router-link-active">Home</a>
 			</li>
-			<li routerLinkActive="underline underline-offset-4" class="hover:underline hover:underline-offset-4">
+			<li  class="hover:underline hover:underline-offset-4">
 				<a routerLink="/profile"  [queryParams]="{id: id}" routerLinkActive="router-link-active">Profile</a>
 			</li>
 			<li routerLinkActive="underline underline-offset-4" class="hover:underline hover:underline-offset-4">
 				<a routerLink="/settings"> Settings</a>
 			</li>
-			<!-- <li routerLinkActive="underline underline-offset-4" class="hover:underline hover:underline-offset-4">
-				<a routerLink="/signup"> Sign up</a>
-			</li>
-			<li routerLinkActive="underline underline-offset-4" class="hover:underline hover:underline-offset-4">
-				<a routerLink="/signin"> Sign in</a>
-			</li> -->
 		</ul>
 	</nav>
 </header>

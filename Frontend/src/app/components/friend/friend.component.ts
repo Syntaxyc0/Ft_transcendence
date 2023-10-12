@@ -1,18 +1,42 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Renderer2, ElementRef,ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { FriendMenuComponent } from '../friend-menu/friend-menu.component';
 
 @Component({
   selector: 'app-friend',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, FriendMenuComponent],
   templateUrl: './friend.component.html',
   styleUrls: ['./friend.component.scss']
 })
 export class FriendComponent {
-	constructor(public http: HttpClient) {}
+	@ViewChild('menu') menu: ElementRef;
+
+	constructor(public http: HttpClient, private renderer: Renderer2) {
+		
+		this.renderer.listen('window', 'click',(e:Event)=>{
+		if(e.target!==this.menu.nativeElement)
+		{
+			this.showMenu=false;
+			}
+		})
+		this.renderer.listen('window', 'contextmenu',(e:Event)=>{
+		if(e.target!==this.menu.nativeElement)
+		{
+			if (this.toshow)
+				this.toshow = false
+			else
+				this.showMenu = false
+		}
+		})
+		
+	}
+
 
 	@Input() id:number = 0
+	showMenu = false
+	toshow = false
 
 	 name:string = 'undefined';
 	 avatar;
@@ -48,14 +72,17 @@ export class FriendComponent {
 		return this.http.get<Blob>("http://localhost:3333/users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
 	}
 
-
-}
-
-export class Friend {
-	name:string =''
-	avatar:string = ''
-	constructor(input1:string, input2:string) {
-		this.name = input1;
-		this.avatar = input2
+	onRightClick(event) {
+		event.preventDefault()
+		if (!this.showMenu)
+		{
+			this.toshow = true
+		}
+		this.toggleMenu()
 	}
+
+	toggleMenu(){
+		this.showMenu = !this.showMenu;
+	  }
+
 }

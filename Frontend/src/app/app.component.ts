@@ -13,9 +13,5 @@ import { RouterModule } from '@angular/router';
 export class AppComponent {
   title = 'Pong';
 
-  getLogin()
-  {
-	  localStorage.getItem('login');
-  }
 
 }

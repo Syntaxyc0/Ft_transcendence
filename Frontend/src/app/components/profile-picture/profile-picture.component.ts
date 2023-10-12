@@ -3,6 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile-picture',
@@ -13,7 +14,7 @@ import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http'
 })
 export class ProfilePictureComponent {
 
-	constructor(public http: HttpClient, private location: Location) {}
+	constructor(public http: HttpClient, private location: Location, private router: Router) {}
 
 	@Input() id:number = 0;
 	name:string = '';
@@ -29,7 +30,7 @@ export class ProfilePictureComponent {
 		},
 		err => {
 			alert("user doesn't exist");
-			this.location.back()
+			this.router.navigate(['/'])
 		})
 		this.get_avatar().subscribe (data => {
 			this.createImageFromBlob(data)
@@ -60,10 +61,6 @@ export class ProfilePictureComponent {
 	  
 		const formData = new FormData();
 		formData.append('file', this.selectedFile);
-	  
-		let headers = new HttpHeaders();
-		headers = headers.append('Content-Type', 'multipart/form-data');
-		headers = headers.append('Accept', '*/*');
 	  
 		this.http.post<any>(url, formData).subscribe({
 		  next: (data: any) => window.location.reload(),

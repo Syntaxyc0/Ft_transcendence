@@ -26,9 +26,8 @@ export class SigninComponent {
     signin(): void {
 		this.http.post<any>('http://localhost:3333/auth/signin', {login: this.login.value, password:this.password.value}).subscribe(
 				res => {
-					localStorage.setItem('token', res['access_token'].stringify);
+					localStorage.setItem('access_token', res['access_token']);
 					localStorage.setItem('id', JSON.stringify(res['id']));
-					localStorage.setItem('login', this.login.value);
 					this.http.patch<any>('http://localhost:3333/users/' + res['id'] + '/status', {status: "ONLINE"}).subscribe()
 					this.router.navigate(['/home'])
 				},
