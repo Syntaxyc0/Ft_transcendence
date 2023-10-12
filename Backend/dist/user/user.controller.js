@@ -12,7 +12,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.imageFileFilter = exports.UserController = void 0;
+exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const multer_1 = require("multer");
 const user_service_1 = require("./user.service");
@@ -56,8 +56,10 @@ let UserController = exports.UserController = class UserController {
     AddFriend(uid, userName) {
         return this.userService.AddFriend(uid, userName['userName']);
     }
+    RemoveFriend(uid, userId) {
+        return this.userService.RemoveFriend(uid, userId['userId']);
+    }
     uploadFile(uid, file) {
-        console.log(file);
         return this.userService.uploadFile(uid, file);
     }
     async getAvatar(uid, res) {
@@ -69,7 +71,7 @@ let UserController = exports.UserController = class UserController {
                 return result;
             }
             else if (user.avatar === "") {
-                const result = res.sendFile("homer.png", { root: "../public" });
+                const result = res.sendFile("stitch.png", { root: "../public" });
                 return result;
             }
         }
@@ -145,6 +147,14 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "AddFriend", null);
 __decorate([
+    (0, common_1.Patch)(':uid/RemoveFriend'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "RemoveFriend", null);
+__decorate([
     (0, common_1.Post)(':uid/upload'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
         storage: (0, multer_1.diskStorage)({
@@ -153,7 +163,6 @@ __decorate([
                 cb(null, file.originalname);
             },
         }),
-        fileFilter: exports.imageFileFilter,
     })),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
     __param(1, (0, common_1.UploadedFile)()),
@@ -173,11 +182,4 @@ exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])
 ], UserController);
-const imageFileFilter = (req, file, callback) => {
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-        return callback(new Error('Only image files are allowed!'), false);
-    }
-    callback(null, true);
-};
-exports.imageFileFilter = imageFileFilter;
 //# sourceMappingURL=user.controller.js.map

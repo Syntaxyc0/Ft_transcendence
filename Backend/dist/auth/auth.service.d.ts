@@ -25,4 +25,6 @@ export declare class AuthService {
         access_token: string;
         id: number;
     }>;
+    generateRandomPassword(): string;
+    check_token(token: any): boolean;
 }

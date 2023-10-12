@@ -68,14 +68,14 @@ let AuthService = exports.AuthService = class AuthService {
         };
         const secret = this.config.get("JWT_SECRET");
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '60m',
+            expiresIn: '180m',
             secret: secret
         });
         return { access_token: token, id: userId };
     }
     async create42user(login, email) {
         try {
-            const pass = 'test';
+            const pass = this.generateRandomPassword();
             const hash = await argon.hash(pass);
             const alreadyregistered = await this.prisma.user.findUnique({
                 where: {
@@ -105,6 +105,24 @@ let AuthService = exports.AuthService = class AuthService {
             }
             throw error;
         }
+    }
+    generateRandomPassword() {
+        const password = Math.random().toString(36);
+        return password;
+    }
+    check_token(token) {
+        if (!token)
+            return false;
+        try {
+            const payload = this.jwt.verify(token.token, { secret: process.env.JWT_SECRET });
+            if (!payload)
+                return false;
+        }
+        catch (e) {
+            console.log(e);
+            return false;
+        }
+        return true;
     }
 };
 exports.AuthService = AuthService = __decorate([
