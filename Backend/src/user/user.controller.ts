@@ -125,4 +125,17 @@ export class UserController {
 			throw new NotFoundException('Image not Found');
 		}
 	}
+	
+	@Post('/:uid/switch2fa')
+	switch2fa(@Param('uid', ParseIntPipe) uid:number, @Body() activate)
+	{
+		console.log('test')
+		return this.userService.switch2fa(uid, activate);
+	}
+
+	@Get('/:uid/2faenabled')
+	get2faenabled(@Param('uid', ParseIntPipe) uid:number)
+	{
+		return this.userService.get2faenabled(uid)
+	}
 }

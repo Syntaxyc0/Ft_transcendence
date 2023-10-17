@@ -8,6 +8,9 @@ export declare class UserService {
         email: string;
         login: string;
         hash: string;
+        is2faenabled: boolean;
+        is2favalidated: boolean;
+        twofacode: string;
         avatar: string;
         elo: number;
         userStatus: string;
@@ -19,6 +22,9 @@ export declare class UserService {
         email: string;
         login: string;
         hash: string;
+        is2faenabled: boolean;
+        is2favalidated: boolean;
+        twofacode: string;
         avatar: string;
         elo: number;
         userStatus: string;
@@ -35,4 +41,8 @@ export declare class UserService {
     getelo(uid: number): Promise<number>;
     updateUserElo(uid: number, elo: number): Promise<void>;
     getlogin(uid: number): Promise<string>;
+    get2faenabled(uid: number): Promise<boolean>;
+    get2favalidated(uid: number): Promise<boolean>;
+    validate2FA(uid: number): Promise<void>;
+    switch2fa(uid: any, activate: any): Promise<void>;
 }

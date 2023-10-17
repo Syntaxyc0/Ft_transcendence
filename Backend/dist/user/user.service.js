@@ -226,6 +226,50 @@ let UserService = exports.UserService = class UserService {
         }
         return user.login;
     }
+    async get2faenabled(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        return user.is2faenabled;
+    }
+    async get2favalidated(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        return user.is2favalidated;
+    }
+    async validate2FA(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        user.is2favalidated = true;
+    }
+    async switch2fa(uid, activate) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        user.is2faenabled = activate['activated'];
+    }
 };
 __decorate([
     __param(1, (0, common_1.Body)()),

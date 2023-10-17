@@ -9,6 +9,9 @@ export declare class UserController {
         email: string;
         login: string;
         hash: string;
+        is2faenabled: boolean;
+        is2favalidated: boolean;
+        twofacode: string;
         avatar: string;
         elo: number;
         userStatus: string;
@@ -20,6 +23,9 @@ export declare class UserController {
         email: string;
         login: string;
         hash: string;
+        is2faenabled: boolean;
+        is2favalidated: boolean;
+        twofacode: string;
         avatar: string;
         elo: number;
         userStatus: string;
@@ -36,4 +42,6 @@ export declare class UserController {
     RemoveFriend(uid: number, userId: any): Promise<void>;
     uploadFile(uid: number, file: Express.Multer.File): Promise<void>;
     getAvatar(uid: number, res: Response): Promise<void>;
+    switch2fa(uid: number, activate: any): Promise<void>;
+    get2faenabled(uid: number): Promise<boolean>;
 }

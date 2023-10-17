@@ -79,6 +79,13 @@ let UserController = exports.UserController = class UserController {
             throw new common_1.NotFoundException('Image not Found');
         }
     }
+    switch2fa(uid, activate) {
+        console.log('test');
+        return this.userService.switch2fa(uid, activate);
+    }
+    get2faenabled(uid) {
+        return this.userService.get2faenabled(uid);
+    }
 };
 __decorate([
     (0, common_1.Get)(':uid'),
@@ -178,6 +185,21 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getAvatar", null);
+__decorate([
+    (0, common_1.Post)('/:uid/switch2fa'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "switch2fa", null);
+__decorate([
+    (0, common_1.Get)('/:uid/2faenabled'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "get2faenabled", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])
