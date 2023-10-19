@@ -20,13 +20,14 @@ function Match(property, validationOptions) {
     };
 }
 exports.Match = Match;
-let MatchConstraint = exports.MatchConstraint = class MatchConstraint {
+let MatchConstraint = class MatchConstraint {
     validate(value, args) {
         const [relatedPropertyName] = args.constraints;
         const relatedValue = args.object[relatedPropertyName];
         return value === relatedValue;
     }
 };
+exports.MatchConstraint = MatchConstraint;
 exports.MatchConstraint = MatchConstraint = __decorate([
     (0, class_validator_1.ValidatorConstraint)({ name: 'Match' })
 ], MatchConstraint);

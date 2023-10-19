@@ -16,7 +16,7 @@ exports.GameController = void 0;
 const common_1 = require("@nestjs/common");
 const GameInfor_dto_1 = require("./dto/GameInfor.dto");
 const game_service_1 = require("./game.service");
-let GameController = exports.GameController = class GameController {
+let GameController = class GameController {
     constructor(gameService) {
         this.gameService = gameService;
     }
@@ -31,6 +31,7 @@ let GameController = exports.GameController = class GameController {
         return this.gameService.getGameInfo(gid);
     }
 };
+exports.GameController = GameController;
 __decorate([
     (0, common_1.Post)('newgame'),
     __param(0, (0, common_1.Body)()),

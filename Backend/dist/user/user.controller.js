@@ -17,7 +17,7 @@ const common_1 = require("@nestjs/common");
 const multer_1 = require("multer");
 const user_service_1 = require("./user.service");
 const platform_express_1 = require("@nestjs/platform-express");
-let UserController = exports.UserController = class UserController {
+let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
@@ -79,7 +79,14 @@ let UserController = exports.UserController = class UserController {
             throw new common_1.NotFoundException('Image not Found');
         }
     }
+    switch2fa(uid, activate) {
+        return this.userService.switch2fa(uid, activate);
+    }
+    get2faenabled(uid) {
+        return this.userService.get2faenabled(uid);
+    }
 };
+exports.UserController = UserController;
 __decorate([
     (0, common_1.Get)(':uid'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
@@ -178,6 +185,21 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getAvatar", null);
+__decorate([
+    (0, common_1.Post)('/:uid/switch2fa'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "switch2fa", null);
+__decorate([
+    (0, common_1.Get)('/:uid/2faenabled'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "get2faenabled", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])

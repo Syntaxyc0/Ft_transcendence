@@ -13,6 +13,9 @@ export declare class JwtStrategy extends JwtStrategy_base {
         email: string;
         login: string;
         hash: string;
+        is2faenabled: boolean;
+        is2favalidated: boolean;
+        twofacode: string;
         avatar: string;
         elo: number;
         userStatus: string;

@@ -17,7 +17,7 @@ const argon = require("argon2");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 const axios_1 = require("@nestjs/axios");
-let AuthService = exports.AuthService = class AuthService {
+let AuthService = class AuthService {
     constructor(prisma, jwt, config, httpService) {
         this.prisma = prisma;
         this.jwt = jwt;
@@ -125,6 +125,7 @@ let AuthService = exports.AuthService = class AuthService {
         return true;
     }
 };
+exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService, axios_1.HttpService])

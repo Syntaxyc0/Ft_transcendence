@@ -12,11 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FortyTwoAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
-let FortyTwoAuthGuard = exports.FortyTwoAuthGuard = class FortyTwoAuthGuard extends (0, passport_1.AuthGuard)('42') {
+let FortyTwoAuthGuard = class FortyTwoAuthGuard extends (0, passport_1.AuthGuard)('42') {
     constructor() {
         super();
     }
 };
+exports.FortyTwoAuthGuard = FortyTwoAuthGuard;
 exports.FortyTwoAuthGuard = FortyTwoAuthGuard = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [])

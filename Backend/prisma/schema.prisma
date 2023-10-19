@@ -21,6 +21,9 @@ model User {
   email	String @unique
   login String @unique
   hash String
+  is2faenabled Boolean @default(false)
+  is2favalidated Boolean @default(false)
+  twofacode String @default("")
   avatar	String	@default("")
   elo		Int		@default(1000)
   userStatus String	@default("OFFLINE")

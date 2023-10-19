@@ -1,5 +1,5 @@
 import { PrismaService } from "src/prisma/prisma.service";
-import { BadRequestException, Body, Injectable, ConflictException } from "@nestjs/common";
+import { BadRequestException, Body, Injectable, ConflictException, ConsoleLogger } from "@nestjs/common";
 import { NotFoundException } from "@nestjs/common";
 import { stat } from "fs";
 
@@ -205,7 +205,6 @@ export class UserService
                 avatar: file['originalname']
             }
 		});
-		// console.log(user)
 	}
 
 	validate_extension(ext: string)
@@ -262,6 +261,62 @@ export class UserService
 			throw new NotFoundException('User not found')
 		}
 		return user.login
+	}
+
+	async	get2faenabled(uid:number)
+	{
+		const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        })
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		return user.is2faenabled
+	}
+
+	async	get2favalidated(uid:number)
+	{
+		const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        })
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		return user.is2favalidated
+	}
+
+	async validate2FA(uid:number)
+	{
+		const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        })
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		user.is2favalidated = true;
+	}
+
+	async switch2fa(uid, activate)
+	{
+		const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        })
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		user.is2faenabled = activate['activated']
 	}
 }
 

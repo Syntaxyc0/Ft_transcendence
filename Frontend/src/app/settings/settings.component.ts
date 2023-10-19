@@ -9,14 +9,19 @@ import { ProfilePictureComponent } from '../components/profile-picture/profile-p
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { LogoutButtonComponent } from '../components/logout-button/logout-button.component';
+import { TwofatogglebarComponent } from '../components/twofatogglebar/twofatogglebar.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, HomeComponent, HeaderbarComponent, AddFriendComponent, GamehistoryComponent, ProfilePictureComponent, HttpClientModule, LogoutButtonComponent],
+  imports: [CommonModule, HomeComponent, HeaderbarComponent, AddFriendComponent, GamehistoryComponent, ProfilePictureComponent, HttpClientModule, LogoutButtonComponent, TwofatogglebarComponent],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent {
-	  
+@Input() id:number = 0
+
+ngOnInit() {
+  this.id = JSON.parse(localStorage.getItem('id')!)
+}
 }
