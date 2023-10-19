@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
-let GameService = exports.GameService = class GameService {
+let GameService = class GameService {
     constructor(prisma) {
         this.prisma = prisma;
     }
@@ -83,6 +83,7 @@ let GameService = exports.GameService = class GameService {
         return game;
     }
 };
+exports.GameService = GameService;
 exports.GameService = GameService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])

@@ -17,7 +17,7 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const common_1 = require("@nestjs/common");
 const common_2 = require("@nestjs/common");
 var path = require('path');
-let UserService = exports.UserService = class UserService {
+let UserService = class UserService {
     constructor(prisma) {
         this.prisma = prisma;
     }
@@ -271,6 +271,7 @@ let UserService = exports.UserService = class UserService {
         user.is2faenabled = activate['activated'];
     }
 };
+exports.UserService = UserService;
 __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),

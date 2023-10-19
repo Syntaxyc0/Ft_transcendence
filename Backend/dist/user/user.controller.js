@@ -17,7 +17,7 @@ const common_1 = require("@nestjs/common");
 const multer_1 = require("multer");
 const user_service_1 = require("./user.service");
 const platform_express_1 = require("@nestjs/platform-express");
-let UserController = exports.UserController = class UserController {
+let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
@@ -80,13 +80,13 @@ let UserController = exports.UserController = class UserController {
         }
     }
     switch2fa(uid, activate) {
-        console.log('test');
         return this.userService.switch2fa(uid, activate);
     }
     get2faenabled(uid) {
         return this.userService.get2faenabled(uid);
     }
 };
+exports.UserController = UserController;
 __decorate([
     (0, common_1.Get)(':uid'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),

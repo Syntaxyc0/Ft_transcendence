@@ -118,7 +118,7 @@ export class UserController {
 			}
 			else if (user.avatar === "")
 			{
-				const result = res.sendFile("stitch.png", { root: "../public" });
+				const result = res.sendFile("stitch.png", { root: "./public" });
 				return result
 			}
 		} catch {
@@ -129,7 +129,6 @@ export class UserController {
 	@Post('/:uid/switch2fa')
 	switch2fa(@Param('uid', ParseIntPipe) uid:number, @Body() activate)
 	{
-		console.log('test')
 		return this.userService.switch2fa(uid, activate);
 	}
 

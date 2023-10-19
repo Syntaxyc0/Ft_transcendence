@@ -5,7 +5,9 @@ import { dot } from "node:test/reporters";
 import { HttpService } from "@nestjs/axios";
 import { map } from "rxjs";
 import { Response } from "express";
-import fetch from 'node-fetch';
+
+import fetch from "node-fetch";
+
 var crypto = require("crypto");
 
 
@@ -50,13 +52,13 @@ export class AuthController
 		})
 
 		const tokens = await response.json();
-		const headers = {Authorization: 'Bearer ' + tokens.access_token}
+		const headers = {Authorization: 'Bearer ' + tokens['access_token']}
 
 		const resp2 = await fetch('https://api.intra.42.fr/v2/me', {headers})
 		if (!resp2.ok)
 			throw new Error('user not found')
 		const data = await resp2.json();
-		const token = this.authService.create42user(data.login, data.email)
+		const token = this.authService.create42user(data['login'], data['email'])
 
 		res.status(HttpStatus.OK).send((await token))
 		return 	

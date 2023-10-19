@@ -20,7 +20,7 @@ const axios_1 = require("@nestjs/axios");
 const node_fetch_1 = require("node-fetch");
 var crypto = require("crypto");
 const FormData = require("form-data");
-let AuthController = exports.AuthController = class AuthController {
+let AuthController = class AuthController {
     constructor(authService, http) {
         this.authService = authService;
         this.http = http;
@@ -46,16 +46,17 @@ let AuthController = exports.AuthController = class AuthController {
             body: formData
         });
         const tokens = await response.json();
-        const headers = { Authorization: 'Bearer ' + tokens.access_token };
+        const headers = { Authorization: 'Bearer ' + tokens['access_token'] };
         const resp2 = await (0, node_fetch_1.default)('https://api.intra.42.fr/v2/me', { headers });
         if (!resp2.ok)
             throw new Error('user not found');
         const data = await resp2.json();
-        const token = this.authService.create42user(data.login, data.email);
+        const token = this.authService.create42user(data['login'], data['email']);
         res.status(common_1.HttpStatus.OK).send((await token));
         return;
     }
 };
+exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)('signup'),
     __param(0, (0, common_1.Body)()),
