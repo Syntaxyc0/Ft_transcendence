@@ -3,11 +3,25 @@ Ce project consiste à créer un site web pour participer à une compétition du
 
 # Makefile
 ## make
-Build et lance le container, ne supprime ni le cache ou les anciens volumes.
+Build et lance les containers, ne supprime ni le cache ou les volumes.
 
     make
-  
+## stop
+Stop les containers.
 
+    make stop
+## clean
+Stop les containers, nettoie toutes les ressources (y compris le cache mais pas les volumes).
+
+    make clean
+## fclean
+Stop les containers, nettoie les ressources et les volumes.
+  
+    make fclean
+## re
+fclean et all.
+
+    make re
 ## Prérequis
   Node Package Manager
   
