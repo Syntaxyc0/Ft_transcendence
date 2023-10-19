@@ -90,8 +90,6 @@ export class UserController {
 		return this.userService.RemoveFriend(uid, userId['userId']);
 	}
 
-	
-
 	@Post(':uid/upload')
 	@UseInterceptors(FileInterceptor('file', {
 		storage: diskStorage({
