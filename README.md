@@ -2,6 +2,11 @@
 Ce project consiste à créer un site web pour participer à une compétition du célèbre jeu Pong
 
 # Makefile
+## make
+Build et lance le container, ne supprime ni le cache ou les anciens volumes.
+
+    make
+  
 
 ## Prérequis
   Node Package Manager
