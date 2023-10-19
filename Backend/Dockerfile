@@ -5,7 +5,6 @@ COPY prisma ./prisma/
 
 COPY . .
 
-
 EXPOSE 3333
 
 

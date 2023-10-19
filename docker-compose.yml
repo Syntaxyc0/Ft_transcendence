@@ -23,7 +23,7 @@ services:
     container_name: "frontend"
     build:
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: Frontend/Dockerfile
     volumes:
       - ./Frontend:/app/Frontend
       - front_node_modules:/app/Frontend/node_modules
@@ -32,6 +32,8 @@ services:
     networks:
       - transcendence
     links:
+      - api
+    depends_on:
       - api
     #command: ["npm", "run", "start"]
 
