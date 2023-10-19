@@ -9,7 +9,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./Backend:/app
+      - ./Backend:/app/src
       - back_node_modules:/app/node_modules
     env_file:
         - ./Backend/.env
@@ -19,21 +19,21 @@ services:
       - transcendence
     command: ["npm", "run", "start:dev"]
 
-  # frontend:
-  #   container_name: "frontend"
-  #   build:
-  #     context: ./Frontend/
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - ./Frontend:/app
-  #     - front_node_modules:/app/node_modules
-  #   ports:
-  #     - 4200:4200
-  #   networks:
-  #     - transcendence
-  #   links:
-  #     - api
-  #   command: ["npm", "run", "start"]
+  frontend:
+    container_name: "frontend"
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./Frontend:/app/Frontend
+      - front_node_modules:/app/Frontend/node_modules
+    ports:
+      - 4200:4200
+    networks:
+      - transcendence
+    links:
+      - api
+    #command: ["npm", "run", "start"]
 
   postgres:
     image: postgres:latest
@@ -52,4 +52,4 @@ networks:
 
 volumes:
   back_node_modules:
-  # front_node_modules:
+  front_node_modules:
