@@ -18,5 +18,5 @@ nocache:
 reload:
 	docker-compose -f docker-compose.yml up -d --build
 
-re: fclean reload
+re: fclean all
 .PHONY: stop clean reload fclean all nocache
