@@ -18,21 +18,21 @@ services:
       - transcendence
     command: ["npm", "run", "start:dev"]
 
-  frontend:
-    container_name: "frontend"
-    build:
-      context: ./
-      dockerfile: Frontend/Dockerfile
-    volumes:
-      - ./Frontend:/app/Frontend
-    ports:
-      - 4200:4200
-    networks:
-      - transcendence
-    links:
-      - api
-    depends_on:
-      - api
+  # frontend:
+  #   container_name: "frontend"
+  #   build:
+  #     context: ./
+  #     dockerfile: Frontend/Dockerfile
+  #   volumes:
+  #     - ./Frontend:/app/Frontend
+  #   ports:
+  #     - 4200:4200
+  #   networks:
+  #     - transcendence
+  #   links:
+  #     - api
+  #   depends_on:
+  #     - api
 
   postgres:
     image: postgres:latest

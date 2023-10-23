@@ -2,6 +2,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { BadRequestException, Body, Injectable, ConflictException, ConsoleLogger } from "@nestjs/common";
 import { NotFoundException } from "@nestjs/common";
 import { stat } from "fs";
+import { MailService } from "src/mail/mail.service";
 
 var path = require('path');
 
@@ -9,7 +10,7 @@ var path = require('path');
 @Injectable()
 export class UserService
 {
-	constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService, private mail: MailService) {}
 
 	async getUserFromId(id: number) {
         const user = await this.prisma.user.findUnique(
@@ -100,9 +101,15 @@ export class UserService
 		{
 			throw new NotFoundException('User not found')
 		}
+		console.log(friend.email)
+		await this.mail.sendEmail(
+			friend.email,
+			'transcendance 2FA',
+			`Please enter this code : 123456`,
+		  );
 		const user = await this.prisma.user.findUnique({
 			where: {
-                id: uid
+				id: uid
             },
 		})
 		if (!user)

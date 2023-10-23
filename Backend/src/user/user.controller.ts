@@ -10,6 +10,7 @@ import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { MailService } from 'src/mail/mail.service';
 
 
 // @UseGuards(JwtGuard)

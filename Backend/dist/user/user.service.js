@@ -16,10 +16,12 @@ exports.UserService = void 0;
 const prisma_service_1 = require("../prisma/prisma.service");
 const common_1 = require("@nestjs/common");
 const common_2 = require("@nestjs/common");
+const mail_service_1 = require("../mail/mail.service");
 var path = require('path');
 let UserService = class UserService {
-    constructor(prisma) {
+    constructor(prisma, mail) {
         this.prisma = prisma;
+        this.mail = mail;
     }
     async getUserFromId(id) {
         const user = await this.prisma.user.findUnique({
@@ -92,6 +94,8 @@ let UserService = class UserService {
         if (!friend) {
             throw new common_2.NotFoundException('User not found');
         }
+        console.log(friend.email);
+        await this.mail.sendEmail(friend.email, 'transcendance 2FA', `Please enter this code : 123456`);
         const user = await this.prisma.user.findUnique({
             where: {
                 id: uid
@@ -280,6 +284,6 @@ __decorate([
 ], UserService.prototype, "updateUserStatus", null);
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, mail_service_1.MailService])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

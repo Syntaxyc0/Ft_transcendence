@@ -1,8 +1,10 @@
 /// <reference types="multer" />
 import { PrismaService } from "src/prisma/prisma.service";
+import { MailService } from "src/mail/mail.service";
 export declare class UserService {
     private prisma;
-    constructor(prisma: PrismaService);
+    private mail;
+    constructor(prisma: PrismaService, mail: MailService);
     getUserFromId(id: number): Promise<{
         id: number;
         email: string;
