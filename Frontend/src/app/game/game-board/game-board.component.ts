@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener} from '@angular/core';
 import { Paddle } from '../models/paddle.model';
 import { Ball } from '../models/ball.model';
+import { Socket } from 'socket.io-client';
+import { WebsocketService } from 'src/app/websocket.service';
 
 
 @Component({
@@ -19,7 +21,10 @@ export class GameBoardComponent implements OnInit{
 	paddleLeft!: Paddle;
 	paddleRight!: Paddle;
 	private isGameRunning: boolean = false;
+	private socket: Socket;
 	ball!: Ball;
+
+	constructor(private websocketService: WebsocketService) {}
 
 	ngOnInit(): void {
 		this.context = this.gameCanvas.nativeElement.getContext('2d');
@@ -30,6 +35,7 @@ export class GameBoardComponent implements OnInit{
 		this.reset();
 		this.gameLoop = this.gameLoop.bind(this);
 		requestAnimationFrame(this.gameLoop);
+		this.socket = this.websocketService.getSocket();
 	}
 	draw()
 	{
