@@ -24,6 +24,10 @@ let GameGateway = class GameGateway {
     }
     handleMessage(body) {
         console.log(body);
+        this.server.emit('onMessage', {
+            msg: 'New Message',
+            content: body,
+        });
     }
 };
 exports.GameGateway = GameGateway;
@@ -32,7 +36,7 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], GameGateway.prototype, "server", void 0);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('message'),
+    (0, websockets_1.SubscribeMessage)('newMessage'),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

@@ -14,8 +14,12 @@ export class GameGateway implements OnModuleInit{
     });
   }
 
-  @SubscribeMessage('message')
+  @SubscribeMessage('newMessage')
   handleMessage(@MessageBody() body: any) {
     console.log(body);
+    this.server.emit('onMessage', {
+      msg: 'New Message',
+      content: body,
+    });
   }
 }

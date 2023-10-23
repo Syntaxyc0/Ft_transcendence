@@ -8,6 +8,6 @@ import { GameGateway } from './game/game.gateway';
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true,}), AuthModule, UserModule, PrismaModule, GameModule],
-  providers: [GameGateway],
+  providers: [],
 })
 export class AppModule {}
