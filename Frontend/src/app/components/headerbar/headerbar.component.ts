@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { SettingsComponent } from 'src/app/settings/settings.component';
 
 @Component({
   selector: 'app-headerbar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SettingsComponent],
   templateUrl: './headerbar.component.html',
   styleUrls: ['./headerbar.component.scss']
 })

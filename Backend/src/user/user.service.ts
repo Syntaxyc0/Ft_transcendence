@@ -302,7 +302,14 @@ export class UserService
 		{
 			throw new NotFoundException('User not found')
 		}
-		user.is2favalidated = true;
+		await this.prisma.user.update({
+			where: {
+				id: uid,
+			},
+			data: {
+				is2favalidated: true
+			}
+		})
 	}
 
 	async switch2fa(uid, activate)
@@ -316,7 +323,14 @@ export class UserService
 		{
 			throw new NotFoundException('User not found')
 		}
-		user.is2faenabled = activate['activated']
+		await this.prisma.user.update({
+			where: {
+				id: uid,
+            },
+            data: {
+				is2faenabled: activate['activated']
+			}
+		})
 	}
 }
 
