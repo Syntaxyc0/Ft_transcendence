@@ -1,8 +1,10 @@
-FROM node:latest
+FROM node:16
 
 RUN apt update -y && apt upgrade -y
 
 RUN npm install -g @angular/cli
+
+RUN npm install -g npm-check-updates
 
 COPY Frontend/config.sh /usr/local/bin/
 
