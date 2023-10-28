@@ -31,9 +31,9 @@ export class Paddle{
 	updateScore()
 	{
 		this.score++;
-		if (this.currentUser)
-			console.log("Left: " + this.score + "\n");
-		else
-			console.log("Right: " + this.score + "\n");
+		// if (this.currentUser)
+		// 	console.log("Left: " + this.score + "\n");
+		// else
+		// 	console.log("Right: " + this.score + "\n");
 	}
 }

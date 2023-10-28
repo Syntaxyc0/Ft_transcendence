@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+import { NgModule } from '@angular/core';
 import { SocketClient } from './socket-client';
 
-@Module({
+@NgModule({
     providers:[SocketClient],
 })
 export class SocketModule {}

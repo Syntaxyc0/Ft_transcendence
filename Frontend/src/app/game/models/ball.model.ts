@@ -11,6 +11,13 @@ export class Ball{
 
 	}
 	
+	newMultiPos(angle: number, x: number, y: number)
+	{
+		this.angle = angle;
+		this.posx = x;
+		this.posy = y;
+	}
+
 	updatePosition()
 	{
 		let hx: number = Math.cos((this.angle * Math.PI) / 180) * this.speed + this.posx;
@@ -19,12 +26,14 @@ export class Ball{
 		{
 			this.angle = this.calculateReflectionAngle(hy - (this.gameBoard.paddleLeft.posy - this.gameBoard.paddleLeft.height / 2), this.gameBoard.paddleLeft.height);
 			this.posx = this.gameBoard.paddleLeft.width + this.radius;
+			this.gameBoard.sendData();
 			return;
 		}
 		if (hx < this.gameBoard.width - this.radius && hx >= this.radius && hy < this.gameBoard.height - this.radius && hy > this.radius)
 		{
 			this.posx = hx;
 			this.posy = hy;
+			this.gameBoard.sendData();
 			return;
 		}
 		else {
@@ -38,6 +47,7 @@ export class Ball{
 			}
 			if (hy <= this.radius || hy >= this.gameBoard.height - this.radius)
 				this.angle = (-this.angle) % 360;
+			this.gameBoard.sendData();
 	  	}
 	
 	}
@@ -53,7 +63,7 @@ export class Ball{
 
 	reset()
 	{
-		this.speed = 15;
+		this.speed = 3;
 		this.posx = this.gameBoard.width / 2;
 		this.posy = this.gameBoard.height / 2;
 		this.angle = Math.random() * 360;

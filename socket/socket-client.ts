@@ -1,14 +1,15 @@
-import { Injectable, OnModuleInit } from "@nestjs/common";
+import { Injectable } from "@angular/core";
 import { io, Socket} from "socket.io-client";
+import { OnInit } from "@angular/core";
 
 @Injectable()
-export class SocketClient implements OnModuleInit{
+export class SocketClient implements OnInit{
     public socketClient: Socket;
     constructor() {
         this.socketClient = io('http://localhost:3333');
     }
 
-    onModuleInit() {
+    ngOnInit() {
         this.registerConsumerEvents();
     }
 

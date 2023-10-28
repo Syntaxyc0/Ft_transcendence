@@ -16,18 +16,52 @@ exports.GameGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 let GameGateway = class GameGateway {
+    constructor() {
+        this.connectedSockets = new Map();
+    }
     onModuleInit() {
         this.server.on('connection', (socket) => {
-            console.log(socket.id);
-            console.log('Connected');
+            this.connectedSockets.set(socket.id, socket);
+            console.log(socket.id + ' has connected');
+            socket.on('disconnect', () => {
+                this.connectedSockets.delete(socket.id);
+                console.log(socket.id + " has disconnected");
+            });
         });
     }
-    handleMessage(body) {
+    handleMessage(body, client) {
+        console.log(client.id);
         console.log(body);
-        this.server.emit('onMessage', {
-            msg: 'New Message',
+        this.server.emit('reading', {
+            msg: 'New Data',
             content: body,
         });
+    }
+    newBallPos(body) {
+        const targetSocket = this.connectedSockets.get(body.secondPlayer);
+        if (!targetSocket)
+            return;
+        targetSocket.emit('onBall', {
+            angle: body.angle,
+            x: body.x,
+            y: body.y
+        });
+    }
+    searchMultiplayer(client) {
+        console.log("Client looking for player: " + client.id);
+        for (const [socketId, socket] of this.connectedSockets) {
+            if (socket.id != client.id) {
+                client.emit('playerFound', {
+                    player: socket.id,
+                    first: true
+                });
+                socket.emit('playerFound', {
+                    player: client.id,
+                    first: false
+                });
+                return;
+            }
+        }
     }
 };
 exports.GameGateway = GameGateway;
@@ -36,13 +70,32 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], GameGateway.prototype, "server", void 0);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('newMessage'),
+    (0, websockets_1.SubscribeMessage)('newData'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", void 0)
+], GameGateway.prototype, "handleMessage", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('newBallPos'),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
-], GameGateway.prototype, "handleMessage", null);
+], GameGateway.prototype, "newBallPos", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('multiplayerRequest'),
+    __param(0, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket]),
+    __metadata("design:returntype", void 0)
+], GameGateway.prototype, "searchMultiplayer", null);
 exports.GameGateway = GameGateway = __decorate([
-    (0, websockets_1.WebSocketGateway)({})
+    (0, websockets_1.WebSocketGateway)({
+        cors: {
+            origin: ['http://localhost:4200'],
+        }
+    })
 ], GameGateway);
 //# sourceMappingURL=game.gateway.js.map
