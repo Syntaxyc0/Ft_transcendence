@@ -28,6 +28,16 @@ export class GameGateway implements OnModuleInit{
     
   }
 
+  @SubscribeMessage('GameRequest')
+  GameRequest(@MessageBody() body: {order: string, secondPlayer: string})
+  {
+    const targetSocket = this.connectedSockets.get(body.secondPlayer);
+    if (!targetSocket)
+      return;
+    targetSocket.emit('onGameRequest', {
+        order: body.order
+    });
+  }
 
 
   @SubscribeMessage('newData')
@@ -47,6 +57,7 @@ export class GameGateway implements OnModuleInit{
     if (!targetSocket)
       return;
     targetSocket.emit('onBall', {
+      order:"ballUp",
       angle: body.angle,
       x: body.x,
       y: body.y
@@ -60,10 +71,12 @@ export class GameGateway implements OnModuleInit{
       if (socket.id != client.id)
       {
         client.emit('playerFound', {
+          order: "newPlayer",
           player: socket.id,
           first: true
         });
         socket.emit('playerFound', {
+          order: "newPlayer",
           player: client.id,
           first: false
         });

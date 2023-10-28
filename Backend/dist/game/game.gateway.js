@@ -29,6 +29,14 @@ let GameGateway = class GameGateway {
             });
         });
     }
+    GameRequest(body) {
+        const targetSocket = this.connectedSockets.get(body.secondPlayer);
+        if (!targetSocket)
+            return;
+        targetSocket.emit('onGameRequest', {
+            order: body.order
+        });
+    }
     handleMessage(body, client) {
         console.log(client.id);
         console.log(body);
@@ -42,6 +50,7 @@ let GameGateway = class GameGateway {
         if (!targetSocket)
             return;
         targetSocket.emit('onBall', {
+            order: "ballUp",
             angle: body.angle,
             x: body.x,
             y: body.y
@@ -52,10 +61,12 @@ let GameGateway = class GameGateway {
         for (const [socketId, socket] of this.connectedSockets) {
             if (socket.id != client.id) {
                 client.emit('playerFound', {
+                    order: "newPlayer",
                     player: socket.id,
                     first: true
                 });
                 socket.emit('playerFound', {
+                    order: "newPlayer",
                     player: client.id,
                     first: false
                 });
@@ -69,6 +80,13 @@ __decorate([
     (0, websockets_1.WebSocketServer)(),
     __metadata("design:type", socket_io_1.Server)
 ], GameGateway.prototype, "server", void 0);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('GameRequest'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], GameGateway.prototype, "GameRequest", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('newData'),
     __param(0, (0, websockets_1.MessageBody)()),

@@ -41,25 +41,30 @@ export class GameBoardComponent implements OnInit{
 		this.paddleRight = new Paddle(false, this.context, this);
 		this.ball = new Ball(this.context, this);
 		this.data = this.firstPlayer.getData();
-		this.data.subscribe((payload: {player:string, first:boolean}) =>{
-	
-			if (!this.secondPlayer)
-				this.newPlayer(payload.player, payload.first);
-			
-			// console.log("angle?");
-		});
-		this.data.subscribe((payload: {secondPlayer: string, angle: number, x: number, y: number}) => {
-			if (this.paddleRight.currentUser)
-			{
-				this.ball.angle = payload.angle;
-				this.ball.posx = payload.x;
-				this.ball.posy = payload.y;
-			}
+		this.data.subscribe((payload: any) =>{
+			this.handleOrder(payload.order, payload);
 		});
 		this.reset();
 		this.gameLoop = this.gameLoop.bind(this);
 		requestAnimationFrame(this.gameLoop);
 		
+	}
+	
+	handleOrder(order:string, payload: any)
+	{
+		// console.log(order);
+		if(order == "stopGame")
+			this.isGameRunning = false;
+		else if (order == "startGame")
+		{
+			this.isGameRunning = true;
+			this.gameLoop();
+		}
+		else if (order == "newPlayer" && !this.secondPlayer)
+			this.newPlayer(payload.player, payload.first);
+		else if (order == "ballUp" && !this.paddleLeft.currentUser)
+			this.ball.newMultiPos(payload.angle, payload.x, payload.y);
+
 	}
 
 	newPlayer(secondPlayer: string, first:boolean)
@@ -67,7 +72,7 @@ export class GameBoardComponent implements OnInit{
 		this.secondPlayer = secondPlayer;
 		this.paddleLeft.currentUser = first;
 		this.paddleRight.currentUser = !first;
-		console.log("first: " + first);
+		// console.log("first: " + first);
 		this.startGame();
 	}
 
@@ -105,11 +110,15 @@ export class GameBoardComponent implements OnInit{
 		if (this.isGameRunning)
 			return;
 		this.isGameRunning = true;
-		this.gameLoop();  // Start the game loop
+		if (this.secondPlayer)
+			this.firstPlayer.GameRequest("startGame", this.secondPlayer);
+		this.gameLoop();
 	}
 
 	stopGame() {
 		this.isGameRunning = false;
+		if (this.secondPlayer)
+			this.firstPlayer.GameRequest("stopGame", this.secondPlayer);
 	}
 
 	gameLoop()

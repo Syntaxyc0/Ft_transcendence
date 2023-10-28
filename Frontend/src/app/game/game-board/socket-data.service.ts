@@ -29,7 +29,10 @@ export class SocketDataService {
     this.socket.on('connect', () => {
       console.log("Current Client: " + this.socket.id);
   });
-    this.socket.on('onBall', (payload: {secondPlayer: string, angle: number, x: number, y: number}) =>{
+    this.socket.on('onBall', (payload: {angle: number, x: number, y: number}) =>{
+      data.next(payload);
+    });
+    this.socket.on('onGameRequest', (payload: {order: string}) =>{
       data.next(payload);
     });
     return dataObservable;
@@ -41,6 +44,10 @@ export class SocketDataService {
 
   emitData(payload: any){
     this.socket.emit('newData', payload);
+  }
+
+  GameRequest(order: string, secondPlayer: string){
+    this.socket.emit('GameRequest', {order, secondPlayer});
   }
 
   multiplayerRequest(){

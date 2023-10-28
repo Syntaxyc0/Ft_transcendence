@@ -4,6 +4,10 @@ export declare class GameGateway implements OnModuleInit {
     server: Server;
     private connectedSockets;
     onModuleInit(): void;
+    GameRequest(body: {
+        order: string;
+        secondPlayer: string;
+    }): void;
     handleMessage(body: any, client: Socket): void;
     newBallPos(body: {
         secondPlayer: string;

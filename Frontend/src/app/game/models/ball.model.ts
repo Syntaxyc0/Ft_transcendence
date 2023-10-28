@@ -33,7 +33,6 @@ export class Ball{
 		{
 			this.posx = hx;
 			this.posy = hy;
-			this.gameBoard.sendData();
 			return;
 		}
 		else {
@@ -44,10 +43,13 @@ export class Ball{
 				else
 					this.gameBoard.paddleLeft.updateScore();
 				this.reset();
+				this.gameBoard.sendData();
 			}
 			if (hy <= this.radius || hy >= this.gameBoard.height - this.radius)
+			{
 				this.angle = (-this.angle) % 360;
-			this.gameBoard.sendData();
+				this.gameBoard.sendData();
+			}
 	  	}
 	
 	}
@@ -63,7 +65,7 @@ export class Ball{
 
 	reset()
 	{
-		this.speed = 3;
+		this.speed = 15;
 		this.posx = this.gameBoard.width / 2;
 		this.posy = this.gameBoard.height / 2;
 		this.angle = Math.random() * 360;
