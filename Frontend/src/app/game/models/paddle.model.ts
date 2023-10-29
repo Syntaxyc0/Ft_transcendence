@@ -24,16 +24,12 @@ export class Paddle{
 
 	reset()
 	{
-		this.speed = 60;
+		this.speed = 50;
 		this.posy = this.gameBoard.height / 2;
 	}
 
 	updateScore()
 	{
 		this.score++;
-		if (this.currentUser)
-			console.log("Left: " + this.score + "\n");
-		else
-			console.log("Right: " + this.score + "\n");
 	}
 }
