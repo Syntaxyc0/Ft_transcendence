@@ -17,17 +17,12 @@ export class SocketDataService {
     const data = new Subject<any>();
     const dataObservable = from(data);
 
-    this.socket.on('reading', (payload: any) => {
-      data.next(payload);
-      console.log(payload);
-
-    });
     this.socket.on('playerFound', (payload: {player: string, first: boolean}) =>{
       data.next(payload);
       console.log(payload);
     });
     this.socket.on('connect', () => {
-      console.log("Current Client: " + this.socket.id);
+      // console.log("Current Client: " + this.socket.id);
   });
     this.socket.on('onBall', (payload: {angle: number, x: number, y: number}) =>{
       data.next(payload);
@@ -35,15 +30,20 @@ export class SocketDataService {
     this.socket.on('onGameRequest', (payload: {order: string}) =>{
       data.next(payload);
     });
+    this.socket.on('otherDisconnected', (payload: {order: string}) =>{
+      console.log(payload.order);
+      data.next(payload);
+    });
     return dataObservable;
+  }
+
+  disconnect(secondPlayer: string)
+  {
+    this.socket.emit('disconnectingClient', {secondPlayer});
   }
 
   getSocket(): Socket{
     return(this.socket);
-  }
-
-  emitData(payload: any){
-    this.socket.emit('newData', payload);
   }
 
   GameRequest(order: string, secondPlayer: string){

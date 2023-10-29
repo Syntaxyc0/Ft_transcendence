@@ -18,6 +18,7 @@ const socket_io_1 = require("socket.io");
 let GameGateway = class GameGateway {
     constructor() {
         this.connectedSockets = new Map();
+        this.lookingForPlayerSockets = new Map();
     }
     onModuleInit() {
         this.server.on('connection', (socket) => {
@@ -25,28 +26,35 @@ let GameGateway = class GameGateway {
             console.log(socket.id + ' has connected');
             socket.on('disconnect', () => {
                 this.connectedSockets.delete(socket.id);
+                this.lookingForPlayerSockets.delete(socket.id);
                 console.log(socket.id + " has disconnected");
             });
         });
     }
-    GameRequest(body) {
+    getTarget(client, id) {
+        const targetSocket = this.connectedSockets.get(id);
+        if (!targetSocket)
+            client.emit('otherDisconnected', { order: 'otherDisconnected' });
+        return (targetSocket);
+    }
+    warnOther(body, client) {
         const targetSocket = this.connectedSockets.get(body.secondPlayer);
+        if (targetSocket) {
+            targetSocket.emit('otherDisconnected', { order: 'otherDisconnected' });
+            this.lookingForPlayerSockets.set(targetSocket.id, targetSocket);
+        }
+        this.lookingForPlayerSockets.delete(client.id);
+    }
+    GameRequest(body, client) {
+        const targetSocket = this.getTarget(client, body.secondPlayer);
         if (!targetSocket)
             return;
         targetSocket.emit('onGameRequest', {
             order: body.order
         });
     }
-    handleMessage(body, client) {
-        console.log(client.id);
-        console.log(body);
-        this.server.emit('reading', {
-            msg: 'New Data',
-            content: body,
-        });
-    }
-    newBallPos(body) {
-        const targetSocket = this.connectedSockets.get(body.secondPlayer);
+    newBallPos(body, client) {
+        const targetSocket = this.getTarget(client, body.secondPlayer);
         if (!targetSocket)
             return;
         targetSocket.emit('onBall', {
@@ -58,7 +66,7 @@ let GameGateway = class GameGateway {
     }
     searchMultiplayer(client) {
         console.log("Client looking for player: " + client.id);
-        for (const [socketId, socket] of this.connectedSockets) {
+        for (const [socketId, socket] of this.lookingForPlayerSockets) {
             if (socket.id != client.id) {
                 client.emit('playerFound', {
                     order: "newPlayer",
@@ -70,9 +78,11 @@ let GameGateway = class GameGateway {
                     player: client.id,
                     first: false
                 });
+                this.lookingForPlayerSockets.delete(socket.id);
                 return;
             }
         }
+        this.lookingForPlayerSockets.set(client.id, client);
     }
 };
 exports.GameGateway = GameGateway;
@@ -81,25 +91,27 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], GameGateway.prototype, "server", void 0);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('GameRequest'),
-    __param(0, (0, websockets_1.MessageBody)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], GameGateway.prototype, "GameRequest", null);
-__decorate([
-    (0, websockets_1.SubscribeMessage)('newData'),
+    (0, websockets_1.SubscribeMessage)('disconnectingClient'),
     __param(0, (0, websockets_1.MessageBody)()),
     __param(1, (0, websockets_1.ConnectedSocket)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", void 0)
-], GameGateway.prototype, "handleMessage", null);
+], GameGateway.prototype, "warnOther", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('GameRequest'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", void 0)
+], GameGateway.prototype, "GameRequest", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('newBallPos'),
     __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", void 0)
 ], GameGateway.prototype, "newBallPos", null);
 __decorate([

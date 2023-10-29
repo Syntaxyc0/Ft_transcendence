@@ -8,7 +8,7 @@ export class Ball{
 	public posy!: number;
 	constructor(public context: CanvasRenderingContext2D, public gameBoard: GameBoardComponent)
 	{
-
+		this.reset();
 	}
 	
 	newMultiPos(angle: number, x: number, y: number)
@@ -65,7 +65,7 @@ export class Ball{
 
 	reset()
 	{
-		this.speed = 15;
+		this.speed = 10;
 		this.posx = this.gameBoard.width / 2;
 		this.posy = this.gameBoard.height / 2;
 		this.angle = Math.random() * 360;

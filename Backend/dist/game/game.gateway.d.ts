@@ -3,17 +3,21 @@ import { Server, Socket } from "socket.io";
 export declare class GameGateway implements OnModuleInit {
     server: Server;
     private connectedSockets;
+    private lookingForPlayerSockets;
     onModuleInit(): void;
+    getTarget(client: Socket, id: string): Socket;
+    warnOther(body: {
+        secondPlayer: string;
+    }, client: Socket): void;
     GameRequest(body: {
         order: string;
         secondPlayer: string;
-    }): void;
-    handleMessage(body: any, client: Socket): void;
+    }, client: Socket): void;
     newBallPos(body: {
         secondPlayer: string;
         angle: number;
         x: number;
         y: number;
-    }): void;
+    }, client: Socket): void;
     searchMultiplayer(client: Socket): void;
 }
