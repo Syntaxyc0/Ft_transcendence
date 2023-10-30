@@ -13,6 +13,11 @@ export declare class GameGateway implements OnModuleInit {
         order: string;
         secondPlayer: string;
     }, client: Socket): void;
+    newPaddlePos(body: {
+        secondPlayer: string;
+        x: number;
+        y: number;
+    }, client: Socket): void;
     newBallPos(body: {
         secondPlayer: string;
         angle: number;

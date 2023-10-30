@@ -34,7 +34,10 @@ export class GameGateway implements OnModuleInit{
   {
     const targetSocket = this.connectedSockets.get(id);
     if (!targetSocket)
-      client.emit('otherDisconnected', {order: 'otherDisconnected'});
+    {
+      client.emit('onGameRequest', {order: 'otherDisconnected'});
+      this.searchMultiplayer(client);
+    }
     return (targetSocket);
   }
 
@@ -42,15 +45,15 @@ export class GameGateway implements OnModuleInit{
   warnOther(@MessageBody() body:{secondPlayer: string}, @ConnectedSocket() client: Socket)
   {
     const targetSocket = this.connectedSockets.get(body.secondPlayer);
+    this.lookingForPlayerSockets.delete(client.id);
     if (targetSocket)
     {
-      targetSocket.emit('otherDisconnected', {order: 'otherDisconnected'});
-      this.lookingForPlayerSockets.set(targetSocket.id, targetSocket);
+      targetSocket.emit('onGameRequest', {order: 'otherDisconnected'});
+      this.searchMultiplayer(targetSocket);
     }
-    this.lookingForPlayerSockets.delete(client.id);
   }
 
-  @SubscribeMessage('GameRequest')
+  @SubscribeMessage('gameRequest')
   GameRequest(@MessageBody() body: {order: string, secondPlayer: string}, @ConnectedSocket() client: Socket)
   {
     const targetSocket = this.getTarget(client, body.secondPlayer);
@@ -61,13 +64,27 @@ export class GameGateway implements OnModuleInit{
     });
   }
 
+  @SubscribeMessage('newPaddlePos')
+  newPaddlePos(@MessageBody() body: {secondPlayer: string, x: number, y: number}, @ConnectedSocket() client: Socket)
+  {
+    console.log(body);
+    const targetSocket = this.getTarget(client, body.secondPlayer);
+    if (!targetSocket)
+      return;
+    targetSocket.emit('onGameRequest', {
+      order:"paddleUp",
+      x: body.x,
+      y: body.y
+    });
+  }
+
   @SubscribeMessage('newBallPos')
   newBallPos(@MessageBody() body: {secondPlayer: string, angle: number, x: number, y: number}, @ConnectedSocket() client: Socket)
   {
     const targetSocket = this.getTarget(client, body.secondPlayer);
     if (!targetSocket)
       return;
-    targetSocket.emit('onBall', {
+    targetSocket.emit('onGameRequest', {
       order:"ballUp",
       angle: body.angle,
       x: body.x,
@@ -81,12 +98,12 @@ export class GameGateway implements OnModuleInit{
     for (const [socketId, socket] of this.lookingForPlayerSockets) {
       if (socket.id != client.id)
       {
-        client.emit('playerFound', {
+        client.emit('onGameRequest', {
           order: "newPlayer",
           player: socket.id,
           first: true
         });
-        socket.emit('playerFound', {
+        socket.emit('onGameRequest', {
           order: "newPlayer",
           player: client.id,
           first: false
@@ -97,5 +114,4 @@ export class GameGateway implements OnModuleInit{
     }
     this.lookingForPlayerSockets.set(client.id, client);
   }
-
 }

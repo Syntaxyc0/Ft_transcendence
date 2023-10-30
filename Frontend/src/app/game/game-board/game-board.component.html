@@ -12,6 +12,8 @@
 <canvas #canvas width="1000" height="640" class="game-board">
 	Fallback
 </canvas>
+<p *ngIf = "paddleLeft.currentUser"> Player1</p>
+<p *ngIf = "paddleRight.currentUser"> Player2 </p>
 <p *ngIf = "!isGameRunning"> Game Paused</p>
 <p> Score: <br> 
 	{{paddleLeft.score}} || {{paddleRight.score}}</p>

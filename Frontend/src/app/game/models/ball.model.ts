@@ -4,8 +4,8 @@ export class Ball{
 	public speed!: number;
 	public radius: number = 15;
 	public angle: number =  Math.random() * 360;
-	public posx!: number;
-	public posy!: number;
+	public x!: number;
+	public y!: number;
 	constructor(public context: CanvasRenderingContext2D, public gameBoard: GameBoardComponent)
 	{
 		this.reset();
@@ -14,25 +14,25 @@ export class Ball{
 	newMultiPos(angle: number, x: number, y: number)
 	{
 		this.angle = angle;
-		this.posx = x;
-		this.posy = y;
+		this.x = x;
+		this.y = y;
 	}
 
 	updatePosition()
 	{
-		let hx: number = Math.cos((this.angle * Math.PI) / 180) * this.speed + this.posx;
-		let hy: number = Math.sin((this.angle * Math.PI) / 180) * this.speed + this.posy;
+		let hx: number = Math.cos((this.angle * Math.PI) / 180) * this.speed + this.x;
+		let hy: number = Math.sin((this.angle * Math.PI) / 180) * this.speed + this.y;
 		if (this.isCollidingPaddle(hx, hy, this.gameBoard.paddleLeft))
 		{
-			this.angle = this.calculateReflectionAngle(hy - (this.gameBoard.paddleLeft.posy - this.gameBoard.paddleLeft.height / 2), this.gameBoard.paddleLeft.height);
-			this.posx = this.gameBoard.paddleLeft.width + this.radius;
-			this.gameBoard.sendData();
+			this.angle = this.calculateReflectionAngle(hy - (this.gameBoard.paddleLeft.y - this.gameBoard.paddleLeft.height / 2), this.gameBoard.paddleLeft.height);
+			this.x = this.gameBoard.paddleLeft.width + this.radius;
+			this.gameBoard.sendBall();
 			return;
 		}
 		if (hx < this.gameBoard.width - this.radius && hx >= this.radius && hy < this.gameBoard.height - this.radius && hy > this.radius)
 		{
-			this.posx = hx;
-			this.posy = hy;
+			this.x = hx;
+			this.y = hy;
 			return;
 		}
 		else {
@@ -43,12 +43,12 @@ export class Ball{
 				else
 					this.gameBoard.paddleLeft.updateScore();
 				this.reset();
-				this.gameBoard.sendData();
+				this.gameBoard.sendBall();
 			}
 			if (hy <= this.radius || hy >= this.gameBoard.height - this.radius)
 			{
 				this.angle = (-this.angle) % 360;
-				this.gameBoard.sendData();
+				this.gameBoard.sendBall();
 			}
 	  	}
 	
@@ -58,7 +58,7 @@ export class Ball{
 	{
 		if (x > this.radius + paddle.width)
 			return false;
-		if (y <= paddle.posy + paddle.height / 2 + this.radius && y >= paddle.posy - paddle.height / 2 - this.radius)
+		if (y <= paddle.y + paddle.height / 2 + this.radius && y >= paddle.y - paddle.height / 2 - this.radius)
 			return true;
 		return false;
 	}
@@ -66,15 +66,15 @@ export class Ball{
 	reset()
 	{
 		this.speed = 10;
-		this.posx = this.gameBoard.width / 2;
-		this.posy = this.gameBoard.height / 2;
+		this.x = this.gameBoard.width / 2;
+		this.y = this.gameBoard.height / 2;
 		this.angle = Math.random() * 360;
 	}
 
 	draw()
 	{
 		this.context.beginPath();
-		this.context.arc(this.posx, this.posy, this.radius, 0, Math.PI * 2, false);
+		this.context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
 		this.context.fillStyle = 'blue';
 		this.context.fill();
 		this.context.closePath();
