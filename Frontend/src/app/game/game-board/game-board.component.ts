@@ -192,16 +192,11 @@ export class GameBoardComponent implements OnInit{
 	handleKeyboardEvent(event: KeyboardEvent)
 	{
 		event.preventDefault();
+		this.startGame(this.paddleRight.currentUser)
 		if(this.paddleLeft.currentUser)
-		{
-			this.startGame(false);
 			this.updatePaddlePosition(this.paddleLeft, event.key)
-		}
 		else if(this.paddleRight.currentUser)
-		{
-			this.startGame(true);
 			this.updatePaddlePosition(this.paddleRight, event.key);
-		}
 	}
 
 	updatePaddlePosition(paddle: Paddle, event: string)
