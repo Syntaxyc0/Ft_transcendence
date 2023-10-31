@@ -83,7 +83,7 @@ export class AuthService
                 login : login,
             },
         });
-        if (alreadyregistered.is2faenabled)
+        if (alreadyregistered)
         {
 
         }
