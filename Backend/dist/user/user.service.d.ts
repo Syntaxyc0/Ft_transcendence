@@ -47,4 +47,6 @@ export declare class UserService {
     get2favalidated(uid: number): Promise<boolean>;
     validate2FA(uid: number): Promise<void>;
     switch2fa(uid: any, activate: any): Promise<void>;
+    verify2facode(uid: any, code: any): Promise<boolean>;
+    generateRandom6digitCode(): string;
 }

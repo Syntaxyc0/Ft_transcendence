@@ -28,7 +28,7 @@ export class SigninComponent {
 				res => {
 					localStorage.setItem('access_token', res['access_token']);
 					localStorage.setItem('id', JSON.stringify(res['id']));
-					this.http.patch<any>('http://localhost:3333/users/' + res['id'] + '/status', {status: "ONLINE"}).subscribe()
+					// this.http.patch<any>('http://localhost:3333/users/' + res['id'] + '/status', {status: "ONLINE"}).subscribe()
 					this.http.get<any>('http://localhost:3333/users/' + res['id'] + '/get2fa').subscribe( res => {
 						if (res)
 							this.router.navigate(['/home'])

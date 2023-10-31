@@ -279,6 +279,17 @@ let UserService = class UserService {
         if (!user) {
             throw new common_2.NotFoundException('User not found');
         }
+        if (activate['activated'] == true) {
+            const code = this.generateRandom6digitCode();
+            await this.prisma.user.update({
+                where: {
+                    id: uid,
+                },
+                data: {
+                    twofacode: code
+                }
+            });
+        }
         await this.prisma.user.update({
             where: {
                 id: uid,
@@ -287,6 +298,23 @@ let UserService = class UserService {
                 is2faenabled: activate['activated']
             }
         });
+    }
+    async verify2facode(uid, code) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        if (user.twofacode != code) {
+            return false;
+        }
+        return true;
+    }
+    generateRandom6digitCode() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
     }
 };
 exports.UserService = UserService;

@@ -82,6 +82,8 @@ let AuthService = class AuthService {
                     login: login,
                 },
             });
+            if (alreadyregistered.is2faenabled) {
+            }
             if (alreadyregistered)
                 return this.signToken(alreadyregistered.id, alreadyregistered.login);
             const user = await this.prisma.user.create({

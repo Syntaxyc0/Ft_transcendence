@@ -2,6 +2,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { BadRequestException, Body, Injectable, ConflictException, ConsoleLogger } from "@nestjs/common";
 import { NotFoundException } from "@nestjs/common";
 import { stat } from "fs";
+import * as argon from 'argon2'
 import { MailService } from "src/mail/mail.service";
 
 var path = require('path');
@@ -142,7 +143,7 @@ export class UserService
 
 	}
 
-	async RemoveFriend(uid:number, userId: number) // TODO
+	async RemoveFriend(uid:number, userId: number)
 	{
 		const newfriendlist = []
 		const friend = await this.prisma.user.findUnique({
@@ -330,6 +331,18 @@ export class UserService
 		{
 			throw new NotFoundException('User not found')
 		}
+		if (activate['activated'] == true)
+		{
+			const code = this.generateRandom6digitCode()
+			await this.prisma.user.update({
+				where: {
+					id: uid,
+				},
+				data: {
+					twofacode: code
+				}
+			})
+		}
 		await this.prisma.user.update({
 			where: {
 				id: uid,
@@ -339,5 +352,29 @@ export class UserService
 			}
 		})
 	}
+
+	async verify2facode(uid, code)
+	{
+		const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        })
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		if (user.twofacode != code)
+		{
+			return false
+		}
+		return true
+		
+	}
+
+	generateRandom6digitCode()
+    {
+        return Math.floor(100000 + Math.random() * 900000).toString()
+    }
 }
 
