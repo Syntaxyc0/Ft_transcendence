@@ -29,13 +29,12 @@ export class SigninComponent {
 					localStorage.setItem('access_token', res['access_token']);
 					localStorage.setItem('id', JSON.stringify(res['id']));
 					// this.http.patch<any>('http://localhost:3333/users/' + res['id'] + '/status', {status: "ONLINE"}).subscribe()
-					this.http.get<any>('http://localhost:3333/users/' + res['id'] + '/get2fa').subscribe( res => {
-						if (res)
+					this.http.get<any>('http://localhost:3333/users/' + res['id'] + '/2faenabled').subscribe( res => {
+						if (res === false)
 							this.router.navigate(['/home'])
 						else
 						{
-							alert("2fa is activated")
-							this.router.navigate(['/home'])
+							this.router.navigate(['/twofa'])
 						}
 
 					})

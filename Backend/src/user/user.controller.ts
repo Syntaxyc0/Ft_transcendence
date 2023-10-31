@@ -131,9 +131,23 @@ export class UserController {
 		return this.userService.switch2fa(uid, activate);
 	}
 
+	@Post('/:uid/verify2facode')
+	verify2facode(@Param('uid', ParseIntPipe) uid:number, @Body() code)
+	{
+		return this.userService.verify2facode(uid, code['code']);
+	}
+
 	@Get('/:uid/2faenabled')
 	get2faenabled(@Param('uid', ParseIntPipe) uid:number)
 	{
 		return this.userService.get2faenabled(uid)
 	}
+
+	@Get('/:uid/2facode')
+	get2facode(@Param('uid', ParseIntPipe) uid:number)
+	{
+		return this.userService.get2facode(uid)
+	}
+
+	
 }

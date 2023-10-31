@@ -82,7 +82,7 @@ let AuthService = class AuthService {
                     login: login,
                 },
             });
-            if (alreadyregistered.is2faenabled) {
+            if (alreadyregistered) {
             }
             if (alreadyregistered)
                 return this.signToken(alreadyregistered.id, alreadyregistered.login);

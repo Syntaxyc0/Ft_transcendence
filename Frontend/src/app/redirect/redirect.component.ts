@@ -13,6 +13,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 export class RedirectComponent {
   constructor(public http: HttpClient, private route: ActivatedRoute, private router: Router) {}
 
+  id: number = 0
   code: any
   ngOnInit()
 	{
@@ -24,8 +25,17 @@ export class RedirectComponent {
 				response => {
           localStorage.setItem('access_token', response['access_token'])
           localStorage.setItem('id', response['id'])
+		  this.id = response['id']
 		  this.http.patch<any>('http://localhost:3333/users/' + response['id'] + '/status', {status: "ONLINE"}).subscribe()
-          this.router.navigate(['home']);
+          this.http.get<any>('http://localhost:3333/users/' + this.id + '/2faenabled').subscribe( res => {
+						if (res === false)
+							this.router.navigate(['/home'])
+						else
+						{
+							this.router.navigate(['/twofa'])
+						}
+
+					})
 				},
 				error => {
 					console.log(error)

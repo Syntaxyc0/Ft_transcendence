@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -19,13 +19,40 @@ export class TwofaComponent {
     code: new FormControl(null, [Validators.required]),
 });
 
+@Input() id: number = 0;
+
+ngOnInit() {
+	this.id = JSON.parse(localStorage.getItem('id')!);
+	console.log(this.id)
+	this.http.get('http://localhost:3333/users/' + this.id + '/2facode').subscribe(
+		res => {
+			console.log(res)
+		},
+		err => {
+			console.log(err);
+		}
+	)
+	
+}
+
 get	code(): FormControl
-	{
-		return this.twofaForm.get('code') as FormControl;
-	}
+{
+	return this.twofaForm.get('code') as FormControl;
+}
 
 validate()
 {
+	this.http.post('http://localhost:3333/users/' + this.id + '/verify2facode', {code: this.code.value} ).subscribe(
+		res => {
+				localStorage.setItem('2favalidated', 'true')
+				this.router.navigate(['/home'])
+		},
+		err => {
+		 	alert('Wrong code')
+			window.location.reload()
+		}
+	)
 
 }
+
 }

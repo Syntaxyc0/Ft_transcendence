@@ -364,12 +364,29 @@ export class UserService
 		{
 			throw new NotFoundException('User not found')
 		}
-		if (user.twofacode != code)
+		if (user.twofacode !== code)
 		{
-			return false
+			throw new BadRequestException('Wrong code provided')
 		}
 		return true
 		
+	}
+
+	async get2facode(uid)
+	{
+		const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        })
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		if (user.twofacode)
+		{
+			return user.twofacode
+		}
 	}
 
 	generateRandom6digitCode()

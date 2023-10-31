@@ -43,5 +43,7 @@ export declare class UserController {
     uploadFile(uid: number, file: Express.Multer.File): Promise<void>;
     getAvatar(uid: number, res: Response): Promise<void>;
     switch2fa(uid: number, activate: any): Promise<void>;
+    verify2facode(uid: number, code: any): Promise<boolean>;
     get2faenabled(uid: number): Promise<boolean>;
+    get2facode(uid: number): Promise<string>;
 }

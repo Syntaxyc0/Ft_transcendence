@@ -308,10 +308,23 @@ let UserService = class UserService {
         if (!user) {
             throw new common_2.NotFoundException('User not found');
         }
-        if (user.twofacode != code) {
-            return false;
+        if (user.twofacode !== code) {
+            throw new common_1.BadRequestException('Wrong code provided');
         }
         return true;
+    }
+    async get2facode(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        if (user.twofacode) {
+            return user.twofacode;
+        }
     }
     generateRandom6digitCode() {
         return Math.floor(100000 + Math.random() * 900000).toString();
