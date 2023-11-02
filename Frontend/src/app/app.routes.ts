@@ -56,4 +56,16 @@ export const routes: Routes = [{
 	canActivate: [AuthGuard],
 	loadComponent:    () => import('./game/game-board/game-board.component').then(m => m.GameBoardComponent),
 },
+{
+	path:    'chat',
+	title:	'Chat',
+	canActivate: [AuthGuard],
+	loadComponent:    () => import('./chat/components/dashboard/dashboard.component').then(m => m.DashboardComponent),
+},
+{
+	path:    'create-room',
+	title:	'Create-Room',
+	canActivate: [AuthGuard],
+	loadComponent:    () => import('./chat/components/create-room/create-room.component').then(m => m.CreateRoomComponent),
+},
 ];
