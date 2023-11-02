@@ -19,33 +19,37 @@ let GameGateway = class GameGateway {
     constructor() {
         this.connectedSockets = new Map();
         this.lookingForPlayerSockets = new Map();
+        this.pairedSockets = new Map();
     }
     onModuleInit() {
         this.server.on('connection', (socket) => {
             this.connectedSockets.set(socket.id, socket);
             console.log(socket.id + ' has connected');
             socket.on('disconnect', () => {
+                console.log(socket.id + " has disconnected");
+                const targetId = this.pairedSockets.get(socket.id);
+                const targetSocket = this.connectedSockets.get(targetId);
                 this.connectedSockets.delete(socket.id);
                 this.lookingForPlayerSockets.delete(socket.id);
-                console.log(socket.id + " has disconnected");
+                this.pairedSockets.delete(socket.id);
+                if (targetId)
+                    this.pairedSockets.delete(targetId);
+                if (targetSocket)
+                    targetSocket.emit('otherDisconnected', { order: 'otherDisconnected' });
             });
         });
     }
     getTarget(client, id) {
         const targetSocket = this.connectedSockets.get(id);
-        if (!targetSocket) {
-            client.emit('onGameRequest', { order: 'otherDisconnected' });
-            this.searchMultiplayer(client);
-        }
+        if (!targetSocket)
+            client.emit('otherDisconnected', { order: 'otherDisconnected' });
         return (targetSocket);
     }
     warnOther(body, client) {
         const targetSocket = this.connectedSockets.get(body.secondPlayer);
         this.lookingForPlayerSockets.delete(client.id);
-        if (targetSocket) {
-            targetSocket.emit('onGameRequest', { order: 'otherDisconnected' });
-            this.searchMultiplayer(targetSocket);
-        }
+        if (targetSocket)
+            targetSocket.emit('otherDisconnected', { order: 'otherDisconnected' });
     }
     GameRequest(body, client) {
         const targetSocket = this.getTarget(client, body.secondPlayer);
@@ -81,17 +85,19 @@ let GameGateway = class GameGateway {
         console.log("Client looking for player: " + client.id);
         for (const [socketId, socket] of this.lookingForPlayerSockets) {
             if (socket.id != client.id) {
-                client.emit('onGameRequest', {
+                client.emit('newPlayer', {
                     order: "newPlayer",
                     player: socket.id,
-                    first: true
+                    first: true,
                 });
-                socket.emit('onGameRequest', {
+                socket.emit('newPlayer', {
                     order: "newPlayer",
                     player: client.id,
-                    first: false
+                    first: false,
                 });
                 this.lookingForPlayerSockets.delete(socket.id);
+                this.pairedSockets.set(socket.id, client.id);
+                this.pairedSockets.set(client.id, socket.id);
                 return;
             }
         }

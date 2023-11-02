@@ -11,6 +11,7 @@ import { Paddle } from '../models/paddle.model';
 export class SocketDataService {
   private socket: Socket;
   private baseUrl = 'http://localhost:3333';
+  private secondPlayer: string;
 
   getData(): Observable<any[]> {
     this.socket = io(this.baseUrl);
@@ -19,37 +20,49 @@ export class SocketDataService {
 
     this.socket.on('connect', () => {
       // console.log("Current Client: " + this.socket.id);
-  });
+    });
     this.socket.on('onGameRequest', (payload: {order: string}) =>{
+      data.next(payload);
+    });
+    this.socket.on('newPlayer', (payload:{order: string, player: string}) =>{
+      this.secondPlayer = payload.player;
+      data.next(payload);
+    });
+    this.socket.on('otherDisconnected', (payload:{order: string})=> {
+      console.log(payload.order);
+      this.secondPlayer = '';
       data.next(payload);
     });
     return dataObservable;
   }
 
-  disconnect(secondPlayer: string)
+  disconnect()
   {
-    this.socket.emit('disconnectingClient', {secondPlayer});
+    console.log(this.secondPlayer);
+    if (this.secondPlayer)
+      this.socket.emit('disconnectingClient', {secondPlayer: this.secondPlayer});
+      this.secondPlayer = '';
   }
 
-  getSocket(): Socket{
-    return(this.socket);
-  }
-
-  GameRequest(order: string, secondPlayer: string){
-    this.socket.emit('gameRequest', {order, secondPlayer});
+  GameRequest(order: string){
+    if (this.secondPlayer)
+      this.socket.emit('gameRequest', {order, secondPlayer: this.secondPlayer});
   }
 
   multiplayerRequest(){
+    if (!this.secondPlayer)
       this.socket.emit('multiplayerRequest');
   }
 
-  newPaddlePos(secondPlayer: string, x: number, y: number)
+  newPaddlePos(x: number, y: number)
   {
-    this.socket.emit('newPaddlePos', {secondPlayer, x, y});
+    if (this.secondPlayer)
+      this.socket.emit('newPaddlePos', {secondPlayer: this.secondPlayer, x, y});
   }
 
-  newBallPos(secondPlayer: string, angle: number, x: number, y: number)
+  newBallPos(angle: number, x: number, y: number)
   {
-    this.socket.emit('newBallPos', {secondPlayer, angle, x, y});
+    if (this.secondPlayer)
+      this.socket.emit('newBallPos', {secondPlayer: this.secondPlayer, angle, x, y});
   }
 }

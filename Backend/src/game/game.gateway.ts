@@ -13,6 +13,7 @@ export class GameGateway implements OnModuleInit{
 
   private connectedSockets: Map<string, Socket> = new Map();
   private lookingForPlayerSockets: Map<string, Socket> = new Map();
+  private pairedSockets: Map<string, string> = new Map();
 
   onModuleInit(){
     this.server.on('connection', (socket) => {
@@ -21,9 +22,19 @@ export class GameGateway implements OnModuleInit{
       console.log(socket.id + ' has connected');
 
       socket.on('disconnect', () => {
+        console.log(socket.id + " has disconnected");
+        const targetId = this.pairedSockets.get(socket.id);
+        const targetSocket = this.connectedSockets.get(targetId);
+
         this.connectedSockets.delete(socket.id);
         this.lookingForPlayerSockets.delete(socket.id);
-        console.log(socket.id + " has disconnected");
+
+        this.pairedSockets.delete(socket.id);
+        if (targetId)
+          this.pairedSockets.delete(targetId);
+
+        if (targetSocket)
+          targetSocket.emit('otherDisconnected', {order: 'otherDisconnected'})
       });
     });
 
@@ -34,10 +45,7 @@ export class GameGateway implements OnModuleInit{
   {
     const targetSocket = this.connectedSockets.get(id);
     if (!targetSocket)
-    {
-      client.emit('onGameRequest', {order: 'otherDisconnected'});
-      this.searchMultiplayer(client);
-    }
+      client.emit('otherDisconnected', {order: 'otherDisconnected'});
     return (targetSocket);
   }
 
@@ -47,10 +55,7 @@ export class GameGateway implements OnModuleInit{
     const targetSocket = this.connectedSockets.get(body.secondPlayer);
     this.lookingForPlayerSockets.delete(client.id);
     if (targetSocket)
-    {
-      targetSocket.emit('onGameRequest', {order: 'otherDisconnected'});
-      this.searchMultiplayer(targetSocket);
-    }
+      targetSocket.emit('otherDisconnected', {order: 'otherDisconnected'});
   }
 
   @SubscribeMessage('gameRequest')
@@ -98,17 +103,20 @@ export class GameGateway implements OnModuleInit{
     for (const [socketId, socket] of this.lookingForPlayerSockets) {
       if (socket.id != client.id)
       {
-        client.emit('onGameRequest', {
+        client.emit('newPlayer', {
           order: "newPlayer",
           player: socket.id,
-          first: true
+          first: true,
         });
-        socket.emit('onGameRequest', {
+        socket.emit('newPlayer', {
           order: "newPlayer",
           player: client.id,
-          first: false
+          first: false,
         });
         this.lookingForPlayerSockets.delete(socket.id);
+        
+        this.pairedSockets.set(socket.id, client.id);
+        this.pairedSockets.set(client.id, socket.id);
         return;
       }
     }

@@ -50,7 +50,7 @@ export class GameBoardComponent implements OnInit{
 				return;
 			this.handleOrder(payload.order, payload);
 		});
-		this.reset();
+		this.reset(false);
 		this.gameLoop = this.gameLoop.bind(this);
 		requestAnimationFrame(this.gameLoop);
 	}
@@ -69,43 +69,40 @@ export class GameBoardComponent implements OnInit{
 		else if(order == "stopGame")
 			this.isGameRunning = false;
 		else if (order == "startGame")
-			this.startGame(true);
+			this.startGame(false);
 		else if (order == "newPlayer" && !this.secondPlayer)
 		{
 			this.newPlayer(payload.player, payload.first);
 			this.sendBall();
 		}
 		else if (order == "resetRequest")
-			this.reset();
+			this.reset(false);
 		else if (order == "resetDone")
 		{
-			this.paddleLeft.reset();
-			this.paddleRight.reset();
+			this.reset(false);
 			this.draw();
 		}
 		else if (order == "otherDisconnected")
+		{
 			this.resetOnline();
+			this.multiplayer();
+		}
 	}
 
 	disconnect()
 	{
 		this.requestedMatchmaking = false;
-		const secondPlayer = this.secondPlayer;
-		if (secondPlayer)
-		{
-			this.secondPlayer = '';
-			this.firstPlayer.disconnect(secondPlayer);
-			this.resetOnline();
-		}
+		this.secondPlayer = '';
+		this.firstPlayer.disconnect();
+		this.resetOnline();
 	}
 
 	resetOnline()
 	{
-		this.stopGame();
 		this.secondPlayer = '';
+		this.stopGame();
 		this.paddleLeft.currentUser = true;
 		this.paddleRight.currentUser = false;
-		this.reset();
 	}
 
 	newPlayer(secondPlayer: string, first:boolean)
@@ -113,7 +110,7 @@ export class GameBoardComponent implements OnInit{
 		this.secondPlayer = secondPlayer;
 		this.paddleLeft.currentUser = first;
 		this.paddleRight.currentUser = !first;
-		this.reset();
+		this.reset(true);
 	}
 
 	draw()
@@ -127,42 +124,38 @@ export class GameBoardComponent implements OnInit{
 	}
 
 	multiplayer(){
-		if (!this.secondPlayer)
-		{
-			this.requestedMatchmaking = true;
-			this.firstPlayer.multiplayerRequest();
-		}
+		this.requestedMatchmaking = true;
+		this.firstPlayer.multiplayerRequest();
 	}
 
-	reset() {
+	reset(request: boolean) {
 		this.stopGame();
-		if (this.secondPlayer && !this.paddleLeft.currentUser)
-		{
-			this.firstPlayer.GameRequest("resetRequest", this.secondPlayer);
-			return;
-		}
 		this.paddleLeft.reset();
 		this.paddleRight.reset();
+		if (!this.paddleLeft.currentUser)
+		{
+			if (request)
+				this.firstPlayer.GameRequest("resetRequest");
+			return;
+		}
 		this.ball.reset();
 		this.draw();
 		this.sendBall();
-		if (this.secondPlayer)
-			this.firstPlayer.GameRequest("resetDone", this.secondPlayer);
+		this.firstPlayer.GameRequest("resetDone");
 	}
 
 	startGame(request: boolean) {
 		if (this.isGameRunning)
 			return;
 		this.isGameRunning = true;
-		if (this.secondPlayer && !request)
-			this.firstPlayer.GameRequest("startGame", this.secondPlayer);
+		if (request)
+			this.firstPlayer.GameRequest("startGame");
 		this.gameLoop();
 	}
 
 	stopGame() {
 		this.isGameRunning = false;
-		if (this.secondPlayer)
-			this.firstPlayer.GameRequest("stopGame", this.secondPlayer);
+		this.firstPlayer.GameRequest("stopGame");
 	}
 
 	gameLoop()
@@ -176,23 +169,15 @@ export class GameBoardComponent implements OnInit{
 
 	sendBall()
 	{
-		if (this.secondPlayer && this.paddleLeft.currentUser)
-			this.firstPlayer.newBallPos(this.secondPlayer, this.ball.angle, this.ball.x, this.ball.y);
-	}
-
-	sendPaddle(paddle: Paddle)
-	{
-		if(this.secondPlayer)
-		{
-				this.firstPlayer.newPaddlePos(this.secondPlayer, paddle.x, paddle.y);
-		}
+		if (this.paddleLeft.currentUser)
+			this.firstPlayer.newBallPos(this.ball.angle, this.ball.x, this.ball.y);
 	}
 
 	@HostListener('document:keydown', ['$event'])
 	handleKeyboardEvent(event: KeyboardEvent)
 	{
 		event.preventDefault();
-		this.startGame(this.paddleRight.currentUser)
+		this.startGame(true)
 		if(this.paddleLeft.currentUser)
 			this.updatePaddlePosition(this.paddleLeft, event.key)
 		else if(this.paddleRight.currentUser)
@@ -204,12 +189,12 @@ export class GameBoardComponent implements OnInit{
 		if(paddle && paddle.y < this.height - paddle.height/2 && (event == 'ArrowDown' || event == 's'))
 		{
 			paddle.y += paddle.speed;
-			this.sendPaddle(paddle);
+			this.firstPlayer.newPaddlePos(paddle.x, paddle.y);
 		}
 		if(paddle && paddle.y > paddle.height/2 && (event == 'ArrowUp' || event == 'w'))
 		{
 			paddle.y -= paddle.speed;
-			this.sendPaddle(paddle);
+			this.firstPlayer.newPaddlePos(paddle.x, paddle.y);
 
 		}
 	}

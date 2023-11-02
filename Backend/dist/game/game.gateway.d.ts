@@ -4,6 +4,7 @@ export declare class GameGateway implements OnModuleInit {
     server: Server;
     private connectedSockets;
     private lookingForPlayerSockets;
+    private pairedSockets;
     onModuleInit(): void;
     getTarget(client: Socket, id: string): Socket;
     warnOther(body: {
