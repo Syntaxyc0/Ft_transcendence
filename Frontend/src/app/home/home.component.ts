@@ -31,4 +31,8 @@ export class HomeComponent {
 		this.router.navigate(['game']);
 	}
 
+	LaunchChat()
+	{
+		this.router.navigate(['chat']);
+	}
 }
