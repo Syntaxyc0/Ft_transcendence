@@ -5,9 +5,12 @@ import { PageEvent } from '@angular/material/paginator';
 import { Observable } from 'rxjs';
 import { RoomPaginateI } from 'src/app/chat/model/room.interface';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
