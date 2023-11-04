@@ -47,7 +47,6 @@ export class UserController {
 		return this.userService.updateUserStatus(uid, status);
 	}
 
-
 	//get user status with its ID
 	@Get(':uid/status')
     GetUserStatus(@Param('uid', ParseIntPipe) uid: number)

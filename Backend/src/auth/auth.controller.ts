@@ -1,10 +1,11 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Options, Param, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Options, Param, ParseIntPipe, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { signinDto, signupDto } from "./dto";
 import { HttpService } from "@nestjs/axios";
 import { map } from "rxjs";
 import { Response } from "express";
 
+import { MailService } from "src/mail/mail.service";
 import fetch from "node-fetch";
 
 var crypto = require("crypto");
@@ -15,7 +16,7 @@ import FormData = require('form-data');
 @Controller('auth')
 export class AuthController
 {
-    constructor(private authService: AuthService, private http: HttpService) {}
+    constructor(private authService: AuthService, private http: HttpService, private mailService: MailService) {}
 
 	token: string
     @Post('signup')
@@ -61,7 +62,17 @@ export class AuthController
 
 		res.status(HttpStatus.OK).send((await token))
 		return 	
+	}
 
-		
+	@Get(':uid/SendMail')
+    SendMail(@Param('uid', ParseIntPipe) uid:number)
+	{
+		return this.authService.SendMail(uid);
+	}
+
+	@Get(':uid/check2fa')
+    check2fa(@Param('uid', ParseIntPipe) uid:number)
+	{
+		return this.authService.check2fa(uid);
 	}
 }

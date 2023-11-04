@@ -3,12 +3,14 @@ import { signinDto, signupDto } from "./dto";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
+import { MailService } from "src/mail/mail.service";
 export declare class AuthService {
     private prisma;
     private jwt;
     private config;
     private readonly httpService;
-    constructor(prisma: PrismaService, jwt: JwtService, config: ConfigService, httpService: HttpService);
+    private mailService;
+    constructor(prisma: PrismaService, jwt: JwtService, config: ConfigService, httpService: HttpService, mailService: MailService);
     signin(dto: signinDto): Promise<{
         access_token: string;
         id: number;
@@ -27,4 +29,6 @@ export declare class AuthService {
     }>;
     generateRandomPassword(): string;
     check_token(token: any): boolean;
+    SendMail(uid: number): Promise<void>;
+    check2fa(uid: number): Promise<boolean>;
 }

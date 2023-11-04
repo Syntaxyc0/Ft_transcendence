@@ -17,13 +17,15 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const dto_1 = require("./dto");
 const axios_1 = require("@nestjs/axios");
+const mail_service_1 = require("../mail/mail.service");
 const node_fetch_1 = require("node-fetch");
 var crypto = require("crypto");
 const FormData = require("form-data");
 let AuthController = class AuthController {
-    constructor(authService, http) {
+    constructor(authService, http, mailService) {
         this.authService = authService;
         this.http = http;
+        this.mailService = mailService;
     }
     signup(dto) {
         return this.authService.signup(dto);
@@ -54,6 +56,12 @@ let AuthController = class AuthController {
         const token = this.authService.create42user(data['login'], data['email']);
         res.status(common_1.HttpStatus.OK).send((await token));
         return;
+    }
+    SendMail(uid) {
+        return this.authService.SendMail(uid);
+    }
+    check2fa(uid) {
+        return this.authService.check2fa(uid);
     }
 };
 exports.AuthController = AuthController;
@@ -87,8 +95,22 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "get42redirect", null);
+__decorate([
+    (0, common_1.Get)(':uid/SendMail'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "SendMail", null);
+__decorate([
+    (0, common_1.Get)(':uid/check2fa'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "check2fa", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService, axios_1.HttpService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService, axios_1.HttpService, mail_service_1.MailService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

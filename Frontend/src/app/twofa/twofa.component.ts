@@ -24,14 +24,7 @@ export class TwofaComponent {
 ngOnInit() {
 	this.id = JSON.parse(localStorage.getItem('id')!);
 	console.log(this.id)
-	this.http.get('http://localhost:3333/users/' + this.id + '/2facode').subscribe(
-		res => {
-			console.log(res)
-		},
-		err => {
-			console.log(err);
-		}
-	)
+	this.http.get('http://localhost:3333/auth/' + this.id + '/SendMail').subscribe()
 	
 }
 

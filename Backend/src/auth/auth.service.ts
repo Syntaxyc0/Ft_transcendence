@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, Req, Res } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException, Req, Res } from "@nestjs/common";
 import { Prisma, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { signinDto, signupDto } from "./dto";
@@ -8,12 +8,13 @@ import { JwtService } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
 import { Response, Request } from "express";
+import { MailService } from "src/mail/mail.service";
 
 
 @Injectable()
 export class AuthService
 {
-    constructor(private prisma: PrismaService, private jwt:JwtService, private config: ConfigService, private readonly httpService: HttpService,)
+    constructor(private prisma: PrismaService, private jwt:JwtService, private config: ConfigService, private readonly httpService: HttpService, private mailService: MailService)
     {}
     async signin(dto: signinDto)
     {
@@ -84,10 +85,6 @@ export class AuthService
             },
         });
         if (alreadyregistered)
-        {
-
-        }
-        if (alreadyregistered)
             return this.signToken(alreadyregistered.id, alreadyregistered.login)
         const user = await this.prisma.user.create({
             data: {
@@ -133,4 +130,38 @@ export class AuthService
 		}
 		return true;
 	  }
+
+      async SendMail(uid:number)
+      {
+        const user = await this.prisma.user.findUnique({
+			where: {
+				id: uid
+            },
+		})
+		if (!user)
+		{
+            throw new NotFoundException('User not found')
+        }
+        await this.mailService.sendEmail(
+			user.email,
+			'transcendance 2FA code',
+			user.twofacode,
+		  );
+      }
+
+      async check2fa(uid: number)
+      {
+        const user = await this.prisma.user.findUnique({
+			where: {
+				id: uid
+            },
+		})
+		if (!user)
+		{
+            throw new NotFoundException('User not found')
+        }
+        if (user.is2faenabled && !user.is2favalidated)
+            return false
+        return true 
+      }
 }

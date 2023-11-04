@@ -17,12 +17,14 @@ const argon = require("argon2");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 const axios_1 = require("@nestjs/axios");
+const mail_service_1 = require("../mail/mail.service");
 let AuthService = class AuthService {
-    constructor(prisma, jwt, config, httpService) {
+    constructor(prisma, jwt, config, httpService, mailService) {
         this.prisma = prisma;
         this.jwt = jwt;
         this.config = config;
         this.httpService = httpService;
+        this.mailService = mailService;
     }
     async signin(dto) {
         const user = await this.prisma.user.findUnique({
@@ -82,8 +84,6 @@ let AuthService = class AuthService {
                     login: login,
                 },
             });
-            if (alreadyregistered) {
-            }
             if (alreadyregistered)
                 return this.signToken(alreadyregistered.id, alreadyregistered.login);
             const user = await this.prisma.user.create({
@@ -126,10 +126,34 @@ let AuthService = class AuthService {
         }
         return true;
     }
+    async SendMail(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        await this.mailService.sendEmail(user.email, 'transcendance 2FA code', user.twofacode);
+    }
+    async check2fa(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        if (user.is2faenabled && !user.is2favalidated)
+            return false;
+        return true;
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService, axios_1.HttpService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService, axios_1.HttpService, mail_service_1.MailService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map
