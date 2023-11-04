@@ -60,10 +60,10 @@ export const routes: Routes = [{
 	path:    'chat',
 	title:	'Chat',
 	canActivate: [AuthGuard],
-	loadComponent:    () => import('./chat/components/dashboard/dashboard.component').then(m => m.DashboardComponent),
+	loadComponent:    () => import('./chat/components/chat/chat.component').then(m => m.ChatComponent),
 },
 {
-	path:    'create-room',
+	path:    'chat/create-room',
 	title:	'Create-Room',
 	canActivate: [AuthGuard],
 	loadComponent:    () => import('./chat/components/create-room/create-room.component').then(m => m.CreateRoomComponent),
