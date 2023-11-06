@@ -33,6 +33,6 @@ export class HomeComponent {
 
 	LaunchChat()
 	{
-		this.router.navigate(['chat']);
+		this.router.navigate(['test']);
 	}
 }
