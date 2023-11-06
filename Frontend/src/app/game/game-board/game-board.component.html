@@ -7,8 +7,8 @@
 	<button (click)="multiplayer()"> Multiplayer</button>
 	<button (click)="disconnect()">Disconnect</button>
 </div>
-<p *ngIf = "requestedMatchmaking && !secondPlayer"> Looking for players...</p>
-<p *ngIf = "secondPlayer"> Connected to: {{secondPlayer}} </p>
+<p *ngIf = "requestedMatchmaking"> Looking for players...</p>
+<p *ngIf = "isOnline"> Connected </p>
 <canvas #canvas width="1000" height="640" class="game-board">
 	Fallback
 </canvas>

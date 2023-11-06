@@ -41,27 +41,21 @@ export class GameGateway implements OnModuleInit{
     
   }
 
-  getTarget(client: Socket, id: string): Socket
-  {
-    const targetSocket = this.connectedSockets.get(id);
-    if (!targetSocket)
-      client.emit('otherDisconnected', {order: 'otherDisconnected'});
-    return (targetSocket);
-  }
-
   @SubscribeMessage('disconnectingClient')
-  warnOther(@MessageBody() body:{secondPlayer: string}, @ConnectedSocket() client: Socket)
+  warnOther(@ConnectedSocket() client: Socket)
   {
-    const targetSocket = this.connectedSockets.get(body.secondPlayer);
+    const targetSocket = this.getOther(client);
     this.lookingForPlayerSockets.delete(client.id);
+    this.pairedSockets.delete(client.id);
+    this.pairedSockets.delete(targetSocket.id);
     if (targetSocket)
       targetSocket.emit('otherDisconnected', {order: 'otherDisconnected'});
   }
 
   @SubscribeMessage('gameRequest')
-  GameRequest(@MessageBody() body: {order: string, secondPlayer: string}, @ConnectedSocket() client: Socket)
+  GameRequest(@MessageBody() body: {order: string}, @ConnectedSocket() client: Socket)
   {
-    const targetSocket = this.getTarget(client, body.secondPlayer);
+    const targetSocket = this.getOther(client);
     if (!targetSocket)
       return;
     targetSocket.emit('onGameRequest', {
@@ -69,11 +63,23 @@ export class GameGateway implements OnModuleInit{
     });
   }
 
-  @SubscribeMessage('newPaddlePos')
-  newPaddlePos(@MessageBody() body: {secondPlayer: string, x: number, y: number}, @ConnectedSocket() client: Socket)
+  getOther(client: Socket): Socket
   {
-    console.log(body);
-    const targetSocket = this.getTarget(client, body.secondPlayer);
+    const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
+    if (!targetSocket)
+    {
+      const targetId = this.pairedSockets.get(client.id);
+      this.pairedSockets.delete(client.id);
+      this.pairedSockets.delete(targetId);
+      client.emit('otherDisconnected', {order: 'otherDisconnected'});
+    }
+    return (targetSocket);
+  }
+
+  @SubscribeMessage('newPaddlePos')
+  newPaddlePos(@MessageBody() body: {x: number, y: number}, @ConnectedSocket() client: Socket)
+  {
+    const targetSocket = this.getOther(client);
     if (!targetSocket)
       return;
     targetSocket.emit('onGameRequest', {
@@ -84,9 +90,9 @@ export class GameGateway implements OnModuleInit{
   }
 
   @SubscribeMessage('newBallPos')
-  newBallPos(@MessageBody() body: {secondPlayer: string, angle: number, x: number, y: number}, @ConnectedSocket() client: Socket)
+  newBallPos(@MessageBody() body: {angle: number, x: number, y: number}, @ConnectedSocket() client: Socket)
   {
-    const targetSocket = this.getTarget(client, body.secondPlayer);
+    const targetSocket = this.getOther(client);
     if (!targetSocket)
       return;
     targetSocket.emit('onGameRequest', {
@@ -105,12 +111,10 @@ export class GameGateway implements OnModuleInit{
       {
         client.emit('newPlayer', {
           order: "newPlayer",
-          player: socket.id,
           first: true,
         });
         socket.emit('newPlayer', {
           order: "newPlayer",
-          player: client.id,
           first: false,
         });
         this.lookingForPlayerSockets.delete(socket.id);

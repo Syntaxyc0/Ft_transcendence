@@ -11,7 +11,7 @@ import { Paddle } from '../models/paddle.model';
 export class SocketDataService {
   private socket: Socket;
   private baseUrl = 'http://localhost:3333';
-  private secondPlayer: string;
+  private isOnline: boolean;
 
   getData(): Observable<any[]> {
     this.socket = io(this.baseUrl);
@@ -24,13 +24,13 @@ export class SocketDataService {
     this.socket.on('onGameRequest', (payload: {order: string}) =>{
       data.next(payload);
     });
-    this.socket.on('newPlayer', (payload:{order: string, player: string}) =>{
-      this.secondPlayer = payload.player;
+    this.socket.on('newPlayer', (payload: {order: string}) =>{
+      this.isOnline = true;
       data.next(payload);
     });
     this.socket.on('otherDisconnected', (payload:{order: string})=> {
+      this.isOnline = false;
       console.log(payload.order);
-      this.secondPlayer = '';
       data.next(payload);
     });
     return dataObservable;
@@ -38,31 +38,30 @@ export class SocketDataService {
 
   disconnect()
   {
-    console.log(this.secondPlayer);
-    if (this.secondPlayer)
-      this.socket.emit('disconnectingClient', {secondPlayer: this.secondPlayer});
-      this.secondPlayer = '';
+    if (this.isOnline)
+      this.socket.emit('disconnectingClient');
+    this.isOnline = false;
   }
 
   GameRequest(order: string){
-    if (this.secondPlayer)
-      this.socket.emit('gameRequest', {order, secondPlayer: this.secondPlayer});
+    if (this.isOnline)
+      this.socket.emit('gameRequest', {order});
   }
 
   multiplayerRequest(){
-    if (!this.secondPlayer)
+    if (!this.isOnline)
       this.socket.emit('multiplayerRequest');
   }
 
   newPaddlePos(x: number, y: number)
   {
-    if (this.secondPlayer)
-      this.socket.emit('newPaddlePos', {secondPlayer: this.secondPlayer, x, y});
+    if (this.isOnline)
+      this.socket.emit('newPaddlePos', {x, y});
   }
 
   newBallPos(angle: number, x: number, y: number)
   {
-    if (this.secondPlayer)
-      this.socket.emit('newBallPos', {secondPlayer: this.secondPlayer, angle, x, y});
+    if (this.isOnline)
+      this.socket.emit('newBallPos', {angle, x, y});
   }
 }

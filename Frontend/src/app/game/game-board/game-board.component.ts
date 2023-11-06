@@ -30,10 +30,10 @@ export class GameBoardComponent implements OnInit{
 	ball!: Ball;
 
 	isGameRunning: boolean = false;
+	requestedMatchmaking = false;
+	isOnline = false;
 
 	data: Observable<any>;
-	secondPlayer: string;
-	requestedMatchmaking = false;
 
 
 	constructor(private firstPlayer: SocketDataService) {}
@@ -70,11 +70,8 @@ export class GameBoardComponent implements OnInit{
 			this.isGameRunning = false;
 		else if (order == "startGame")
 			this.startGame(false);
-		else if (order == "newPlayer" && !this.secondPlayer)
-		{
-			this.newPlayer(payload.player, payload.first);
-			this.sendBall();
-		}
+		else if (order == "newPlayer")
+			this.newPlayer(payload.first);
 		else if (order == "resetRequest")
 			this.reset(false);
 		else if (order == "resetDone")
@@ -92,25 +89,26 @@ export class GameBoardComponent implements OnInit{
 	disconnect()
 	{
 		this.requestedMatchmaking = false;
-		this.secondPlayer = '';
 		this.firstPlayer.disconnect();
 		this.resetOnline();
 	}
 
 	resetOnline()
 	{
-		this.secondPlayer = '';
 		this.stopGame();
+		this.isOnline = false;
 		this.paddleLeft.currentUser = true;
 		this.paddleRight.currentUser = false;
 	}
 
-	newPlayer(secondPlayer: string, first:boolean)
+	newPlayer(first:boolean)
 	{
-		this.secondPlayer = secondPlayer;
 		this.paddleLeft.currentUser = first;
 		this.paddleRight.currentUser = !first;
+		this.isOnline = true;
+		this.requestedMatchmaking = false;
 		this.reset(true);
+		this.sendBall();
 	}
 
 	draw()
@@ -124,6 +122,8 @@ export class GameBoardComponent implements OnInit{
 	}
 
 	multiplayer(){
+		if (this.isOnline)
+			return;
 		this.requestedMatchmaking = true;
 		this.firstPlayer.multiplayerRequest();
 	}
