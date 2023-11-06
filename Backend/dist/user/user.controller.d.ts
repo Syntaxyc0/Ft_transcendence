@@ -46,4 +46,5 @@ export declare class UserController {
     verify2facode(uid: number, code: any): Promise<boolean>;
     get2faenabled(uid: number): Promise<boolean>;
     get2facode(uid: number): Promise<string>;
+    getelo(uid: number): Promise<number>;
 }

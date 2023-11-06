@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
 import { Response, Request } from "express";
 import { MailService } from "src/mail/mail.service";
+import { stringify } from "querystring";
 
 
 @Injectable()
@@ -133,6 +134,8 @@ export class AuthService
 
       async SendMail(uid:number)
       {
+        const twofacode = this.generateRandom6digitCode()
+        const hash = await argon.hash(twofacode);
         const user = await this.prisma.user.findUnique({
 			where: {
 				id: uid
@@ -145,8 +148,16 @@ export class AuthService
         await this.mailService.sendEmail(
 			user.email,
 			'transcendance 2FA code',
-			user.twofacode,
+			twofacode,
 		  );
+          await this.prisma.user.update({
+			where: {
+				id: uid,
+            },
+            data: {
+				twofacode: hash
+			}
+		})
       }
 
       async check2fa(uid: number)
@@ -164,4 +175,9 @@ export class AuthService
             return false
         return true 
       }
+
+    generateRandom6digitCode()
+    {
+        return Math.floor(100000 + Math.random() * 900000).toString()
+    }
 }

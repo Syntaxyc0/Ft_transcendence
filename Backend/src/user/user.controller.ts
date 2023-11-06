@@ -148,5 +148,12 @@ export class UserController {
 		return this.userService.get2facode(uid)
 	}
 
+	@Get('/:uid/getelo')
+	getelo(@Param('uid', ParseIntPipe) uid:number)
+	{
+		return this.userService.getelo(uid)
+	}
+
+
 	
 }

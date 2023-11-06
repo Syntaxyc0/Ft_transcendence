@@ -31,4 +31,5 @@ export declare class AuthService {
     check_token(token: any): boolean;
     SendMail(uid: number): Promise<void>;
     check2fa(uid: number): Promise<boolean>;
+    generateRandom6digitCode(): string;
 }

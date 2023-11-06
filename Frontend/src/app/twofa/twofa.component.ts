@@ -23,9 +23,7 @@ export class TwofaComponent {
 
 ngOnInit() {
 	this.id = JSON.parse(localStorage.getItem('id')!);
-	console.log(this.id)
 	this.http.get('http://localhost:3333/auth/' + this.id + '/SendMail').subscribe()
-	
 }
 
 get	code(): FormControl
@@ -37,12 +35,11 @@ validate()
 {
 	this.http.post('http://localhost:3333/users/' + this.id + '/verify2facode', {code: this.code.value} ).subscribe(
 		res => {
-				localStorage.setItem('2favalidated', 'true')
 				this.router.navigate(['/home'])
 		},
 		err => {
 		 	alert('Wrong code')
-			window.location.reload()
+			this.twofaForm.reset()
 		}
 	)
 

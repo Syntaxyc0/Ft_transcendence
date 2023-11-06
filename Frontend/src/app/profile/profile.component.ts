@@ -19,18 +19,29 @@ import { PictureComponent } from '../components/picture/picture.component';
 export class ProfileComponent {
 
 	id:number = 0;
-	name:string = "";
-	avatar:string = "";
+	elo:number = 0;
 
 	constructor(public http: HttpClient, public router:Router, private route: ActivatedRoute){}
 	ngOnInit()
 	{
 		this.getuserbyId();
+		this.getuserElo()
 	}
 	getuserbyId(): void
 	{
 		this.route.queryParams.subscribe(params => {
 			this.id = params['id'];
 		})
+	}
+	getuserElo()
+	{
+		this.http.get<number>('http://localhost:3333/users/' + this.id + '/getelo').subscribe(
+			res => {
+				this.elo = res
+			},
+			err => {
+				console.log(err)
+			}
+		)
 	}
 }

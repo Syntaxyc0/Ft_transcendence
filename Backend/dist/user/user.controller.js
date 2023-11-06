@@ -91,6 +91,9 @@ let UserController = class UserController {
     get2facode(uid) {
         return this.userService.get2facode(uid);
     }
+    getelo(uid) {
+        return this.userService.getelo(uid);
+    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -221,6 +224,13 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "get2facode", null);
+__decorate([
+    (0, common_1.Get)('/:uid/getelo'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "getelo", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])

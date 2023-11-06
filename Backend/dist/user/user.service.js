@@ -16,6 +16,7 @@ exports.UserService = void 0;
 const prisma_service_1 = require("../prisma/prisma.service");
 const common_1 = require("@nestjs/common");
 const common_2 = require("@nestjs/common");
+const argon = require("argon2");
 const mail_service_1 = require("../mail/mail.service");
 var path = require('path');
 let UserService = class UserService {
@@ -279,17 +280,6 @@ let UserService = class UserService {
         if (!user) {
             throw new common_2.NotFoundException('User not found');
         }
-        if (activate['activated'] == true) {
-            const code = this.generateRandom6digitCode();
-            await this.prisma.user.update({
-                where: {
-                    id: uid,
-                },
-                data: {
-                    twofacode: code
-                }
-            });
-        }
         await this.prisma.user.update({
             where: {
                 id: uid,
@@ -308,9 +298,17 @@ let UserService = class UserService {
         if (!user) {
             throw new common_2.NotFoundException('User not found');
         }
-        if (user.twofacode !== code) {
-            throw new common_1.BadRequestException('Wrong code provided');
-        }
+        const CodeMatches = await argon.verify(user.twofacode, code);
+        if (!CodeMatches)
+            throw new common_1.ForbiddenException("Wrong code");
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                is2favalidated: true
+            }
+        });
         return true;
     }
     async get2facode(uid) {

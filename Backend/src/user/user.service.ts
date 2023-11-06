@@ -1,5 +1,5 @@
 import { PrismaService } from "src/prisma/prisma.service";
-import { BadRequestException, Body, Injectable, ConflictException, ConsoleLogger } from "@nestjs/common";
+import { BadRequestException, Body, Injectable, ConflictException, ConsoleLogger, ForbiddenException } from "@nestjs/common";
 import { NotFoundException } from "@nestjs/common";
 import { stat } from "fs";
 import * as argon from 'argon2'
@@ -331,18 +331,6 @@ export class UserService
 		{
 			throw new NotFoundException('User not found')
 		}
-		if (activate['activated'] == true)
-		{
-			const code = this.generateRandom6digitCode()
-			await this.prisma.user.update({
-				where: {
-					id: uid,
-				},
-				data: {
-					twofacode: code
-				}
-			})
-		}
 		await this.prisma.user.update({
 			where: {
 				id: uid,
@@ -364,10 +352,17 @@ export class UserService
 		{
 			throw new NotFoundException('User not found')
 		}
-		if (user.twofacode !== code)
-		{
-			throw new BadRequestException('Wrong code provided')
-		}
+		const CodeMatches = await argon.verify(user.twofacode, code);
+        if (!CodeMatches)
+            throw new ForbiddenException("Wrong code");
+		await this.prisma.user.update({
+			where: {
+				id: uid,
+            },
+            data: {
+				is2favalidated:true
+			}
+		})
 		return true
 		
 	}

@@ -127,6 +127,8 @@ let AuthService = class AuthService {
         return true;
     }
     async SendMail(uid) {
+        const twofacode = this.generateRandom6digitCode();
+        const hash = await argon.hash(twofacode);
         const user = await this.prisma.user.findUnique({
             where: {
                 id: uid
@@ -135,7 +137,15 @@ let AuthService = class AuthService {
         if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
-        await this.mailService.sendEmail(user.email, 'transcendance 2FA code', user.twofacode);
+        await this.mailService.sendEmail(user.email, 'transcendance 2FA code', twofacode);
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                twofacode: hash
+            }
+        });
     }
     async check2fa(uid) {
         const user = await this.prisma.user.findUnique({
@@ -149,6 +159,9 @@ let AuthService = class AuthService {
         if (user.is2faenabled && !user.is2favalidated)
             return false;
         return true;
+    }
+    generateRandom6digitCode() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
     }
 };
 exports.AuthService = AuthService;
