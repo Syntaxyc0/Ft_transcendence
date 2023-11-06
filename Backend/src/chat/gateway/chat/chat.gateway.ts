@@ -4,7 +4,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { PageI } from 'src/chat/model/page.interface';
-import { Prisma } from '@prisma/client'; 
+import { Prisma, User, Room } from '@prisma/client'; 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UnauthorizedException } from '@nestjs/common';
 
@@ -18,30 +18,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private authService: AuthService,
     private prisma: PrismaService
   ) {}
-
   async handleConnection(socket: Socket) {
-    try {
-      const decodedToken = await this.authService.verifyJwt(socket.handshake.headers.authorization);
-      const user: Prisma.User | null = await this.prisma.user.findUnique({
-        where: { id: decodedToken.user.id },
-      });
-
-      if (!user) {
-        return this.disconnect(socket);
-      } else {
-        socket.data.user = user;
-        const rooms = await this.prisma.room.findMany({
-          where: { userId: user.id },
-          take: 10,
-          skip: 0,
-        });
-
-        return this.server.to(socket.id).emit('rooms', rooms);
-      }
-    } catch {
-      return this.disconnect(socket);
-    }
+	try {
+	  const decodedToken = await this.authService.verifyJwt(socket.handshake.headers.authorization);
+	  const user: User | null = await this.prisma.user.findUnique({
+		where: { id: decodedToken.user.id },
+	  });
+  
+	  if (!user) {
+		return this.disconnect(socket);
+	  } else {
+		socket.data.user = user;
+		const rooms = await this.prisma.room.findMany({
+		  where: { users: { some: { id: user.id } } },
+		  take: 10,
+		  skip: 0,
+		});
+  
+		return this.server.to(socket.id).emit('rooms', rooms);
+	  }
+	} catch {
+	  return this.disconnect(socket);
+	}
   }
+  
 
   handleDisconnect(socket: Socket) {
     socket.disconnect();
@@ -53,38 +53,56 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('createRoom')
-  async onCreateRoom(socket: Socket, room: Prisma.RoomCreateInput): Promise<Prisma.Room> {
-    if (!socket.data.user) {
-      throw new UnauthorizedException();
-    }
-
-    room.userId = socket.data.user.id;
-
-    const createdRoom = await this.prisma.room.create({
-      data: room,
-    });
-
-    console.log('creator: ' + socket.data.user);
-    console.log('room' + room);
-
-    return createdRoom;
+async onCreateRoom(socket: Socket, roomInput: Prisma.RoomCreateInput): Promise<Room> {
+  if (!socket.data.user) {
+    throw new UnauthorizedException();
   }
 
-  @SubscribeMessage('paginateRooms')
-  async onPaginateRoom(socket: Socket, page: PageI) {
-    if (!socket.data.user) {
-      throw new UnauthorizedException();
-    }
+  const user = await this.prisma.user.findUnique({
+    where: { id: socket.data.user.id },
+  });
 
-    page.limit = page.limit > 100 ? 100 : page.limit;
-    page.page = page.page + 1;
-
-    const rooms = await this.prisma.room.findMany({
-      where: { userId: socket.data.user.id },
-      take: page.limit,
-      skip: (page.page - 1) * page.limit,
-    });
-
-    return this.server.to(socket.id).emit('rooms', rooms);
+  if (!user) {
+    throw new UnauthorizedException();
   }
+
+  const createdRoom = await this.prisma.room.create({
+    data: {
+      ...roomInput,
+      users: {
+        connect: { id: user.id },
+      },
+    },
+  });
+
+  console.log('creator: ' + socket.data.user);
+  console.log('room' + roomInput);
+
+  return createdRoom;
+}
+
+
+@SubscribeMessage('paginateRooms')
+async onPaginateRoom(socket: Socket, page: PageI) {
+  if (!socket.data.user) {
+    throw new UnauthorizedException();
+  }
+
+  page.limit = page.limit > 100 ? 100 : page.limit;
+  page.page = page.page + 1;
+
+  const user = await this.prisma.user.findUnique({
+    where: { id: socket.data.user.id },
+    include: { rooms: { take: page.limit, skip: (page.page - 1) * page.limit } },
+  });
+
+  if (!user) {
+    throw new UnauthorizedException();
+  }
+
+  const rooms = user.rooms;
+
+  return this.server.to(socket.id).emit('rooms', rooms);
+}
+
 }
