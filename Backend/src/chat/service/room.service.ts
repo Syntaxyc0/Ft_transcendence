@@ -15,47 +15,49 @@ export class RoomService {
   }
 
   async getRoomForUser(userId: number, options: IPaginationOptions): Promise<Pagination<Room>> {
-    const rooms = await this.prisma.room.findMany({
-      where: {
-        users: {
-          some: {
-            id: userId,
-          },
-        },
-      },
-      orderBy: {
-        updated_at: 'desc',
-      },
-      take: options.limit || 10,
-      skip: (options.page - 1) * (options.limit || 10),
-      include: {
-        users: true,
-      },
-    });
-
-    const totalItems = await this.prisma.room.count({
-      where: {
-        users: {
-          some: {
-            id: userId,
-          },
-        },
-      },
-    });
-
-    return paginate<Room>(rooms, { ...options, totalItems });
+	const parsedLimit = typeof options.limit === 'string' ? parseInt(options.limit, 10) : options.limit || 10;
+	const parsedPage = typeof options.page === 'string' ? parseInt(options.page, 10) : options.page || 1;
+  
+	const rooms = await this.prisma.room.findMany({
+	  where: {
+		users: {
+		  some: {
+			id: userId,
+		  },
+		},
+	  },
+	  orderBy: {
+		updated_at: 'desc',
+	  },
+	  take: parsedLimit,
+	  skip: (parsedPage - 1) * parsedLimit,
+	  include: {
+		users: true,
+	  },
+	});
+  
+	const totalItems = await this.prisma.room.count({
+	  where: {
+		users: {
+		  some: {
+			id: userId,
+		  },
+		},
+	  },
+	});
+  
+	return paginate<Room>(rooms, { limit: parsedLimit, page: parsedPage, totalItems });
   }
-
-  async addCreatorToRoom(room: Prisma.RoomCreateInput, creator: User): Promise<Prisma.RoomCreateInput> {
-    if (!room.users) {
-      room.users = {
-        connect: [{ id: creator.id }],
-      };
-    } else {
-      room.users.connect = room.users.connect || [];
-      room.users.connect.push({ id: creator.id });
-    }
-
-    return room;
+  
+  async addCreatorToRoom(room: Room, creator: User): Promise<Room> {
+	return this.prisma.room.update({
+	  where: { id: room.id },
+	  data: {
+		users: {
+		  connect: [{ id: creator.id }],
+		},
+	  },
+	});
   }
+  
 }
