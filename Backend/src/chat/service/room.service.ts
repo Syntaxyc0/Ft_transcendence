@@ -1,37 +1,61 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma, Room, User } from '@prisma/client';
 import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
-import { RoomEntity } from 'src/chat/model/room.entity';
-import { RoomI } from 'src/chat/model/room.interface';
-import { UserI } from 'src/user/model/user.interface';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class RoomService {
+  constructor(private readonly prisma: PrismaService) {}
 
-	constructor(
-		@InjectRepository(RoomEntity)								//Change to Prisma
-		private readonly roomRepository: Repository<RoomEntity>		//Change to Prisma
-	) {}
+  async createRoom(room: Prisma.RoomCreateInput, creator: User): Promise<Room> {
+    const newRoom = await this.addCreatorToRoom(room, creator);
+    return this.prisma.room.create({
+      data: newRoom,
+    });
+  }
 
-	async createRoom(room: RoomI, creator: UserI): Promise<RoomI> {	//Change inteface
-		const newRoom = await this.addCreatorToRoom(room, creator);
-		return this.roomRepository.save(newRoom);					//change to prisma
-	}
+  async getRoomForUser(userId: number, options: IPaginationOptions): Promise<Pagination<Room>> {
+    const rooms = await this.prisma.room.findMany({
+      where: {
+        users: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+      orderBy: {
+        updated_at: 'desc',
+      },
+      take: options.limit || 10,
+      skip: (options.page - 1) * (options.limit || 10),
+      include: {
+        users: true,
+      },
+    });
 
-	async getRoomForUser(userId: number, options: IPaginationOptions): Promise<Pagination<RoomI>> {
-		const query = this.roomRepository
-			.createQueryBuilder('room')
-			.leftJoin('room.users', 'user')
-			.where('user.id = :userId', {userId})
-			.leftJoinAndSelect('room.users', 'all_users')
-			.orderBy('room.updated_at', 'DESC');
+    const totalItems = await this.prisma.room.count({
+      where: {
+        users: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
 
-		return paginate(query, options);
-	}
+    return paginate<Room>(rooms, { ...options, totalItems });
+  }
 
-	async addCreatorToRoom(room: RoomI, creator: UserI): Promise<RoomI> {
-		room.users.push(creator);
-		return room;
-	}
+  async addCreatorToRoom(room: Prisma.RoomCreateInput, creator: User): Promise<Prisma.RoomCreateInput> {
+    if (!room.users) {
+      room.users = {
+        connect: [{ id: creator.id }],
+      };
+    } else {
+      room.users.connect = room.users.connect || [];
+      room.users.connect.push({ id: creator.id });
+    }
+
+    return room;
+  }
 }
