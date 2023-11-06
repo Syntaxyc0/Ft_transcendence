@@ -2,10 +2,11 @@
 
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { AuthService } from 'src/auth/service/auth.service';
+import { AuthService } from 'src/auth/auth.service';
 import { PageI } from 'src/chat/model/page.interface';
-import { Prisma } from '@prisma/client'; // Importez les types Prisma ici
+import { Prisma } from '@prisma/client'; 
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UnauthorizedException } from '@nestjs/common';
 
 @WebSocketGateway({ cors: { origin: ['https://hoppscotch.io', 'http://localhost:3000', 'http://localhost:4200'] } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
