@@ -4,12 +4,9 @@ import { signinDto, signupDto } from "./dto";
 import { HttpService } from "@nestjs/axios";
 import { map } from "rxjs";
 import { Response } from "express";
-
 import fetch from "node-fetch";
 
 var crypto = require("crypto");
-
-
 import FormData = require('form-data');
 
 @Controller('auth')
