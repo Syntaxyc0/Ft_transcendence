@@ -1,11 +1,19 @@
 import { Component } from '@angular/core';
-import { FormArray, FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormArray, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { UserI } from 'src/app/chat/model/user.interface';
 import { ChatService } from '../../chat-service/chat.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-create-room',
+  standalone: true,
+  imports: [ ReactiveFormsModule, CommonModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatCardModule ],
   templateUrl: './create-room.component.html',
   styleUrls: ['./create-room.component.scss']
 })
@@ -68,6 +76,6 @@ export class CreateRoomComponent {
 	}
 
 	goToDashboard() {
-		this.router.navigate(['chat-dashboard']);
+		this.router.navigate(['chat']);
 	}
 }

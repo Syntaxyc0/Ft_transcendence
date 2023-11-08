@@ -17,7 +17,7 @@ export class SelectUsersComponent implements OnInit{
 
 	searchUsername = new FormControl();
 	filteredUsers: UserI[] = [];
-	selectedUser: UserI = null;
+	selectedUser: UserI | null = null;
 
 	constructor(private userService: UserService) {}
 
@@ -32,12 +32,14 @@ export class SelectUsersComponent implements OnInit{
 	}
 
 	addUserToForm() {
-		this.addUser.emit(this.selectedUser);
+		if (this.selectedUser !== null) {
+		  this.addUser.emit(this.selectedUser);
+		}
 		this.filteredUsers = [];
 		this.selectedUser = null;
 		this.searchUsername.setValue(null);
-
-	}
+	  }
+	  
 
 	removeUserFromForm(user: UserI) {
 		this.removeuser.emit(user);
