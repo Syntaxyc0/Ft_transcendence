@@ -12,23 +12,22 @@ export class ChatService {
 
   constructor(private socket: CustomSocket) { }
 
-  sendMessage() {
-  }
+	sendMessage() {
+	}
 
-  getMessage() {
-	return this.socket.fromEvent('message');
-  }
+	getMessage() {
+		return this.socket.fromEvent('message');
+	}
 
-  getMyRooms(): Observable<RoomPaginateI> {
-	return this.socket.fromEvent<RoomPaginateI>('rooms');
-  }
+	getMyRooms(): Observable<RoomPaginateI> {
+		return this.socket.fromEvent<RoomPaginateI>('rooms');
+	}
 
-  emitPaginateRooms(limit: number, page: number) {
-	this.socket.emit('paginateRooms', {limit, page});
+	emitPaginateRooms(limit: number, page: number) {
+		this.socket.emit('paginateRooms', {limit, page});
+	}
 
-  }
-
-  createRoom(room: RoomI) {
-	this.socket.emit('createRoom', room);
-  }
+	createRoom(room: RoomI) {
+		this.socket.emit('createRoom', room);
+	}
 }

@@ -11,98 +11,96 @@ import { UnauthorizedException } from '@nestjs/common';
 @WebSocketGateway({ cors: { origin: ['https://hoppscotch.io', 'http://localhost:3000', 'http://localhost:4200'] } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
-  @WebSocketServer()
-  server: Server;
+	@WebSocketServer()
+	server: Server;
 
-  constructor(
-    private authService: AuthService,
-    private prisma: PrismaService
-  ) {}
-  async handleConnection(socket: Socket) {
-	try {
-	  const decodedToken = await this.authService.verifyJwt(socket.handshake.headers.authorization);
-	  const user: User | null = await this.prisma.user.findUnique({
-		where: { id: decodedToken.user.id },
-	  });
-  
-	  if (!user) {
-		return this.disconnect(socket);
-	  } else {
-		socket.data.user = user;
-		const rooms = await this.prisma.room.findMany({
-		  where: { users: { some: { id: user.id } } },
-		  take: 10,
-		  skip: 0,
-		});
-  
-		return this.server.to(socket.id).emit('rooms', rooms);
-	  }
-	} catch {
-	  return this.disconnect(socket);
+	constructor( private authService: AuthService, private prisma: PrismaService ) {}
+
+	async handleConnection(socket: Socket) {
+		try {
+			const decodedToken = await this.authService.verifyJwt(socket.handshake.headers.authorization);
+			const user: User | null = await this.prisma.user.findUnique({
+				where: { id: decodedToken.user.id },
+		  	});
+
+			if (!user) {
+				return this.disconnect(socket);
+			} else {
+				socket.data.user = user;
+				const rooms = await this.prisma.room.findMany({
+					where: { users: { some: { id: user.id } } },
+					take: 10,
+					skip: 0,
+				});
+
+				return this.server.to(socket.id).emit('rooms', rooms);
+			}
+		} catch {
+			return this.disconnect(socket);
+		}
 	}
-  }
-  
-
-  handleDisconnect(socket: Socket) {
-    socket.disconnect();
-  }
-
-  private disconnect(socket: Socket) {
-    socket.emit('Error', new UnauthorizedException());
-    socket.disconnect();
-  }
-
-  @SubscribeMessage('createRoom')
-async onCreateRoom(socket: Socket, roomInput: Prisma.RoomCreateInput): Promise<Room> {
-  if (!socket.data.user) {
-    throw new UnauthorizedException();
-  }
-
-  const user = await this.prisma.user.findUnique({
-    where: { id: socket.data.user.id },
-  });
-
-  if (!user) {
-    throw new UnauthorizedException();
-  }
-
-  const createdRoom = await this.prisma.room.create({
-    data: {
-      ...roomInput,
-      users: {
-        connect: { id: user.id },
-      },
-    },
-  });
-
-  console.log('creator: ' + socket.data.user);
-  console.log('room' + roomInput);
-
-  return createdRoom;
-}
 
 
-@SubscribeMessage('paginateRooms')
-async onPaginateRoom(socket: Socket, page: PageI) {
-  if (!socket.data.user) {
-    throw new UnauthorizedException();
-  }
+	handleDisconnect(socket: Socket) {
+		socket.disconnect();
+	}
 
-  page.limit = page.limit > 100 ? 100 : page.limit;
-  page.page = page.page + 1;
+	private disconnect(socket: Socket) {
+		socket.emit('Error', new UnauthorizedException());
+		socket.disconnect();
+	}
 
-  const user = await this.prisma.user.findUnique({
-    where: { id: socket.data.user.id },
-    include: { rooms: { take: page.limit, skip: (page.page - 1) * page.limit } },
-  });
+	@SubscribeMessage('createRoom')
+	async onCreateRoom(socket: Socket, roomInput: Prisma.RoomCreateInput): Promise<Room> {
+		if (!socket.data.user) {
+		throw new UnauthorizedException();
+		}
 
-  if (!user) {
-    throw new UnauthorizedException();
-  }
+		const user = await this.prisma.user.findUnique({
+			where: { id: socket.data.user.id },
+		});
 
-  const rooms = user.rooms;
+		if (!user) {
+			throw new UnauthorizedException();
+		}
 
-  return this.server.to(socket.id).emit('rooms', rooms);
-}
+		const createdRoom = await this.prisma.room.create({
+			data: {
+			  ...roomInput,
+			  users: {
+			    connect: { id: user.id },
+			  },
+			},
+		});
+
+		console.log('creator: ' + socket.data.user);
+		console.log('room' + roomInput);
+
+		return createdRoom;
+	}
+
+
+	@SubscribeMessage('paginateRooms')
+	async onPaginateRoom(socket: Socket, page: PageI) {
+	if (!socket.data.user) {
+	throw new UnauthorizedException();
+	}
+
+	page.limit = page.limit > 100 ? 100 : page.limit;
+	page.page = page.page + 1;
+
+	const user = await this.prisma.user.findUnique({
+	where: { id: socket.data.user.id },
+	include: { rooms: { take: page.limit, skip: (page.page - 1) * page.limit } },
+	});
+
+	if (!user) {
+	throw new UnauthorizedException();
+	}
+
+	const rooms = user.rooms;
+
+	return this.server.to(socket.id).emit('rooms', rooms);
+	}
 
 }

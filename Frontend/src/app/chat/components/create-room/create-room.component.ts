@@ -4,6 +4,7 @@ import { UserI } from 'src/app/chat/model/user.interface';
 import { ChatService } from '../../chat-service/chat.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+// import { SelectUsersComponent } from 'src/app/chat/components/select-users/select-users.component'
 
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,7 +23,7 @@ export class CreateRoomComponent {
 	form: FormGroup = new FormGroup({
 		name: new FormControl(null, [Validators.required]),
 		description: new FormControl(null),
-		users: new FormArray([],[Validators.required])
+		// users: new FormArray([],[Validators.required])
 	});
 
 	constructor(private chatService: ChatService, private router: Router, private activateRoute: ActivatedRoute) {
@@ -32,7 +33,7 @@ export class CreateRoomComponent {
 	create() {
 		if (this.form.valid) {
 			this.chatService.createRoom(this.form.getRawValue());
-			this.router.navigate(["../dashboard"], {relativeTo: this.activateRoute});
+			this.router.navigate(["../chat"]);
 		}
 	}
 
