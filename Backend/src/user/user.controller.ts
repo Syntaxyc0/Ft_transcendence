@@ -154,6 +154,12 @@ export class UserController {
 		return this.userService.getelo(uid)
 	}
 
+	@Post('/:uid/logout')
+	logout(@Param('uid', ParseIntPipe) uid:number)
+	{
+		return this.userService.logout(uid)
+	}
+
 
 	
 }

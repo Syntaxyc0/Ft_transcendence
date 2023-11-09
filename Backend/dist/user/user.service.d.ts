@@ -50,4 +50,5 @@ export declare class UserService {
     verify2facode(uid: any, code: any): Promise<boolean>;
     get2facode(uid: any): Promise<string>;
     generateRandom6digitCode(): string;
+    logout(uid: any): Promise<void>;
 }

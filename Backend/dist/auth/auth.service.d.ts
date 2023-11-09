@@ -32,4 +32,7 @@ export declare class AuthService {
     SendMail(uid: number): Promise<void>;
     check2fa(uid: number): Promise<boolean>;
     generateRandom6digitCode(): string;
+    geturl(): {
+        url: string;
+    };
 }

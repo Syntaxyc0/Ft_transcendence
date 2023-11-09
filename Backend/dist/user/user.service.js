@@ -327,6 +327,34 @@ let UserService = class UserService {
     generateRandom6digitCode() {
         return Math.floor(100000 + Math.random() * 900000).toString();
     }
+    async logout(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        if (user.is2faenabled) {
+            await this.prisma.user.update({
+                where: {
+                    id: uid,
+                },
+                data: {
+                    is2favalidated: false
+                }
+            });
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                userStatus: 'OFFLINE'
+            }
+        });
+    }
 };
 exports.UserService = UserService;
 __decorate([

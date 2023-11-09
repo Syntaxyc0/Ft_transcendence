@@ -163,6 +163,9 @@ let AuthService = class AuthService {
     generateRandom6digitCode() {
         return Math.floor(100000 + Math.random() * 900000).toString();
     }
+    geturl() {
+        return { url: process.env.REDIRECT_URL };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

@@ -11,7 +11,9 @@ services:
     volumes:
       - ./Backend:/app/Backend
     env_file:
-        - ./Backend/.env
+        - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
     ports:
       - 3333:3333
     networks:
@@ -38,10 +40,11 @@ services:
     image: postgres:latest
     container_name: postgres
     env_file:
-      - ./Backend/.env
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
     ports:
       - 5432:5432
-      - 5555:5555
     networks:
       - transcendence
     

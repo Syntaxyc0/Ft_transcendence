@@ -75,4 +75,10 @@ export class AuthController
 	{
 		return this.authService.check2fa(uid);
 	}
+
+	@Get('/geturl')
+	geturl()
+	{
+		return this.authService.geturl()
+	}
 }

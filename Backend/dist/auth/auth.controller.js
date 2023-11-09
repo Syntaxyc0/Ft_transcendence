@@ -63,6 +63,9 @@ let AuthController = class AuthController {
     check2fa(uid) {
         return this.authService.check2fa(uid);
     }
+    geturl() {
+        return this.authService.geturl();
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -109,6 +112,12 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "check2fa", null);
+__decorate([
+    (0, common_1.Get)('/geturl'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "geturl", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService, axios_1.HttpService, mail_service_1.MailService])

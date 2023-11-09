@@ -20,4 +20,7 @@ export declare class AuthController {
     get42redirect(request: any, res: any): Promise<void>;
     SendMail(uid: number): Promise<void>;
     check2fa(uid: number): Promise<boolean>;
+    geturl(): {
+        url: string;
+    };
 }

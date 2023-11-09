@@ -94,6 +94,9 @@ let UserController = class UserController {
     getelo(uid) {
         return this.userService.getelo(uid);
     }
+    logout(uid) {
+        return this.userService.logout(uid);
+    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -231,6 +234,13 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "getelo", null);
+__decorate([
+    (0, common_1.Post)('/:uid/logout'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "logout", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])
