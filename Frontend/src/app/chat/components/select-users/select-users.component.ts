@@ -1,63 +1,78 @@
-// import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-// import { UserI } from 'src/app/chat/model/user.interface';
-// import { FormControl } from '@angular/forms';
-// import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs';
-// // import { UserService } from 'src/app/public/services/user-service/user.service';
-// import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { UserI } from 'src/app/chat/model/user.interface';
+import { FormControl } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs';
+import { UserService } from 'src/app/chat/services/user.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-// @Component({
-//   selector: 'app-select-users',
-//   standalone: true,
-//   imports: [ CommonModule ],
-//   templateUrl: './select-users.component.html',
-//   styleUrls: ['./select-users.component.scss']
-// })
-// export class SelectUsersComponent implements OnInit{
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatOptionModule } from '@angular/material/core';
+import { MatChipsModule } from '@angular/material/chips';
 
-// 	@Input() users: UserI[] | null = null;
-// 	@Output() addUser: EventEmitter<UserI> = new EventEmitter<UserI>();
-// 	@Output() removeuser: EventEmitter<UserI> = new EventEmitter<UserI>();
+@Component({
+  selector: 'app-select-users',
+  standalone: true,
+  imports: [
+	CommonModule,
+	MatFormFieldModule,
+	MatInputModule,
+	MatAutocompleteModule,
+	MatOptionModule,
+	MatChipsModule,
+	FormsModule,
+	ReactiveFormsModule],
+  templateUrl: './select-users.component.html',
+  styleUrls: ['./select-users.component.scss']
+})
+export class SelectUsersComponent implements OnInit{
 
-// 	searchUsername = new FormControl();
-// 	filteredUsers: UserI[] = [];
-// 	selectedUser: UserI | null = null;
+	@Input() users: UserI[] | null = null;
+	@Output() addUser: EventEmitter<UserI> = new EventEmitter<UserI>();
+	@Output() removeuser: EventEmitter<UserI> = new EventEmitter<UserI>();
 
-// 	constructor(private userService: UserService) {}
+	searchUsername = new FormControl();
+	filteredUsers: UserI[] = [];
+	selectedUser: UserI | null = null;
 
-// 	ngOnInit() : void {
-// 		this.searchUsername.valueChanges.pipe(
-// 			debounceTime(500),
-// 			distinctUntilChanged(),
-// 			switchMap((username: string) => this.userService.findByUsername(username).pipe(
-// 				tap((users: UserI[]) => this.filteredUsers = users)
-// 			))
-// 		).subscribe();
-// 	}
+	constructor(private userService: UserService) {}
 
-// 	addUserToForm() {
-// 		if (this.selectedUser !== null) {
-// 		  this.addUser.emit(this.selectedUser);
-// 		}
-// 		this.filteredUsers = [];
-// 		this.selectedUser = null;
-// 		this.searchUsername.setValue(null);
-// 	  }
+	ngOnInit() : void {
+		this.searchUsername.valueChanges.pipe(
+			debounceTime(500),
+			distinctUntilChanged(),
+			switchMap((username: string) => this.userService.findByUsername(username).pipe(
+				tap((users: UserI[]) => this.filteredUsers = users)
+			))
+		).subscribe();
+	}
+
+	addUserToForm() {
+		if (this.selectedUser !== null) {
+		  this.addUser.emit(this.selectedUser);
+		}
+		this.filteredUsers = [];
+		this.selectedUser = null;
+		this.searchUsername.setValue(null);
+	  }
 	  
 
-// 	removeUserFromForm(user: UserI) {
-// 		this.removeuser.emit(user);
-// 	}
+	removeUserFromForm(user: UserI) {
+		this.removeuser.emit(user);
+	}
 
-// 	setSelectedUser(user: UserI) {
-// 		this.selectedUser = user;
-// 	}
+	setSelectedUser(user: UserI) {
+		this.selectedUser = user;
+	}
 
-// 	displayFn(user: UserI) {
-// 		if (user) {
-// 			return user.username;
-// 		} else {
-// 			return '';
-// 		}
-// 	}
-// }
+	displayFn(user: UserI) {
+		if (user) {
+			return user.username;
+		} else {
+			return '';
+		}
+	}
+}
 

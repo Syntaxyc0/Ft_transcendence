@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 })
 export class ChatService {
 
-  constructor(private socket: CustomSocket) { }
+  constructor(private socket: CustomSocket, private snackbar: MatSnackBar) { }
 
 	sendMessage() {
 	}
@@ -29,5 +29,8 @@ export class ChatService {
 
 	createRoom(room: RoomI) {
 		this.socket.emit('createRoom', room);
+		// this.snackbar.open(`Room ${room.name} creatded succefully`, 'Close' ,{
+		// 	duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
+		// } );
 	}
 }

@@ -4,7 +4,7 @@ import { Prisma, Room, User } from '@prisma/client';
 import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
-export class RoomService {
+export class RoomService{
   constructor(private readonly prisma: PrismaService) {}
 
   async createRoom(room: Room, creator: User): Promise<Room> {

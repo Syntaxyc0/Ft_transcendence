@@ -5,6 +5,7 @@ import { HttpService } from "@nestjs/axios";
 import { map } from "rxjs";
 import { Response } from "express";
 import fetch from "node-fetch";
+import { PrismaService } from '../prisma/prisma.service'; 
 
 var crypto = require("crypto");
 import FormData = require('form-data');
@@ -12,7 +13,7 @@ import FormData = require('form-data');
 @Controller('auth')
 export class AuthController
 {
-    constructor(private authService: AuthService, private http: HttpService) {}
+    constructor(private authService: AuthService, private http: HttpService, private prismaService: PrismaService) {}
 
 	token: string
     @Post('signup')
@@ -60,5 +61,11 @@ export class AuthController
 		return 	
 
 		
+	}
+
+	@Get('room')
+	async getUsers() {
+		return await this.prismaService.room.findMany();
+		// return {'message' : 'hello world'};
 	}
 }

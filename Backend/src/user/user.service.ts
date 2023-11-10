@@ -2,6 +2,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { BadRequestException, Body, Injectable, ConflictException, ConsoleLogger } from "@nestjs/common";
 import { NotFoundException } from "@nestjs/common";
 import { stat } from "fs";
+import { Prisma, Room, User } from '@prisma/client';
 
 var path = require('path');
 

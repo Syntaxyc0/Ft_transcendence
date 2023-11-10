@@ -11,7 +11,7 @@
 </mat-form-field>
 <button mat-button type="button" [disabled]="!selectedUser" (click)="addUserToForm()">Add User</button>
 
-<mat-chip-set *ngIf="users.length > 0; else no_users">
+<mat-chip-set *ngIf="users && users.length > 0; else no_users">
 	<mat-chip *ngFor="let user of users" (removed)="removeUserFromForm(user)">
 		{{user.username}}
 		<mat-icon matChipRemove>cancel</mat-icon>

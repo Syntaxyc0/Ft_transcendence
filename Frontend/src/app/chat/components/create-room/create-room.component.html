@@ -1,45 +1,8 @@
-<!-- <div class="container">
-	<div>
-	  <div class="dashboard">
-		<a (click)="goToDashboard()">Go to Dashboard</a>
-
-	  </div>
-  
-	  <div>
-		<div class="card">
-		  <div class="card-title">Create Chatroom</div>
-  
-		  <div class="card-content">
-			<form [formGroup]="form" (submit)="create()">
-			  <div class="form-field">
-				<input type="text" placeholder="Name" formControlName="name">
-				<div class="error" *ngIf="name.touched && name.hasError('required')">Name is required</div>
-			  </div>
-			  
-			  <div class="form-field">
-				<input type="text" placeholder="Description" formControlName="description">
-			  </div>
-  
-			  <app-select-users [users]="users.value" (addUser)="addUser(initUser($event))" (removeuser)="removeUser($event.id)"></app-select-users>
-  
-			  <div class="hint" *ngIf="!form.valid"><small>Please fill out needed information</small></div>
-  
-			  <div class="button">
-				<button type="submit" [disabled]="!form.valid">Create Chatroom</button>
-			  </div>
-			</form>
-		  </div>
-		</div>
-	  </div>
-	</div>
-  </div>
-   -->
-
    <div class="container">
 
 	<div>
 		<div class="dashboard">
-			<a (click)="goToDashboard()">Go to Dashboard</a>
+			<a [routerLink]="'/chat'">Go to Chat-Dashboard</a>
 		</div>
 
 		<div>
@@ -59,7 +22,7 @@
 							<input type ="text" matInput placeholder="Descritpion" formControlName="description">
 						</mat-form-field>
 
-						<!-- <app-select-users [users]="users.value" (addUser)="addUser(initUser($event))" (removeuser)="removeUser($event.id)"></app-select-users> -->
+						<app-select-users [users]="users.value || []" (addUser)="addUser(initUser($event))" (removeuser)="removeUser($event.id)"></app-select-users>
 						
 						<mat-hint *ngIf="!form.valid"><small>Please fill out needed information</small></mat-hint>
 

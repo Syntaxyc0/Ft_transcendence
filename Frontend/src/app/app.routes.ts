@@ -1,5 +1,8 @@
-import { Routes } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth.guard';
+import { NgModule } from '@angular/core';
+import { ChatComponent } from './chat/components/chat/chat.component';
+import { CreateRoomComponent } from './chat/components/create-room/create-room.component';
 
 export const routes: Routes = [{
 	path:	'',
@@ -68,4 +71,14 @@ export const routes: Routes = [{
 	canActivate: [AuthGuard],
 	loadComponent:    () => import('./chat/components/create-room/create-room.component').then(m => m.CreateRoomComponent),
 },
+{ path: 'chat', component: ChatComponent },
+{ path: '', redirectTo: '/chat', pathMatch: 'full' },
+{ path: 'create-room', component: CreateRoomComponent },
+{ path: '', redirectTo: '/create-room', pathMatch: 'full' },
 ];
+
+@NgModule({
+	imports: [RouterModule.forRoot(routes)],
+	exports: [RouterModule]
+  })
+  export class AppRoutingModule {}

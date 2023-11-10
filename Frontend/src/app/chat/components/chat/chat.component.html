@@ -1,28 +1,3 @@
-<!-- <div class="container">
-	<div class="card">
-	  <div style="display: flex; flex-direction: row;">
-		<div>
-		  <h1></h1>
-		  <h2>My Chatrooms</h2>
-		  <button (click)="LaunchCreateRoom()">Create new Room</button>
-		  <div *ngFor="let room of (rooms$ | async)?.items">
-			Name: {{ room.name }} Id: {{ room.id }}
-		  </div>
-		  <div>
-			<h2>My Room</h2>
-			{{ selectedRoom }}
-		  </div>
-		</div>
-	  </div>
-	</div>
-	<ng-template #no_rooms>
-	  <div>
-		No Chatrooms for you so far, please create one or get an invite
-	  </div>
-	</ng-template>
-  </div>
-   -->
-
    <div class="container">
 
 	<mat-card>
@@ -32,7 +7,7 @@
 			<div>
 				<h1></h1>
 				<h2>My Chatrooms</h2>
-				<button mat-button (click)="LaunchCreateRoom()">Create new Room</button>
+				<button mat-button [routerLink]="'/create-room'">Create new Room</button>
 				<mat-selection-list hideSingleSelectionIndicator [multiple]="false" (selectionChange)="onSelectRoom($event)">
 				  <mat-list-option *ngFor="let room of (rooms$ | async)?.items" [value]="room">
 					Name: {{room.name}} Id: {{room.id}}

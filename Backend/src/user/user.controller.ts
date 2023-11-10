@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res, UseGuards, Request, Body, Post, Param, ParseIntPipe, NotFoundException, Patch, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, Request, Body, Post, Param, ParseIntPipe, NotFoundException, Patch, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
 import { getMetadataStorage } from 'class-validator';

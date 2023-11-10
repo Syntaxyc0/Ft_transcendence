@@ -11,4 +11,5 @@ import { HttpModule } from '@nestjs/axios';
 	imports: [ AuthModule, UserModule, JwtModule, HttpModule],
 	providers: [ChatGateway, RoomService, AuthService]
 })
-export class ChatModule {}
+export class ChatModule {
+}
