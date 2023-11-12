@@ -29,14 +29,8 @@ model User {
   userStatus String	@default("OFFLINE")
   gameHistory Int[] 
   friendList Int[] @default([])
-  FriendRequest	FriendRequest[]
-}
-
-model FriendRequest {
-	id Int @id @default(autoincrement())
-	userId Int
-	User User	@relation(fields: [userId], references: [id])
-	Status Boolean @default(false)
+  FriendRequestsEmitted	Int[] @default([])
+  FriendRequestsReceived	Int[] @default([])
 }
 
 model GameInfo {

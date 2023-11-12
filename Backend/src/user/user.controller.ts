@@ -60,6 +60,12 @@ export class UserController {
 		return this.userService.GetUserFriendlist(uid);
 	}
 
+	@Get(':uid/friendrequestsreceived')
+    GetUserFriendRequestsReceived(@Param('uid', ParseIntPipe) uid:number)
+	{
+		return this.userService.GetUserFriendRequestsReceived(uid);
+	}
+
 	@Get(":uid/login")
 	getUserLogin(@Param('uid', ParseIntPipe) uid: number)
 	{
@@ -154,7 +160,7 @@ export class UserController {
 		return this.userService.getelo(uid)
 	}
 
-	@Post('/:uid/logout')
+	@Get('/:uid/logout')
 	logout(@Param('uid', ParseIntPipe) uid:number)
 	{
 		return this.userService.logout(uid)

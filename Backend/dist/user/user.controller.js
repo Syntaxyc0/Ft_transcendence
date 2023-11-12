@@ -44,6 +44,9 @@ let UserController = class UserController {
     GetUserFriendlist(uid) {
         return this.userService.GetUserFriendlist(uid);
     }
+    GetUserFriendRequestsReceived(uid) {
+        return this.userService.GetUserFriendRequestsReceived(uid);
+    }
     getUserLogin(uid) {
         return this.userService.getlogin(uid);
     }
@@ -135,6 +138,13 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUserFriendlist", null);
+__decorate([
+    (0, common_1.Get)(':uid/friendrequestsreceived'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "GetUserFriendRequestsReceived", null);
 __decorate([
     (0, common_1.Get)(":uid/login"),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
@@ -235,7 +245,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "getelo", null);
 __decorate([
-    (0, common_1.Post)('/:uid/logout'),
+    (0, common_1.Get)('/:uid/logout'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),

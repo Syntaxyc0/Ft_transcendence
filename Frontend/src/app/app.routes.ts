@@ -44,16 +44,22 @@ export const routes: Routes = [{
     loadComponent:    () => import('./settings/settings.component').then(m => m.SettingsComponent),
 },
 {
-	path:    'profile',
+	path:    'user',
 	title:	'Profile',
 	canActivate: [AuthGuard],
 	loadComponent:    () => import('./profile/profile.component').then(m => m.ProfileComponent),
 },
 {
-	path:    'profile/:id',
+	path:    'user/:id',
 	title:	'Profile',
 	canActivate: [AuthGuard],
 	loadComponent:    () => import('./profile/profile.component').then(m => m.ProfileComponent),
+},
+{
+	path:    'profile',
+	title:	'Profile',
+	canActivate: [AuthGuard],
+	loadComponent:    () => import('./private-profile/private-profile.component').then(m => m.PrivateProfileComponent),
 },
 {
 	path:    'game',

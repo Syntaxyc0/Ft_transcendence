@@ -58,7 +58,7 @@ export class SettingsComponent {
 
 	logout()
 	{
-		this.http.patch<any>('http://localhost:3333/users/' + this.id + '/status', {status: "OFFLINE"}).subscribe()
+		this.http.get('http://localhost:3333/users/' + this.id + '/logout').subscribe()
 		localStorage.clear()
 		this.router.navigate(['/landing'])
 	}

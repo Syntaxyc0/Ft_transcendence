@@ -91,6 +91,23 @@ export class UserService
 		return user.friendList
 	}
 
+	async GetUserFriendRequestsReceived(uid: number)
+	{
+		const user = await this.prisma.user.findUnique(
+		{
+			where: {
+				id: uid
+			},
+		})
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		return user.FriendRequestsReceived
+	}
+
+	
+
 	async AddFriend(uid:number, userName: string)
 	{
 		const friend = await this.prisma.user.findUnique({
@@ -102,12 +119,6 @@ export class UserService
 		{
 			throw new NotFoundException('User not found')
 		}
-		console.log(friend.email)
-		await this.mail.sendEmail(
-			friend.email,
-			'transcendance 2FA',
-			`Please enter this code : 123456`,
-		  );
 		const user = await this.prisma.user.findUnique({
 			where: {
 				id: uid
@@ -129,14 +140,32 @@ export class UserService
 					throw new ConflictException(friend.login + " is already a friend")
 			}
 		}
+		const friendrequests = user.FriendRequestsEmitted
+		for (const i of friendrequests)
+		{
+			{
+				if ( i == friend.id)
+					throw new ConflictException(friend.login + " has already been added")
+			}
+		}
 		await this.prisma.user.update({
 			data: {
-				friendList :{
+				FriendRequestsEmitted :{
 					push: friend.id
 						}	
 					},
 			where: {
 				id: uid,
+			}
+		})
+		await this.prisma.user.update({
+			data: {
+				FriendRequestsReceived :{
+					push: user.id
+						}	
+					},
+			where: {
+				id: friend.id,
 			}
 		})
 		

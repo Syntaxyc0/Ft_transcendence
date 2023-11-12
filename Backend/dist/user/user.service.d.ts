@@ -18,6 +18,8 @@ export declare class UserService {
         userStatus: string;
         gameHistory: number[];
         friendList: number[];
+        FriendRequestsEmitted: number[];
+        FriendRequestsReceived: number[];
     }>;
     getUserFromLogin(login: string): Promise<{
         id: number;
@@ -32,10 +34,13 @@ export declare class UserService {
         userStatus: string;
         gameHistory: number[];
         friendList: number[];
+        FriendRequestsEmitted: number[];
+        FriendRequestsReceived: number[];
     }>;
     updateUserStatus(id: number, status: any): Promise<void>;
     GetUserStatus(id: number): Promise<string>;
     GetUserFriendlist(uid: number): Promise<number[]>;
+    GetUserFriendRequestsReceived(uid: number): Promise<number[]>;
     AddFriend(uid: number, userName: string): Promise<void>;
     RemoveFriend(uid: number, userId: number): Promise<void>;
     uploadFile(uid: number, file: Express.Multer.File): Promise<void>;

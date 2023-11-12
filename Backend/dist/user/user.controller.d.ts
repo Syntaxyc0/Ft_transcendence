@@ -17,6 +17,8 @@ export declare class UserController {
         userStatus: string;
         gameHistory: number[];
         friendList: number[];
+        FriendRequestsEmitted: number[];
+        FriendRequestsReceived: number[];
     }>;
     getUserFromLogin(login: string): Promise<{
         id: number;
@@ -31,10 +33,13 @@ export declare class UserController {
         userStatus: string;
         gameHistory: number[];
         friendList: number[];
+        FriendRequestsEmitted: number[];
+        FriendRequestsReceived: number[];
     }>;
     updateUserStatus(uid: number, status: string): Promise<void>;
     GetUserStatus(uid: number): Promise<string>;
     GetUserFriendlist(uid: number): Promise<number[]>;
+    GetUserFriendRequestsReceived(uid: number): Promise<number[]>;
     getUserLogin(uid: number): Promise<string>;
     getUserElo(uid: number): Promise<number>;
     updateUserElo(uid: number, elo: number): Promise<void>;

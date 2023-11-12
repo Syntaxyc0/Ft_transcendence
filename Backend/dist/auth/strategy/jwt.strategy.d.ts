@@ -21,6 +21,8 @@ export declare class JwtStrategy extends JwtStrategy_base {
         userStatus: string;
         gameHistory: number[];
         friendList: number[];
+        FriendRequestsEmitted: number[];
+        FriendRequestsReceived: number[];
     }>;
 }
 export {};
