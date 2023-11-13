@@ -11,7 +11,7 @@ import { Paddle } from '../models/paddle.model';
 export class SocketDataService {
   private socket: Socket;
   private baseUrl = 'http://localhost:3333';
-  private isOnline: boolean;
+  private isOnline: boolean = false;
 
   getData(): Observable<any[]> {
     this.socket = io(this.baseUrl);
@@ -19,18 +19,20 @@ export class SocketDataService {
     const dataObservable = from(data);
 
     this.socket.on('connect', () => {
-      // console.log("Current Client: " + this.socket.id);
+      // //console.log("Current Client: " + this.socket.id);
+      //console.log("Connected " + this.isOnline);
     });
     this.socket.on('onGameRequest', (payload: {order: string}) =>{
       data.next(payload);
     });
     this.socket.on('newPlayer', (payload: {order: string}) =>{
+      //console.log("newPlayer " + this.isOnline);
       this.isOnline = true;
       data.next(payload);
     });
     this.socket.on('otherDisconnected', (payload:{order: string})=> {
+    //console.log("otherDisconnected " + this.isOnline)
       this.isOnline = false;
-      console.log(payload.order);
       data.next(payload);
     });
     return dataObservable;
@@ -38,8 +40,8 @@ export class SocketDataService {
 
   disconnect()
   {
-    if (this.isOnline)
-      this.socket.emit('disconnectingClient');
+    //console.log("disconnect " + this.isOnline)
+    this.socket.emit('disconnectingClient');
     this.isOnline = false;
   }
 
@@ -49,6 +51,7 @@ export class SocketDataService {
   }
 
   multiplayerRequest(){
+    //console.log("multiplayerRequest " + this.isOnline)
     if (!this.isOnline)
       this.socket.emit('multiplayerRequest');
   }
@@ -63,5 +66,11 @@ export class SocketDataService {
   {
     if (this.isOnline)
       this.socket.emit('newBallPos', {angle, x, y});
+  }
+
+  newScore(leftScore: number, rightScore:number)
+  {
+    if (this.isOnline)
+      this.socket.emit('newScore', {leftScore, rightScore});
   }
 }

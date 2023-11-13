@@ -6,11 +6,15 @@ export declare class GameGateway implements OnModuleInit {
     private lookingForPlayerSockets;
     private pairedSockets;
     onModuleInit(): void;
+    disconnectClient(clientId: string): void;
     warnOther(client: Socket): void;
     GameRequest(body: {
         order: string;
     }, client: Socket): void;
-    getOther(client: Socket): Socket;
+    newScore(body: {
+        leftScore: number;
+        rightScore: number;
+    }, client: Socket): void;
     newPaddlePos(body: {
         x: number;
         y: number;

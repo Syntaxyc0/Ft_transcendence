@@ -28,6 +28,7 @@ export class GameBoardComponent implements OnInit{
 	paddleLeft!: Paddle;
 	paddleRight!: Paddle;
 	ball!: Ball;
+	score: number = 0;
 
 	isGameRunning: boolean = false;
 	requestedMatchmaking = false;
@@ -55,50 +56,55 @@ export class GameBoardComponent implements OnInit{
 		requestAnimationFrame(this.gameLoop);
 	}
 	
-	handleOrder(order:string, payload: any)
+	handleOrder(order:string, payload:any)
 	{
-		if (order == "paddleUp")
-		{
-			if (this.paddleRight.currentUser)
+		switch(order){
+			case "paddleUp":
+				if (this.paddleRight.currentUser)
 				this.paddleLeft.newMultiPos(payload.x, payload.y);
-			else if (this.paddleLeft.currentUser)
+				else if (this.paddleLeft.currentUser)
 				this.paddleRight.newMultiPos(payload.x, payload.y);
-		}
-		if (order == "ballUp" && !this.paddleLeft.currentUser)
-			this.ball.newMultiPos(payload.angle, payload.x, payload.y);
-		else if(order == "stopGame")
-			this.isGameRunning = false;
-		else if (order == "startGame")
-			this.startGame(false);
-		else if (order == "newPlayer")
-			this.newPlayer(payload.first);
-		else if (order == "resetRequest")
-			this.reset(false);
-		else if (order == "resetDone")
-		{
-			this.reset(false);
-			this.draw();
-		}
-		else if (order == "otherDisconnected")
-		{
-			this.resetOnline();
-			this.multiplayer();
+			break;
+			case "ballUp":
+				this.ball.newMultiPos(payload.angle, payload.x, payload.y);break;
+			case "scoreUp":
+				this.paddleLeft.score = payload.leftScore;
+				this.paddleRight.score = payload.rightScore;
+			break;
+			case "stopGame":
+				this.isGameRunning = false;break;
+			case "startGame":
+				this.startGame(false);break;
+			case "newPlayer":
+				this.newPlayer(payload.first);break;
+			case "resetRequest":
+				this.reset(false);break;
+			case "resetDone":
+				this.reset(false);
+				this.draw();
+			break;
+			case "otherDisconnected":
+				this.resetOnline();
+				this.multiplayer();
+			break;
 		}
 	}
 
 	disconnect()
 	{
 		this.requestedMatchmaking = false;
-		this.firstPlayer.disconnect();
 		this.resetOnline();
+		this.firstPlayer.disconnect();
 	}
 
 	resetOnline()
 	{
-		this.stopGame();
 		this.isOnline = false;
+		this.stopGame();
+		this.requestedMatchmaking = false;
 		this.paddleLeft.currentUser = true;
 		this.paddleRight.currentUser = false;
+		this.reset(false);
 	}
 
 	newPlayer(first:boolean)
@@ -141,6 +147,7 @@ export class GameBoardComponent implements OnInit{
 		this.ball.reset();
 		this.draw();
 		this.sendBall();
+		this.sendScore();
 		this.firstPlayer.GameRequest("resetDone");
 	}
 
@@ -165,6 +172,12 @@ export class GameBoardComponent implements OnInit{
 		this.ball.updatePosition();
 		this.draw();
 		requestAnimationFrame(this.gameLoop);
+	}
+
+	sendScore()
+	{
+		if (this.paddleLeft.currentUser)
+			this.firstPlayer.newScore(this.paddleLeft.score, this.paddleRight.score);
 	}
 
 	sendBall()

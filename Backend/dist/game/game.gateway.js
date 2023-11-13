@@ -29,44 +29,47 @@ let GameGateway = class GameGateway {
                 console.log(socket.id + " has disconnected");
                 const targetId = this.pairedSockets.get(socket.id);
                 const targetSocket = this.connectedSockets.get(targetId);
+                this.disconnectClient(socket.id);
                 this.connectedSockets.delete(socket.id);
-                this.lookingForPlayerSockets.delete(socket.id);
-                this.pairedSockets.delete(socket.id);
-                if (targetId)
-                    this.pairedSockets.delete(targetId);
                 if (targetSocket)
                     targetSocket.emit('otherDisconnected', { order: 'otherDisconnected' });
             });
         });
     }
+    disconnectClient(clientId) {
+        const targetId = this.pairedSockets.get(clientId);
+        this.pairedSockets.delete(clientId);
+        this.pairedSockets.delete(targetId);
+        this.lookingForPlayerSockets.delete(clientId);
+        this.lookingForPlayerSockets.delete(targetId);
+        console.log("erase happened");
+    }
     warnOther(client) {
-        const targetSocket = this.getOther(client);
-        this.lookingForPlayerSockets.delete(client.id);
-        this.pairedSockets.delete(client.id);
-        this.pairedSockets.delete(targetSocket.id);
+        const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
+        this.disconnectClient(client.id);
         if (targetSocket)
             targetSocket.emit('otherDisconnected', { order: 'otherDisconnected' });
     }
     GameRequest(body, client) {
-        const targetSocket = this.getOther(client);
+        const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
         if (!targetSocket)
             return;
         targetSocket.emit('onGameRequest', {
             order: body.order
         });
     }
-    getOther(client) {
+    newScore(body, client) {
         const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
-        if (!targetSocket) {
-            const targetId = this.pairedSockets.get(client.id);
-            this.pairedSockets.delete(client.id);
-            this.pairedSockets.delete(targetId);
-            client.emit('otherDisconnected', { order: 'otherDisconnected' });
-        }
-        return (targetSocket);
+        if (!targetSocket)
+            return;
+        targetSocket.emit('onGameRequest', {
+            order: "scoreUp",
+            leftScore: body.leftScore,
+            rightScore: body.rightScore
+        });
     }
     newPaddlePos(body, client) {
-        const targetSocket = this.getOther(client);
+        const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
         if (!targetSocket)
             return;
         targetSocket.emit('onGameRequest', {
@@ -76,7 +79,7 @@ let GameGateway = class GameGateway {
         });
     }
     newBallPos(body, client) {
-        const targetSocket = this.getOther(client);
+        const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
         if (!targetSocket)
             return;
         targetSocket.emit('onGameRequest', {
@@ -90,6 +93,7 @@ let GameGateway = class GameGateway {
         console.log("Client looking for player: " + client.id);
         for (const [socketId, socket] of this.lookingForPlayerSockets) {
             if (socket.id != client.id) {
+                console.log("Player found: " + socket.id);
                 client.emit('newPlayer', {
                     order: "newPlayer",
                     first: true,
@@ -127,6 +131,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", void 0)
 ], GameGateway.prototype, "GameRequest", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('newScore'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", void 0)
+], GameGateway.prototype, "newScore", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('newPaddlePos'),
     __param(0, (0, websockets_1.MessageBody)()),

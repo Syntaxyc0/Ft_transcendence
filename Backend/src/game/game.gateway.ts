@@ -26,28 +26,28 @@ export class GameGateway implements OnModuleInit{
         const targetId = this.pairedSockets.get(socket.id);
         const targetSocket = this.connectedSockets.get(targetId);
 
+        this.disconnectClient(socket.id);
         this.connectedSockets.delete(socket.id);
-        this.lookingForPlayerSockets.delete(socket.id);
-
-        this.pairedSockets.delete(socket.id);
-        if (targetId)
-          this.pairedSockets.delete(targetId);
-
         if (targetSocket)
           targetSocket.emit('otherDisconnected', {order: 'otherDisconnected'})
       });
     });
-
-    
   }
+
+  disconnectClient(clientId: string) {
+    const targetId = this.pairedSockets.get(clientId);
+    this.pairedSockets.delete(clientId);
+    this.pairedSockets.delete(targetId); // Remove the target as well
+    this.lookingForPlayerSockets.delete(clientId);
+    this.lookingForPlayerSockets.delete(targetId); // Remove the target as well
+    console.log("erase happened")
+}
 
   @SubscribeMessage('disconnectingClient')
   warnOther(@ConnectedSocket() client: Socket)
   {
-    const targetSocket = this.getOther(client);
-    this.lookingForPlayerSockets.delete(client.id);
-    this.pairedSockets.delete(client.id);
-    this.pairedSockets.delete(targetSocket.id);
+    const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
+    this.disconnectClient(client.id);
     if (targetSocket)
       targetSocket.emit('otherDisconnected', {order: 'otherDisconnected'});
   }
@@ -55,31 +55,31 @@ export class GameGateway implements OnModuleInit{
   @SubscribeMessage('gameRequest')
   GameRequest(@MessageBody() body: {order: string}, @ConnectedSocket() client: Socket)
   {
-    const targetSocket = this.getOther(client);
+    const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
       return;
     targetSocket.emit('onGameRequest', {
         order: body.order
     });
-  }
+  }  
 
-  getOther(client: Socket): Socket
+  @SubscribeMessage('newScore')
+  newScore(@MessageBody() body: {leftScore: number, rightScore: number}, @ConnectedSocket() client:Socket)
   {
     const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
-    {
-      const targetId = this.pairedSockets.get(client.id);
-      this.pairedSockets.delete(client.id);
-      this.pairedSockets.delete(targetId);
-      client.emit('otherDisconnected', {order: 'otherDisconnected'});
-    }
-    return (targetSocket);
+      return;
+    targetSocket.emit('onGameRequest', {
+      order: "scoreUp",
+      leftScore: body.leftScore,
+      rightScore: body.rightScore
+    });
   }
 
   @SubscribeMessage('newPaddlePos')
   newPaddlePos(@MessageBody() body: {x: number, y: number}, @ConnectedSocket() client: Socket)
   {
-    const targetSocket = this.getOther(client);
+    const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
       return;
     targetSocket.emit('onGameRequest', {
@@ -92,7 +92,7 @@ export class GameGateway implements OnModuleInit{
   @SubscribeMessage('newBallPos')
   newBallPos(@MessageBody() body: {angle: number, x: number, y: number}, @ConnectedSocket() client: Socket)
   {
-    const targetSocket = this.getOther(client);
+    const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
       return;
     targetSocket.emit('onGameRequest', {
@@ -109,6 +109,7 @@ export class GameGateway implements OnModuleInit{
     for (const [socketId, socket] of this.lookingForPlayerSockets) {
       if (socket.id != client.id)
       {
+        console.log("Player found: " + socket.id);
         client.emit('newPlayer', {
           order: "newPlayer",
           first: true,
@@ -118,7 +119,6 @@ export class GameGateway implements OnModuleInit{
           first: false,
         });
         this.lookingForPlayerSockets.delete(socket.id);
-        
         this.pairedSockets.set(socket.id, client.id);
         this.pairedSockets.set(client.id, socket.id);
         return;

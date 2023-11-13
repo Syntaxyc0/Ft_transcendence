@@ -34,9 +34,4 @@ export class Paddle{
 		this.y = this.gameBoard.height / 2;
 		this.score = 0;
 	}
-
-	updateScore()
-	{
-		this.score++;
-	}
 }

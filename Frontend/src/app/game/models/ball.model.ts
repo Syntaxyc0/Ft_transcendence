@@ -39,9 +39,9 @@ export class Ball{
 			if (hx <= this.radius || hx >= this.gameBoard.width - this.radius)
 			{
 				if (hx <= this.radius)
-					this.gameBoard.paddleRight.updateScore();
+					this.gameBoard.paddleRight.score++;
 				else
-					this.gameBoard.paddleLeft.updateScore();
+					this.gameBoard.paddleLeft.score++;
 				this.reset();
 				this.gameBoard.sendBall();
 			}
