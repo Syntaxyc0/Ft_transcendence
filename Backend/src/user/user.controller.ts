@@ -135,4 +135,11 @@ export class UserController {
 	{
 		return this.userService.get2faenabled(uid)
 	}
+
+	@Get('/find-by-login/:login')
+	async findAllByLogin(@Param('login') login: string) {
+		console.log(login);
+		return this.userService.findAllByLogin(login);
+	}
+	
 }

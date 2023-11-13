@@ -8,7 +8,7 @@ import { Prisma, User, Room } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UnauthorizedException } from '@nestjs/common';
 
-@WebSocketGateway({ cors: { origin: ['https://hoppscotch.io', 'http://localhost:3000', 'http://localhost:4200'] } })
+@WebSocketGateway({ cors: { origin: ['http://localhost:3333', 'http://localhost:4200'] } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@WebSocketServer()
@@ -82,25 +82,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('paginateRooms')
 	async onPaginateRoom(socket: Socket, page: PageI) {
-	if (!socket.data.user) {
-	throw new UnauthorizedException();
-	}
+		if (!socket.data.user) {
+			throw new UnauthorizedException();
+		}
 
-	page.limit = page.limit > 100 ? 100 : page.limit;
-	page.page = page.page + 1;
+		page.limit = page.limit > 100 ? 100 : page.limit;
+		page.page = page.page + 1;
 
-	const user = await this.prisma.user.findUnique({
-	where: { id: socket.data.user.id },
-	include: { rooms: { take: page.limit, skip: (page.page - 1) * page.limit } },
-	});
+		const user = await this.prisma.user.findUnique({
+			where: { id: socket.data.user.id },
+				include: { rooms: { take: page.limit, skip: (page.page - 1) * page.limit } },
+		});
 
-	if (!user) {
-	throw new UnauthorizedException();
-	}
+		if (!user) {
+			throw new UnauthorizedException();
+		}
 
-	const rooms = user.rooms;
+		const rooms = user.rooms;
 
-	return this.server.to(socket.id).emit('rooms', rooms);
+		return this.server.to(socket.id).emit('rooms', rooms);
 	}
 
 }

@@ -25,7 +25,7 @@ import { MatChipsModule } from '@angular/material/chips';
 	FormsModule,
 	ReactiveFormsModule],
   templateUrl: './select-users.component.html',
-  styleUrls: ['./select-users.component.scss']
+  styleUrls: ['./select-users.component.scss'],
 })
 export class SelectUsersComponent implements OnInit{
 
@@ -33,17 +33,17 @@ export class SelectUsersComponent implements OnInit{
 	@Output() addUser: EventEmitter<UserI> = new EventEmitter<UserI>();
 	@Output() removeuser: EventEmitter<UserI> = new EventEmitter<UserI>();
 
-	searchUsername = new FormControl();
+	searchLogin = new FormControl();
 	filteredUsers: UserI[] = [];
 	selectedUser: UserI | null = null;
 
 	constructor(private userService: UserService) {}
 
 	ngOnInit() : void {
-		this.searchUsername.valueChanges.pipe(
+		this.searchLogin.valueChanges.pipe(
 			debounceTime(500),
 			distinctUntilChanged(),
-			switchMap((username: string) => this.userService.findByUsername(username).pipe(
+			switchMap((login: string) => this.userService.findByLogin(login).pipe(
 				tap((users: UserI[]) => this.filteredUsers = users)
 			))
 		).subscribe();
@@ -55,7 +55,7 @@ export class SelectUsersComponent implements OnInit{
 		}
 		this.filteredUsers = [];
 		this.selectedUser = null;
-		this.searchUsername.setValue(null);
+		this.searchLogin.setValue(null);
 	  }
 	  
 
@@ -67,12 +67,12 @@ export class SelectUsersComponent implements OnInit{
 		this.selectedUser = user;
 	}
 
-	displayFn(user: UserI) {
-		if (user) {
-			return user.username;
-		} else {
-			return '';
-		}
+	displayFn = (user: UserI | undefined): string => {
+	  if (user && user.login) {
+	    return user.login;
+	  } else {
+	    return '';
+	  }
 	}
 }
 

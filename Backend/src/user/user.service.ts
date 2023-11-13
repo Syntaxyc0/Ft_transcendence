@@ -3,6 +3,7 @@ import { BadRequestException, Body, Injectable, ConflictException, ConsoleLogger
 import { NotFoundException } from "@nestjs/common";
 import { stat } from "fs";
 import { Prisma, Room, User } from '@prisma/client';
+import { UserI } from "src/chat/model/user.interface";
 
 var path = require('path');
 
@@ -319,5 +320,17 @@ export class UserService
 		}
 		user.is2faenabled = activate['activated']
 	}
+
+	async findAllByLogin(login: string): Promise<UserI[]> {
+		  const users = await this.prisma.user.findMany({
+			where: {
+			  login: {
+				contains: login.toLowerCase()
+			  },
+			},
+		  });
+		  return users;
+	  }
+
 }
 

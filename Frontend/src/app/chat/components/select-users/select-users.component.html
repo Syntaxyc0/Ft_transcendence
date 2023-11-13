@@ -1,9 +1,9 @@
 <mat-form-field>
-	<input matInput placeholder="Search User by Username" [matAutocomplete]="auto" [formControl]="searchUsername">
+	<input matInput placeholder="Search User by Login" [matAutocomplete]="auto" [formControl]="searchLogin">
 	<mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="setSelectedUser($event.option.value)">
 		<ng-container>
 			<mat-option *ngFor="let user of filteredUsers" [value]="user">
-				<span>{{user.username}}</span>
+				<span>{{user.login}}</span>
 				<small>| ID: {{user.id}}</small>
 			</mat-option>
 		</ng-container>
@@ -13,7 +13,7 @@
 
 <mat-chip-set *ngIf="users && users.length > 0; else no_users">
 	<mat-chip *ngFor="let user of users" (removed)="removeUserFromForm(user)">
-		{{user.username}}
+		{{user.login}}
 		<mat-icon matChipRemove>cancel</mat-icon>
 	</mat-chip>
 </mat-chip-set>

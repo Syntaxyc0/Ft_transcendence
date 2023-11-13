@@ -13,10 +13,12 @@ export class UserService {
 
   constructor(private http: HttpClient, private snackbar: MatSnackBar) { }
 
+  
+  findByLogin(login: string): Observable<UserI[]> {
+    console.log("poutre");
+    return this.http.get<UserI[]>(`http://localhost:3333/users/find-by-login/${login}`);
+}
 
-  findByUsername(username: string): Observable<UserI[]> {
-	return this.http.get<UserI[]>(`users/:${username}`);
-  }
 
 //   create(user: UserI): Observable<UserI> {
 // 	return this.http.post<UserI>('api/users', user).pipe(

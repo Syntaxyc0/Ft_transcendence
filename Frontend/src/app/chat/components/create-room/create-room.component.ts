@@ -43,7 +43,7 @@ export class CreateRoomComponent {
 	initUser(user: UserI) {
 		return new FormControl({
 			id: user.id,
-			username: user.username,
+			login: user.login,
 			email: user.email
 		});
 	}

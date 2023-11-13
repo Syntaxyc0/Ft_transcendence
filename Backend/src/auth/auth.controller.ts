@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Options, Param, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, NotFoundException, Options, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { signinDto, signupDto } from "./dto";
 import { HttpService } from "@nestjs/axios";
@@ -63,9 +63,17 @@ export class AuthController
 		
 	}
 
+	//--------------------// 
+	//  DataBase VIEWER   //
+	//--------------------// 
+
 	@Get('room')
 	async getUsers() {
-		return await this.prismaService.room.findMany();
-		// return {'message' : 'hello world'};
+		return await this.prismaService.user.findMany();
 	}
+
+	//--------------------// 
+	//        Test        //
+	//--------------------// 
+
 }
