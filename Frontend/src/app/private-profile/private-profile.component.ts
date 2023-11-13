@@ -8,11 +8,12 @@ import { HeaderbarComponent } from '../components/headerbar/headerbar.component'
 import { ProfilePictureComponent } from '../components/profile-picture/profile-picture.component';
 import { GamehistoryComponent } from '../components/gamehistory/gamehistory.component';
 import { PictureComponent } from '../components/picture/picture.component';
+import { FriendrequestComponent } from '../components/friendrequest/friendrequest.component';
 
 @Component({
   selector: 'app-private-profile',
   standalone: true,
-  imports: [CommonModule, HeaderbarComponent, HttpClientModule, RouterModule, ProfilePictureComponent, GamehistoryComponent, PictureComponent],
+  imports: [CommonModule, HeaderbarComponent, HttpClientModule, RouterModule, ProfilePictureComponent, GamehistoryComponent, PictureComponent,FriendrequestComponent],
   templateUrl: './private-profile.component.html',
   styleUrls: ['./private-profile.component.scss']
 })
@@ -28,7 +29,7 @@ export class PrivateProfileComponent {
 		this.getuserElo()
 		this.http.get<number[]>("http://localhost:3333/users/" + this.id + "/friendrequestsreceived").subscribe(res => {
 			this.friendrequestsreceived = res;
-		})
+		})	
 	}
 	getuserElo()
 	{
