@@ -50,11 +50,11 @@ let GameGateway = class GameGateway {
         if (targetSocket)
             targetSocket.emit('otherDisconnected', { order: 'otherDisconnected' });
     }
-    GameRequest(body, client) {
+    gameRequest(body, client) {
         const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
         if (!targetSocket)
             return;
-        targetSocket.emit('onGameRequest', {
+        targetSocket.emit('ongameRequest', {
             order: body.order
         });
     }
@@ -62,7 +62,7 @@ let GameGateway = class GameGateway {
         const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
         if (!targetSocket)
             return;
-        targetSocket.emit('onGameRequest', {
+        targetSocket.emit('ongameRequest', {
             order: "scoreUp",
             leftScore: body.leftScore,
             rightScore: body.rightScore
@@ -72,7 +72,7 @@ let GameGateway = class GameGateway {
         const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
         if (!targetSocket)
             return;
-        targetSocket.emit('onGameRequest', {
+        targetSocket.emit('ongameRequest', {
             order: "paddleUp",
             x: body.x,
             y: body.y
@@ -82,7 +82,7 @@ let GameGateway = class GameGateway {
         const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
         if (!targetSocket)
             return;
-        targetSocket.emit('onGameRequest', {
+        targetSocket.emit('ongameRequest', {
             order: "ballUp",
             angle: body.angle,
             x: body.x,
@@ -130,7 +130,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", void 0)
-], GameGateway.prototype, "GameRequest", null);
+], GameGateway.prototype, "gameRequest", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('newScore'),
     __param(0, (0, websockets_1.MessageBody)()),

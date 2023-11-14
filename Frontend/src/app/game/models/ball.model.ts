@@ -42,6 +42,7 @@ export class Ball{
 					this.gameBoard.paddleRight.score++;
 				else
 					this.gameBoard.paddleLeft.score++;
+				this.gameBoard.sendScore()
 				this.reset();
 				this.gameBoard.sendBall();
 			}
@@ -65,7 +66,7 @@ export class Ball{
 
 	reset()
 	{
-		this.speed = 10;
+		this.speed = 30;
 		this.x = this.gameBoard.width / 2;
 		this.y = this.gameBoard.height / 2;
 		this.angle = Math.random() * 360;

@@ -53,12 +53,12 @@ export class GameGateway implements OnModuleInit{
   }
 
   @SubscribeMessage('gameRequest')
-  GameRequest(@MessageBody() body: {order: string}, @ConnectedSocket() client: Socket)
+  gameRequest(@MessageBody() body: {order: string}, @ConnectedSocket() client: Socket)
   {
     const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
       return;
-    targetSocket.emit('onGameRequest', {
+    targetSocket.emit('ongameRequest', {
         order: body.order
     });
   }  
@@ -69,7 +69,7 @@ export class GameGateway implements OnModuleInit{
     const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
       return;
-    targetSocket.emit('onGameRequest', {
+    targetSocket.emit('ongameRequest', {
       order: "scoreUp",
       leftScore: body.leftScore,
       rightScore: body.rightScore
@@ -82,7 +82,7 @@ export class GameGateway implements OnModuleInit{
     const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
       return;
-    targetSocket.emit('onGameRequest', {
+    targetSocket.emit('ongameRequest', {
       order:"paddleUp",
       x: body.x,
       y: body.y
@@ -95,7 +95,7 @@ export class GameGateway implements OnModuleInit{
     const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
       return;
-    targetSocket.emit('onGameRequest', {
+    targetSocket.emit('ongameRequest', {
       order:"ballUp",
       angle: body.angle,
       x: body.x,

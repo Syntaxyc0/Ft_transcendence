@@ -8,7 +8,7 @@ export declare class GameGateway implements OnModuleInit {
     onModuleInit(): void;
     disconnectClient(clientId: string): void;
     warnOther(client: Socket): void;
-    GameRequest(body: {
+    gameRequest(body: {
         order: string;
     }, client: Socket): void;
     newScore(body: {

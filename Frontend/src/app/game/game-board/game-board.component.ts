@@ -33,6 +33,9 @@ export class GameBoardComponent implements OnInit{
 	isGameRunning: boolean = false;
 	requestedMatchmaking = false;
 	isOnline = false;
+	currentLead: boolean = true;
+	private isPageVisible: boolean = true;
+	otherVisible: boolean = true;
 
 	data: Observable<any>;
 
@@ -87,6 +90,20 @@ export class GameBoardComponent implements OnInit{
 				this.resetOnline();
 				this.multiplayer();
 			break;
+			case "changeLead":
+				this.currentLead = !this.currentLead;
+				this.firstPlayer.gameRequest("leadChanged")
+				console.log("changeLead: " + this.currentLead)
+			break;
+			case "leadChanged":
+				this.currentLead = !this.currentLead;
+				console.log("LeadChanged: " + this.currentLead)
+			break;
+			case "visibleChange":
+				this.otherVisible = !this.otherVisible;
+			break;
+			case "giveData":
+				this.sendData();break;
 		}
 	}
 
@@ -100,6 +117,7 @@ export class GameBoardComponent implements OnInit{
 	resetOnline()
 	{
 		this.isOnline = false;
+		this.currentLead = true;
 		this.stopGame();
 		this.requestedMatchmaking = false;
 		this.paddleLeft.currentUser = true;
@@ -109,6 +127,7 @@ export class GameBoardComponent implements OnInit{
 
 	newPlayer(first:boolean)
 	{
+		this.currentLead = first;
 		this.paddleLeft.currentUser = first;
 		this.paddleRight.currentUser = !first;
 		this.isOnline = true;
@@ -116,6 +135,22 @@ export class GameBoardComponent implements OnInit{
 		this.reset(true);
 		this.sendBall();
 	}
+
+	@HostListener('document:visibilitychange', ['$event'])
+	onVisibilityChange(event: Event): void {
+		if (document.visibilityState === 'visible') {
+			this.isPageVisible = true;
+			this.firstPlayer.gameRequest("visibleChange")
+			if (!this.otherVisible && !this.currentLead)
+				this.firstPlayer.gameRequest("changeLead")
+			}
+		else {
+			this.isPageVisible = false;
+			this.firstPlayer.gameRequest("visibleChange")
+			if (this.otherVisible && this.currentLead)
+				this.firstPlayer.gameRequest("changeLead");
+		}
+	  }
 
 	draw()
 	{
@@ -138,17 +173,17 @@ export class GameBoardComponent implements OnInit{
 		this.stopGame();
 		this.paddleLeft.reset();
 		this.paddleRight.reset();
-		if (!this.paddleLeft.currentUser)
+		if (!this.currentLead)
 		{
 			if (request)
-				this.firstPlayer.GameRequest("resetRequest");
+				this.firstPlayer.gameRequest("resetRequest");
 			return;
 		}
 		this.ball.reset();
 		this.draw();
 		this.sendBall();
 		this.sendScore();
-		this.firstPlayer.GameRequest("resetDone");
+		this.firstPlayer.gameRequest("resetDone");
 	}
 
 	startGame(request: boolean) {
@@ -156,13 +191,13 @@ export class GameBoardComponent implements OnInit{
 			return;
 		this.isGameRunning = true;
 		if (request)
-			this.firstPlayer.GameRequest("startGame");
+			this.firstPlayer.gameRequest("startGame");
 		this.gameLoop();
 	}
 
 	stopGame() {
 		this.isGameRunning = false;
-		this.firstPlayer.GameRequest("stopGame");
+		this.firstPlayer.gameRequest("stopGame");
 	}
 
 	gameLoop()
@@ -174,16 +209,29 @@ export class GameBoardComponent implements OnInit{
 		requestAnimationFrame(this.gameLoop);
 	}
 
+	sendData()
+	{
+		this.sendBall()
+		this.sendPaddle()
+		this.sendScore()
+	}
+
 	sendScore()
 	{
-		if (this.paddleLeft.currentUser)
+		if (this.currentLead)
 			this.firstPlayer.newScore(this.paddleLeft.score, this.paddleRight.score);
 	}
 
 	sendBall()
 	{
-		if (this.paddleLeft.currentUser)
+		if (this.currentLead)
 			this.firstPlayer.newBallPos(this.ball.angle, this.ball.x, this.ball.y);
+	}
+
+	sendPaddle()
+	{
+		this.firstPlayer.newPaddlePos(this.paddleLeft.x, this.paddleLeft.y);
+		this.firstPlayer.newPaddlePos(this.paddleRight.x, this.paddleRight.y);
 	}
 
 	@HostListener('document:keydown', ['$event'])
