@@ -70,6 +70,8 @@ export class Ball{
 		this.x = this.gameBoard.width / 2;
 		this.y = this.gameBoard.height / 2;
 		this.angle = Math.random() * 360;
+		while((this.angle >= 75 && this.angle <= 105) || (this.angle >= 255 && this.angle <= 285) )//|| (this.angle >= 0 && this.angle <= 15)
+			this.angle = Math.random() * 360;
 	}
 
 	draw()
