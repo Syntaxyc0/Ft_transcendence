@@ -2,7 +2,7 @@
 	<input matInput placeholder="Search User by Login" [matAutocomplete]="auto" [formControl]="searchLogin">
 	<mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
 	  <ng-container>
-		<mat-option *ngFor="let login of allUsers" [value]="login" (click)="toggleSelection(user.login)">
+		<mat-option *ngFor="let user of allUsers" [value]="user.login" (click)="toggleSelection(user.login)">
 		  {{ user.login }}
 		</mat-option>
 	  </ng-container>

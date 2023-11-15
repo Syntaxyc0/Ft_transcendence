@@ -29,6 +29,10 @@ import { MatChipsModule } from '@angular/material/chips';
 })
 export class SelectUsersComponent implements OnInit{
 
+	@Input() users: UserI[] | null = null;
+	@Output() addUser: EventEmitter<UserI> = new EventEmitter<UserI>();
+	@Output() removeuser: EventEmitter<UserI> = new EventEmitter<UserI>();
+
 	allUsers: UserI[] = [];
 	selectedLogins: string[] = [];
 	searchLogin = new FormControl();
