@@ -12,10 +12,16 @@ import { catchError, tap } from 'rxjs/operators'
 export class UserService {
 
   constructor(private http: HttpClient, private snackbar: MatSnackBar) { }
-
+  users$: Observable<UserI[]>;
   
 	findByLogin(login: string): Observable<UserI[]> {
-		return this.http.get<UserI[]>(`http://localhost:3333/users/find-by-login/${login}`);
+		users$: Observable<UserI[]>;
+		this.users$ = this.http.get<UserI[]>(`http://localhost:3333/users/find-by-login/${login}`)
+
+		this.users$.subscribe((users) => {
+			console.log('dans le userService du Front :', users);});
+
+		return this.users$;
 	}
 
 	getAllUsers(): Observable<UserI[]> {

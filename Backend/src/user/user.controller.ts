@@ -140,6 +140,7 @@ export class UserController {
 	async findAllByLogin(@Param('login') login: string) {
 		return this.userService.findAllByLogin(login);
 	}
+	
 
 	@Get('/all-users')
 	async getAllUsers() {

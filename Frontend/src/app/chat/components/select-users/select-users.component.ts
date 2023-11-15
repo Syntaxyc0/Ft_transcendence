@@ -33,64 +33,49 @@ export class SelectUsersComponent implements OnInit{
 	@Output() addUser: EventEmitter<UserI> = new EventEmitter<UserI>();
 	@Output() removeuser: EventEmitter<UserI> = new EventEmitter<UserI>();
 
-	allUsers: UserI[] = [];
-	selectedLogins: string[] = [];
 	searchLogin = new FormControl();
-	user: UserI;
+	filteredUsers: UserI[] = [];
+	selectedUser: UserI | null = null;
 
 	constructor(private userService: UserService) {}
 
-	ngOnInit(): void {
-		this.userService.getAllUsers();
-	}
-
-	toggleSelection(login: string | undefined): void {
-		if (!login) return;
-
-		const index = this.selectedLogins.indexOf(login);
-		
-		if (index !== -1) {
-		  this.selectedLogins.splice(index, 1);
-		} else {
-		  this.selectedLogins.push(login);
+	ngOnInit() : void {
+		this.searchLogin.valueChanges.pipe(
+			debounceTime(500),
+			distinctUntilChanged(),
+			switchMap((login: string) => this.userService.findByLogin(login).pipe(
+				tap((users: UserI[]) => this.filteredUsers = users)
+				))
+				).subscribe();
+			}
+			
+			
+			addUserToForm() {
+				if (this.selectedUser !== null) {
+					this.addUser.emit(this.selectedUser);
+				}
+				this.filteredUsers = [];
+				this.selectedUser = null;
+				this.searchLogin.setValue(null);
+			}
+			
+			
+			removeUserFromForm(user: UserI) {
+				this.removeuser.emit(user);
+			}
+			
+			setSelectedUser(user: any) {
+				console.log("test" + user.login)
+				this.selectedUser = user;
+			}
+			
+			displayFn(user: UserI | undefined): string {
+				if (user && user.login) {
+				  return user.login;
+				} else {
+				  return '';
+				}
+			}
 		}
-	}
-
-	
-	// ngOnInit() : void {
-	// 	this.searchLogin.valueChanges.pipe(
-	// 		debounceTime(500),
-	// 		distinctUntilChanged(),
-	// 		switchMap((login: string) => this.userService.findByLogin(login).pipe(
-	// 			tap((users: UserI[]) => this.filteredUsers = users)
-	// 		))
-	// 	).subscribe();
-	// }
-
-	// addUserToForm() {
-	// 	if (this.selectedUser !== null) {
-	// 	  this.addUser.emit(this.selectedUser);
-	// 	}
-	// 	this.filteredUsers = [];
-	// 	this.selectedUser = null;
-	// 	this.searchLogin.setValue(null);
-	//   }
-	  
-
-	// removeUserFromForm(user: UserI) {
-	// 	this.removeuser.emit(user);
-	// }
-
-	// setSelectedUser(user: UserI) {
-	// 	this.selectedUser = user;
-	// }
-
-	displayFn = (user: UserI | undefined): string => {
-	  if (user && user.login) {
-	    return user.login;
-	  } else {
-	    return '';
-	  }
-	}
-}
-
+		
+		

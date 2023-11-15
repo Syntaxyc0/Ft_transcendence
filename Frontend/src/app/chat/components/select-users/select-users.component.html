@@ -1,4 +1,4 @@
-<mat-form-field>
+<!-- <mat-form-field>
 	<input matInput placeholder="Search User by Login" [matAutocomplete]="auto" [formControl]="searchLogin">
 	<mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
 	  <ng-container>
@@ -8,18 +8,18 @@
 	  </ng-container>
 	</mat-autocomplete>
   </mat-form-field>
+  <button mat-button type="button" [disabled]="selectedLogins.length === 0" (click)="addUserToRoom()">Add User to Room</button>
   
   <mat-chip-set *ngIf="selectedLogins.length > 0">
 	<mat-chip *ngFor="let login of selectedLogins" (removed)="toggleSelection(user.login)" >
 	  {{ user.login }}
 	  <mat-icon matChipRemove>cancel</mat-icon>
 	</mat-chip>
-  </mat-chip-set>
+  </mat-chip-set> -->
   
-  <!-- <button mat-button type="button" [disabled]="selectedLogins.length === 0" (click)="addUserToRoom()">Add User to Room</button> -->
   
 
-<!-- <mat-form-field>
+<mat-form-field>
 	<input matInput placeholder="Search User by Login" [matAutocomplete]="auto" [formControl]="searchLogin">
 	<mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="setSelectedUser($event.option.value)">
 		<ng-container>
@@ -41,4 +41,4 @@
 
 <ng-template #no_users>
 	<mat-error>No Users added so far</mat-error>
-</ng-template> -->
+</ng-template>
