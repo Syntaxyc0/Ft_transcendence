@@ -29,43 +29,57 @@ import { MatChipsModule } from '@angular/material/chips';
 })
 export class SelectUsersComponent implements OnInit{
 
-	@Input() users: UserI[] | null = null;
-	@Output() addUser: EventEmitter<UserI> = new EventEmitter<UserI>();
-	@Output() removeuser: EventEmitter<UserI> = new EventEmitter<UserI>();
-
+	allUsers: UserI[] = [];
+	selectedLogins: string[] = [];
 	searchLogin = new FormControl();
-	filteredUsers: UserI[] = [];
-	selectedUser: UserI | null = null;
+	user: UserI;
 
 	constructor(private userService: UserService) {}
 
-	ngOnInit() : void {
-		this.searchLogin.valueChanges.pipe(
-			debounceTime(500),
-			distinctUntilChanged(),
-			switchMap((login: string) => this.userService.findByLogin(login).pipe(
-				tap((users: UserI[]) => this.filteredUsers = users)
-			))
-		).subscribe();
+	ngOnInit(): void {
+		this.userService.getAllUsers();
 	}
 
-	addUserToForm() {
-		if (this.selectedUser !== null) {
-		  this.addUser.emit(this.selectedUser);
+	toggleSelection(login: string | undefined): void {
+		if (!login) return;
+
+		const index = this.selectedLogins.indexOf(login);
+		
+		if (index !== -1) {
+		  this.selectedLogins.splice(index, 1);
+		} else {
+		  this.selectedLogins.push(login);
 		}
-		this.filteredUsers = [];
-		this.selectedUser = null;
-		this.searchLogin.setValue(null);
-	  }
+	}
+
+	
+	// ngOnInit() : void {
+	// 	this.searchLogin.valueChanges.pipe(
+	// 		debounceTime(500),
+	// 		distinctUntilChanged(),
+	// 		switchMap((login: string) => this.userService.findByLogin(login).pipe(
+	// 			tap((users: UserI[]) => this.filteredUsers = users)
+	// 		))
+	// 	).subscribe();
+	// }
+
+	// addUserToForm() {
+	// 	if (this.selectedUser !== null) {
+	// 	  this.addUser.emit(this.selectedUser);
+	// 	}
+	// 	this.filteredUsers = [];
+	// 	this.selectedUser = null;
+	// 	this.searchLogin.setValue(null);
+	//   }
 	  
 
-	removeUserFromForm(user: UserI) {
-		this.removeuser.emit(user);
-	}
+	// removeUserFromForm(user: UserI) {
+	// 	this.removeuser.emit(user);
+	// }
 
-	setSelectedUser(user: UserI) {
-		this.selectedUser = user;
-	}
+	// setSelectedUser(user: UserI) {
+	// 	this.selectedUser = user;
+	// }
 
 	displayFn = (user: UserI | undefined): string => {
 	  if (user && user.login) {

@@ -138,8 +138,12 @@ export class UserController {
 
 	@Get('/find-by-login/:login')
 	async findAllByLogin(@Param('login') login: string) {
-		console.log(login);
 		return this.userService.findAllByLogin(login);
+	}
+
+	@Get('/all-users')
+	async getAllUsers() {
+		return this.userService.allUser();
 	}
 	
 }
