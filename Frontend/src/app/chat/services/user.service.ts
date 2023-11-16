@@ -18,8 +18,8 @@ export class UserService {
 		users$: Observable<UserI[]>;
 		this.users$ = this.http.get<UserI[]>(`http://localhost:3333/users/find-by-login/${login}`)
 
-		this.users$.subscribe((users) => {
-			console.log('dans le userService du Front :', users);});
+		// this.users$.subscribe((users) => {
+		// 	console.log('dans le userService du Front :', users);});
 
 		return this.users$;
 	}

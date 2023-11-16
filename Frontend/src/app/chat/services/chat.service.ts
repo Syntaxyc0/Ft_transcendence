@@ -28,9 +28,10 @@ export class ChatService {
 	}
 
 	createRoom(room: RoomI) {
+		console.log(room);
 		this.socket.emit('createRoom', room);
-		// this.snackbar.open(`Room ${room.name} creatded succefully`, 'Close' ,{
-		// 	duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
-		// } );
+		this.snackbar.open(`Room ${room.name} created succefully`, 'Close' ,{
+			duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
+		} );
 	}
 }

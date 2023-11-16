@@ -7,6 +7,7 @@ import { PageI } from 'src/chat/model/page.interface';
 import { Prisma, User, Room } from '@prisma/client'; 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UnauthorizedException } from '@nestjs/common';
+import { UserI } from '../model/user.interface';
 
 @WebSocketGateway({ cors: { origin: ['http://localhost:3333', 'http://localhost:4200'] } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -19,10 +20,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleConnection(socket: Socket) {
 		try {
 			const decodedToken = await this.authService.verifyJwt(socket.handshake.headers.authorization);
-			const user: User | null = await this.prisma.user.findUnique({
-				where: { id: decodedToken.user.id },
-		  	});
-
+			const user: UserI = await this.prisma.user.findUnique({
+				where: { id: decodedToken.sub },
+			});
 			if (!user) {
 				return this.disconnect(socket);
 			} else {
@@ -32,11 +32,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					take: 10,
 					skip: 0,
 				});
-
+				
 				return this.server.to(socket.id).emit('rooms', rooms);
 			}
 		} catch {
-			return this.disconnect(socket);
+				console.log("le catch");
+				return this.disconnect(socket);
 		}
 	}
 
@@ -52,6 +53,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('createRoom')
 	async onCreateRoom(socket: Socket, roomInput: Prisma.RoomCreateInput): Promise<Room> {
+		console.log('dans le chat backend');
 		if (!socket.data.user) {
 		throw new UnauthorizedException();
 		}

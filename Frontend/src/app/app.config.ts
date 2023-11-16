@@ -7,3 +7,11 @@ import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-br
 export const appConfig: ApplicationConfig = {
   providers: [provideRouter(routes), provideHttpClient(withJsonpSupport()), provideAnimations()],
 };
+
+export function tokenGetter() {
+	let token = localStorage.getItem("access_token");
+	if (token)
+		return token;
+	else
+		return  '';
+}
