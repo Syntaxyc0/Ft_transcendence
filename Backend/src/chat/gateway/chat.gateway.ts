@@ -36,7 +36,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				return this.server.to(socket.id).emit('rooms', rooms);
 			}
 		} catch {
-				console.log("le catch");
 				return this.disconnect(socket);
 		}
 	}
@@ -53,7 +52,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('createRoom')
 	async onCreateRoom(socket: Socket, roomInput: Prisma.RoomCreateInput): Promise<Room> {
-		console.log('dans le chat backend');
+		console.log(socket.data.user);
 		if (!socket.data.user) {
 		throw new UnauthorizedException();
 		}
