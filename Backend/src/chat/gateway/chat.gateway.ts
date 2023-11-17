@@ -32,10 +32,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					take: 10,
 					skip: 0,
 				});
-				
+				console.log("HandleCo")
+
 				return this.server.to(socket.id).emit('rooms', rooms);
 			}
 		} catch {
+				
 				return this.disconnect(socket);
 		}
 	}
@@ -52,9 +54,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('createRoom')
 	async onCreateRoom(socket: Socket, roomInput: Prisma.RoomCreateInput): Promise<Room> {
-		console.log(socket.data.user);
 		if (!socket.data.user) {
-		throw new UnauthorizedException();
+			throw new UnauthorizedException();
 		}
 
 		const user = await this.prisma.user.findUnique({
@@ -84,9 +85,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('paginateRooms')
 	async onPaginateRoom(socket: Socket, page: PageI) {
 		if (!socket.data.user) {
+			console.log("1e except")
 			throw new UnauthorizedException();
 		}
-
+		
 		page.limit = page.limit > 100 ? 100 : page.limit;
 		page.page = page.page + 1;
 
@@ -96,12 +98,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 
 		if (!user) {
+			console.log("2e except")
 			throw new UnauthorizedException();
 		}
 
 		const rooms = user.rooms;
+		console.log(rooms)
 
 		return this.server.to(socket.id).emit('rooms', rooms);
 	}
-
 }

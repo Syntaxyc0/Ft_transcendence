@@ -24,6 +24,7 @@ export class ChatService {
 	}
 
 	emitPaginateRooms(limit: number, page: number) {
+		console.log("emitPag");
 		this.socket.emit('paginateRooms', {limit, page});
 	}
 

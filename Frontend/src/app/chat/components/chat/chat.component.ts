@@ -18,6 +18,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
 import { RouterModule } from '@angular/router';
+import { io } from 'socket.io-client';
 
 @Component({
   selector: 'app-chat',
@@ -26,7 +27,7 @@ import { RouterModule } from '@angular/router';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit, AfterViewInit{
+export class ChatComponent implements OnInit{
 	
 	rooms$: Observable<RoomPaginateI> = this.chatService.getMyRooms();
 	selectedRoom = null;
@@ -36,12 +37,14 @@ export class ChatComponent implements OnInit, AfterViewInit{
 	constructor(private route:ActivatedRoute, private router: Router, private chatService: ChatService, public http: HttpClient) {}
 
 	ngOnInit() {
+		console.log("OnInit");
 		this.chatService.emitPaginateRooms(10, 0);
 	}
 
-	ngAfterViewInit() {
-		this.chatService.emitPaginateRooms(10, 0);
-	}
+	// ngAfterViewInit() {
+	// 	console.log("Viewinit");
+	// 	this.chatService.emitPaginateRooms(10, 0);
+	// }
 
 	onSelectRoom(event: MatSelectionListChange) {
 		this.selectedRoom = event.source.selectedOptions.selected[0].value;
