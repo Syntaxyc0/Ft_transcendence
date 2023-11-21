@@ -4,7 +4,7 @@ RUN apt update -y && apt upgrade -y
 
 RUN npm install -g @angular/cli
 
-RUN npm install -g npm-check-updates
+# RUN npm install -g npm-check-updates
 
 COPY Frontend/config.sh /usr/local/bin/
 
