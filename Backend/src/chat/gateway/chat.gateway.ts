@@ -54,6 +54,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('createRoom')
 	async onCreateRoom(socket: Socket, roomInput: Prisma.RoomCreateInput): Promise<Room> {
+
 		if (!socket.data.user) {
 			throw new UnauthorizedException();
 		}
@@ -66,11 +67,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			throw new UnauthorizedException();
 		}
 
+		const usersConnectArray = (roomInput.users as Array<{ id: number }>).map(user => ({ id: user.id }));
+
 		const createdRoom = await this.prisma.room.create({
 			data: {
 			  ...roomInput,
 			  users: {
-			    connect: { id: user.id },
+			    connect: usersConnectArray,
 			  },
 			},
 		});
@@ -82,29 +85,43 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 
-	@SubscribeMessage('paginateRooms')
-	async onPaginateRoom(socket: Socket, page: PageI) {
-		if (!socket.data.user) {
-			console.log("1e except")
-			throw new UnauthorizedException();
-		}
+	// @SubscribeMessage('paginateRooms')
+	// async onPaginateRoom(socket: Socket, page: PageI) {
+	// 	if (!socket.data.user) {
+	// 		console.log("1e except")
+	// 		throw new UnauthorizedException();
+	// 	}
 		
-		page.limit = page.limit > 100 ? 100 : page.limit;
-		page.page = page.page + 1;
+	// 	page.limit = page.limit > 100 ? 100 : page.limit;
+	// 	page.page = page.page + 1;
 
+	// 	const user = await this.prisma.user.findUnique({
+	// 		where: { id: socket.data.user.id },
+	// 			include: { rooms: { take: page.limit, skip: (page.page - 1) * page.limit } },
+	// 	});
+
+	// 	if (!user) {
+	// 		console.log("2e except")
+	// 		throw new UnauthorizedException();
+	// 	}
+
+	// 	const rooms = user.rooms;
+	// 	console.log("on paginate room",rooms)
+
+	// 	return this.server.to(socket.id).emit('rooms', rooms);
+	// }
+
+	@SubscribeMessage('roomsArray')
+	async getRooms(socket: Socket, page: PageI) {
 		const user = await this.prisma.user.findUnique({
 			where: { id: socket.data.user.id },
-				include: { rooms: { take: page.limit, skip: (page.page - 1) * page.limit } },
-		});
+			include: {
+			  rooms: true,
+			},
+		  });
 
-		if (!user) {
-			console.log("2e except")
-			throw new UnauthorizedException();
-		}
-
-		const rooms = user.rooms;
-		console.log(rooms)
-
-		return this.server.to(socket.id).emit('rooms', rooms);
+		const room = user.rooms;
+		console.log("on roomarray:", room);
+		return this.server.to(socket.id).emit('roomsI', room);
 	}
 }

@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
-import { RoomPaginateI } from '../../model/room.interface';
+import { RoomI, RoomPaginateI } from '../../model/room.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatService } from '../../services/chat.service';
 import { MatSelectionListChange } from '@angular/material/list';
@@ -30,6 +30,7 @@ import { io } from 'socket.io-client';
 export class ChatComponent implements OnInit{
 	
 	rooms$: Observable<RoomPaginateI> = this.chatService.getMyRooms();
+	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
 	userList :object[] = []
 
@@ -37,7 +38,6 @@ export class ChatComponent implements OnInit{
 	constructor(private route:ActivatedRoute, private router: Router, private chatService: ChatService, public http: HttpClient) {}
 
 	ngOnInit() {
-		console.log("OnInit");
 		this.chatService.emitPaginateRooms(10, 0);
 	}
 

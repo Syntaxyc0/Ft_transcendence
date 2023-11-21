@@ -14,34 +14,34 @@ export class RoomService{
     });
   }
 
-  async getRoomForUser(userId: number, options: IPaginationOptions): Promise<Room[]> {
-	const parsedLimit = typeof options.limit === 'string' ? parseInt(options.limit, 10) : options.limit || 10;
-	const parsedPage = typeof options.page === 'string' ? parseInt(options.page, 10) : options.page || 1;
+//   async getRoomForUser(userId: number, options: IPaginationOptions): Promise<Room[]> {
+// 	const parsedLimit = typeof options.limit === 'string' ? parseInt(options.limit, 10) : options.limit || 10;
+// 	const parsedPage = typeof options.page === 'string' ? parseInt(options.page, 10) : options.page || 1;
   
-	const skip = (parsedPage - 1) * parsedLimit;
+// 	const skip = (parsedPage - 1) * parsedLimit;
   
-	const where = {
-	  users: {
-		some: {
-		  id: userId,
-		},
-	  },
-	};
+// 	const where = {
+// 	  users: {
+// 		some: {
+// 		  id: userId,
+// 		},
+// 	  },
+// 	};
   
-	const rooms = await this.prisma.room.findMany({
-	  where,
-	  orderBy: {
-		updated_at: 'desc',
-	  },
-	  take: parsedLimit,
-	  skip,
-	  include: {
-		users: true,
-	  },
-	});
+// 	const rooms = await this.prisma.room.findMany({
+// 	  where,
+// 	  orderBy: {
+// 		updated_at: 'desc',
+// 	  },
+// 	  take: parsedLimit,
+// 	  skip,
+// 	  include: {
+// 		users: true,
+// 	  },
+// 	});
   
-	return rooms;
-  }
+// 	return rooms;
+//   }
   
   
   

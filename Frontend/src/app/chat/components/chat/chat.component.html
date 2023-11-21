@@ -9,7 +9,7 @@
 				<h2>My Chatrooms</h2>
 				<button mat-button [routerLink]="'/create-room'">Create new Room</button>
 				<mat-selection-list hideSingleSelectionIndicator [multiple]="false" (selectionChange)="onSelectRoom($event)">
-				  <mat-list-option *ngFor="let room of (rooms$ | async)?.items" [value]="room">
+				  <mat-list-option *ngFor="let room of (room$ | async)" [value]="room">
 					Name: {{room.name}} Id: {{room.id}}
 					<mat-divider></mat-divider>
 				  </mat-list-option>
