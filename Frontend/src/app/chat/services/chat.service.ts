@@ -19,10 +19,12 @@ export class ChatService {
 		return this.socket.fromEvent('message');
 	}
 
+	// Paginate(not use for the moment)
 	getMyRooms(): Observable<RoomPaginateI> {
 		return this.socket.fromEvent<RoomPaginateI>('rooms');
 	}
 
+	// Not paginate!(in use)
 	getRooms(): Observable<RoomI[]> {
 		return this.socket.fromEvent('roomsI');
 	}

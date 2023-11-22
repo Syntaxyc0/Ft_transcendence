@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { UserI } from 'src/app/chat/model/user.interface';
 import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
 import { UserService } from 'src/app/chat/services/user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -45,38 +45,44 @@ export class SelectUsersComponent implements OnInit{
 		this.searchLogin.valueChanges.pipe(
 			debounceTime(500),
 			distinctUntilChanged(),
-			switchMap((login: string) => this.userService.findByLogin(login).pipe(
-				tap((users: UserI[]) => this.filteredUsers = users)
-				))
-				).subscribe();
-			}
-			
-			
-			addUserToForm() {
-				if (this.selectedUser !== null) {
-					this.addUser.emit(this.selectedUser);
+			switchMap((login: string) => {
+				if (!login) {
+					this.filteredUsers = []
+					return of([])
 				}
-				this.filteredUsers = [];
-				this.selectedUser = null;
-				this.searchLogin.setValue(null);
-			}
+				return this.userService.findByLogin(login).pipe(
+					tap((users: UserI[]) => this.filteredUsers = users)
+				)
+			})
+		).subscribe();
+	}
 			
 			
-			removeUserFromForm(user: UserI) {
-				this.removeuser.emit(user);
-			}
-			
-			setSelectedUser(user: any) {
-				this.selectedUser = user;
-			}
-			
-			displayFn(user: UserI | undefined): string {
-				if (user && user.login) {
-				  return user.login;
-				} else {
-				  return '';
-				}
-			}
+	addUserToForm() {
+		if (this.selectedUser !== null) {
+			this.addUser.emit(this.selectedUser);
+		}
+		this.filteredUsers = [];
+		this.selectedUser = null;
+		this.searchLogin.setValue(null);
+	}
+	
+	
+	removeUserFromForm(user: UserI) {
+		this.removeuser.emit(user);
+	}
+	
+	setSelectedUser(user: any) {
+		this.selectedUser = user;
+	}
+	
+	displayFn(user: UserI | undefined): string {
+		if (user && user.login) {
+			return user.login;
+		} else {
+			return '';
+		}
+	}
 		}
 		
 		

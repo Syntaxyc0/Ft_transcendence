@@ -41,10 +41,9 @@ export class ChatComponent implements OnInit{
 		this.chatService.emitPaginateRooms(10, 0);
 	}
 
-	// ngAfterViewInit() {
-	// 	console.log("Viewinit");
-	// 	this.chatService.emitPaginateRooms(10, 0);
-	// }
+	ngAfterViewInit() {
+		this.chatService.emitPaginateRooms(10, 0);
+	}
 
 	onSelectRoom(event: MatSelectionListChange) {
 		this.selectedRoom = event.source.selectedOptions.selected[0].value;

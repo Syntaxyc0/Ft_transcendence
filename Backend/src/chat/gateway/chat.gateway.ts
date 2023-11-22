@@ -32,7 +32,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					take: 10,
 					skip: 0,
 				});
-				console.log("HandleCo")
 
 				return this.server.to(socket.id).emit('rooms', rooms);
 			}
@@ -78,9 +77,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			},
 		});
 
-		console.log('creator: ' + socket.data.user);
-		console.log('room' + roomInput);
-
 		return createdRoom;
 	}
 
@@ -121,7 +117,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		  });
 
 		const room = user.rooms;
-		console.log("on roomarray:", room);
 		return this.server.to(socket.id).emit('roomsI', room);
 	}
 }
