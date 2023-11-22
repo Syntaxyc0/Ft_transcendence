@@ -27,7 +27,7 @@ export class ChatService {
 	// Not paginate!(in use)
 	getRooms(): Observable<RoomI[]> {
 		return this.socket.fromEvent('roomsI');
-	}
+	}  
 
 	emitPaginateRooms(limit: number, page: number) {
 		this.socket.emit('roomsArray', {limit, page});

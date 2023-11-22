@@ -10,17 +10,17 @@
 				<button mat-button [routerLink]="'/create-room'">Create new Room</button>
 				<mat-selection-list hideSingleSelectionIndicator [multiple]="false" (selectionChange)="onSelectRoom($event)">
 				  <mat-list-option *ngFor="let room of (room$ | async)" [value]="room">
-					Name: {{room.name}} Id: {{room.id}}
+					Name: {{room.name}}, ID: {{room.id}}
 					<mat-divider></mat-divider>
 				  </mat-list-option>
 				</mat-selection-list>
-				<mat-paginator
+				<!-- <mat-paginator
 				[length]="(rooms$ | async)?.meta?.totalItems"
 				[pageIndex]="(rooms$ | async)?.meta?.currentPage"
 				[pageSize]="(rooms$ | async)?.meta?.itemCount"
 				(page)="onPaginateRooms($event)"
 				[pageSizeOptions]="[10,25,50]"
-				></mat-paginator>
+				></mat-paginator> -->
 			  </div>
 		
 			  <div style="margin-left: 40px;">

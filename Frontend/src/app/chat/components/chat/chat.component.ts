@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
+import { Observable, of, take } from 'rxjs';
 import { RoomI, RoomPaginateI } from '../../model/room.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatService } from '../../services/chat.service';
@@ -16,6 +16,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
 
 import { RouterModule } from '@angular/router';
 import { io } from 'socket.io-client';
@@ -23,7 +24,7 @@ import { io } from 'socket.io-client';
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatListModule, MatDividerModule, MatPaginatorModule, MatFormFieldModule, HttpClientModule, RouterModule],
+  imports: [CommonModule, MatCardModule, MatButtonModule, MatListModule, MatDividerModule, MatPaginatorModule, MatFormFieldModule, MatIconModule, HttpClientModule, RouterModule],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
@@ -38,10 +39,6 @@ export class ChatComponent implements OnInit{
 	constructor(private route:ActivatedRoute, private router: Router, private chatService: ChatService, public http: HttpClient) {}
 
 	ngOnInit() {
-		this.chatService.emitPaginateRooms(10, 0);
-	}
-
-	ngAfterViewInit() {
 		this.chatService.emitPaginateRooms(10, 0);
 	}
 
