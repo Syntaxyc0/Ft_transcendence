@@ -6,6 +6,7 @@ export class Paddle{
 	width: number = 25;
 	x!: number;
 	y!: number;
+	targetY: number = 0;
 	score: number = 0;
 	constructor(public currentUser: boolean, public context: CanvasRenderingContext2D, public gameBoard: GameBoardComponent)
 	{
@@ -30,7 +31,7 @@ export class Paddle{
 
 	reset()
 	{
-		this.speed = 50;
+		this.speed = 100;
 		this.y = this.gameBoard.height / 2;
 		this.score = 0;
 	}

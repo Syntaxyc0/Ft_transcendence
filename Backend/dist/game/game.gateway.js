@@ -22,6 +22,7 @@ let GameGateway = class GameGateway {
         this.pairedSockets = new Map();
     }
     onModuleInit() {
+        console.log("Server up");
         this.server.on('connection', (socket) => {
             this.connectedSockets.set(socket.id, socket);
             console.log(socket.id + ' has connected');

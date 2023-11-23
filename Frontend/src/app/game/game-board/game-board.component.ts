@@ -22,6 +22,7 @@ export class GameBoardComponent implements OnInit{
 	@ViewChild('canvas', {static: true}) gameCanvas!: ElementRef;
 	context!: CanvasRenderingContext2D;
 
+
 	width: number = 1000;
 	height: number = 640;
 
@@ -34,10 +35,11 @@ export class GameBoardComponent implements OnInit{
 	requestedMatchmaking = false;
 	isOnline = false;
 	currentLead: boolean = true;
-	private isPageVisible: boolean = true;
+	// private isPageVisible: boolean = true;
 	otherVisible: boolean = true;
 
 	data: Observable<any>;
+	oldTimeStamp = 0;
 
 
 	constructor(private firstPlayer: SocketDataService) {}
@@ -140,13 +142,13 @@ export class GameBoardComponent implements OnInit{
 	@HostListener('document:visibilitychange', ['$event'])
 	onVisibilityChange(event: Event): void {
 		if (document.visibilityState === 'visible') {
-			this.isPageVisible = true;
+			// this.isPageVisible = true;
 			this.firstPlayer.gameRequest("visibleChange")
 			if (!this.otherVisible && !this.currentLead)
 				this.firstPlayer.gameRequest("changeLead")
 			}
 		else {
-			this.isPageVisible = false;
+			// this.isPageVisible = false;
 			this.firstPlayer.gameRequest("visibleChange")
 			if (this.otherVisible && this.currentLead)
 				this.firstPlayer.gameRequest("changeLead");
@@ -193,6 +195,7 @@ export class GameBoardComponent implements OnInit{
 		this.isGameRunning = true;
 		if (request)
 			this.firstPlayer.gameRequest("startGame");
+		this.oldTimeStamp = Date.now()
 		this.gameLoop();
 	}
 
@@ -205,9 +208,26 @@ export class GameBoardComponent implements OnInit{
 	{
 		if(!this.isGameRunning)
 			return;
+		const timeStamp = Date.now();
+		const secondsPassed = (timeStamp - this.oldTimeStamp)/1000;
+		this.oldTimeStamp = timeStamp;
+
+		// this.update(secondsPassed)
 		this.ball.updatePosition();
 		this.draw();
 		requestAnimationFrame(this.gameLoop);
+	}
+
+	update(secondsPassed: number){
+		// this.paddleLeft.x += (1000 * secondsPassed)
+		if (this.paddleLeft.targetY < this.paddleLeft.y)
+		{
+			this.paddleLeft.y -= (500 * secondsPassed)
+		}
+		else if (this.paddleLeft.targetY > this.paddleLeft.y)
+		{
+			this.paddleLeft.y += (500 * secondsPassed)
+		}
 	}
 
 	sendData()
@@ -253,13 +273,17 @@ export class GameBoardComponent implements OnInit{
 
 	updatePaddlePosition(paddle: Paddle, event: string)
 	{
-		if(paddle && paddle.y < this.height - paddle.height/2 && (event == 'ArrowDown' || event == 's'))
+		const top = this.height - paddle.height
+		const bottom = paddle.height
+		if(paddle && paddle.y < top && (event == 'ArrowDown' || event == 's'))
 		{
+			// paddle.targetY = paddle.y + paddle.speed
 			paddle.y += paddle.speed;
 			this.firstPlayer.newPaddlePos(paddle.x, paddle.y);
 		}
-		if(paddle && paddle.y > paddle.height/2 && (event == 'ArrowUp' || event == 'w'))
+		if(paddle && paddle.y > bottom && (event == 'ArrowUp' || event == 'w'))
 		{
+			// paddle.targetY = paddle.y - paddle.speed
 			paddle.y -= paddle.speed;
 			this.firstPlayer.newPaddlePos(paddle.x, paddle.y);
 

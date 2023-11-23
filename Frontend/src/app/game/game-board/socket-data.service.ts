@@ -1,14 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Subject, from } from 'rxjs';
 import { Observable } from 'rxjs';
 import { Socket, io } from 'socket.io-client';
 import { Ball } from '../models/ball.model';
 import { Paddle } from '../models/paddle.model';
 
+
 @Injectable({
   providedIn: 'root'
 })
-export class SocketDataService {
+export class SocketDataService implements OnDestroy{
   private socket: Socket;
   private baseUrl = 'http://localhost:3333';
   private isOnline: boolean = false;
@@ -36,6 +37,11 @@ export class SocketDataService {
       data.next(payload);
     });
     return dataObservable;
+  }
+
+  ngOnDestroy()
+  {
+
   }
 
   disconnect()

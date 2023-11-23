@@ -16,6 +16,7 @@ export class GameGateway implements OnModuleInit{
   private pairedSockets: Map<string, string> = new Map();
 
   onModuleInit(){
+    console.log("Server up")
     this.server.on('connection', (socket) => {
       
       this.connectedSockets.set(socket.id, socket);
