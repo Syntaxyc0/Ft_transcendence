@@ -26,10 +26,12 @@ export class ChatService {
 
 	// Not paginate!(in use)
 	getRooms(): Observable<RoomI[]> {
+		console.log('frontend getRooms');
 		return this.socket.fromEvent('roomsI');
 	}  
 
 	emitPaginateRooms(limit: number, page: number) {
+		console.log('frontend emitpage');
 		this.socket.emit('roomsArray', {limit, page});
 	}
 
@@ -39,5 +41,10 @@ export class ChatService {
 		this.snackbar.open(`Room ${room.name} created succefully`, 'Close' ,{
 			duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
 		} );
+	}
+
+	disconnect() {
+		console.log('Disconnect');
+		this.socket.disconnect();
 	}
 }
