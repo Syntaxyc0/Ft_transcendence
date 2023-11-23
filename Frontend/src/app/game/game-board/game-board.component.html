@@ -6,6 +6,7 @@
 	<button (click)="startGame(true)"> Start</button>
 	<button (click)="multiplayer()"> Multiplayer</button>
 	<button (click)="disconnect()">Disconnect</button>
+	<button (click)="beOtherPlayer()"> Change Player </button>
 </div>
 <p *ngIf = "requestedMatchmaking"> Looking for players...</p>
 <p *ngIf = "isOnline"> Connected </p>

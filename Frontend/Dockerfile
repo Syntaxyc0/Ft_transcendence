@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:latest
 
 RUN apt update -y && apt upgrade -y
 

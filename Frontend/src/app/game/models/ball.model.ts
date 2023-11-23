@@ -22,23 +22,30 @@ export class Ball{
 	{
 		let hx: number = Math.cos((this.angle * Math.PI) / 180) * this.speed + this.x;
 		let hy: number = Math.sin((this.angle * Math.PI) / 180) * this.speed + this.y;
-		if (this.isCollidingPaddle(hx, hy, this.gameBoard.paddleLeft))
-		{
-			this.angle = this.calculateReflectionAngle(hy - (this.gameBoard.paddleLeft.y - this.gameBoard.paddleLeft.height / 2), this.gameBoard.paddleLeft.height);
-			this.x = this.gameBoard.paddleLeft.width + this.radius;
-			this.gameBoard.sendBall();
-			return;
+
+		const bottom = this.radius;
+		const top = this.gameBoard.height - this.radius;
+
+		const left = this.radius;
+		const right = this.gameBoard.width - this.radius;
+
+		let playerColliding = this.xIsColliding(this.gameBoard.paddleRight, this.gameBoard.paddleLeft, hx)
+		if (playerColliding != 0 && this.gameBoard.currentLead){
+			if (playerColliding == 1 && this.yIsColliding(this.gameBoard.paddleRight, hy))
+				return this.updateCollide(this.gameBoard.paddleRight, hy, hx, playerColliding)
+			else if (this.yIsColliding(this.gameBoard.paddleLeft, hy) && playerColliding == -1)
+				return this.updateCollide(this.gameBoard.paddleLeft, hy, hx, playerColliding)
 		}
-		if (hx < this.gameBoard.width - this.radius && hx >= this.radius && hy < this.gameBoard.height - this.radius && hy > this.radius)
+		if (hx < right && hx > left && hy < top && hy > bottom)
 		{
 			this.x = hx;
 			this.y = hy;
 			return;
 		}
-		else {
-			if (hx <= this.radius || hx >= this.gameBoard.width - this.radius)
+		else if (this.gameBoard.currentLead){
+			if (hx <= left || hx >= right)
 			{
-				if (hx <= this.radius)
+				if (hx <= left)
 					this.gameBoard.paddleRight.score++;
 				else
 					this.gameBoard.paddleLeft.score++;
@@ -46,27 +53,51 @@ export class Ball{
 				this.reset();
 				this.gameBoard.sendBall();
 			}
-			if (hy <= this.radius || hy >= this.gameBoard.height - this.radius)
+			if (hy <= bottom || hy >= top)
 			{
-				this.angle = (-this.angle) % 360;
+				this.angle = (-this.angle);
 				this.gameBoard.sendBall();
 			}
 	  	}
 	
 	}
 
-	isCollidingPaddle(x:number, y:number ,paddle: Paddle) : boolean
+	updateCollide(paddle: Paddle, y: number, x: number, playerColliding: number)
 	{
-		if (x > this.radius + paddle.width)
-			return false;
-		if (y <= paddle.y + paddle.height / 2 + this.radius && y >= paddle.y - paddle.height / 2 - this.radius)
-			return true;
-		return false;
+		if (playerColliding == 1)
+			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, 225, 135);
+		else
+			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, -45, 45);
+		this.x = paddle.x + (-this.radius) * playerColliding + -playerColliding;
+		if (playerColliding == -1)
+			this.x += paddle.width;
+		this.gameBoard.sendBall()
+	}
+
+	xIsColliding(paddleRight: Paddle, paddleLeft: Paddle, x: number) : number
+	{
+		if(x - this.radius <= paddleLeft.width + paddleLeft.x)
+			return -1;
+		else if (x + this.radius >= paddleRight.x)
+			return 1;
+		return 0;
+	}
+
+	yIsColliding(paddle: Paddle, y: number): boolean
+	{
+		let paddleMin = paddle.y - (paddle.height / 2)
+		let paddleMax = paddle.y + (paddle.height / 2)
+
+		let ballMin = -this.radius + y
+		let ballMax = this.radius + y
+		if((ballMax < paddleMax && ballMax > paddleMin) || (ballMin < paddleMax && ballMin > paddleMin))
+			return true
+		return false
 	}
 
 	reset()
 	{
-		this.speed = 30;
+		this.speed = 20;
 		this.x = this.gameBoard.width / 2;
 		this.y = this.gameBoard.height / 2;
 		this.angle = Math.random() * 360;
@@ -83,13 +114,9 @@ export class Ball{
 		this.context.closePath();
 	}
 
-	calculateReflectionAngle(ballY: number, paddleHeight: number): number {
-		// Define angle range for mapping (e.g., -45 degrees to 45 degrees)
-		const minAngle = -45;  // Angle at the bottom of the paddle
-		const maxAngle = 45;   // Angle at the top of the paddle
+	calculateReflectionAngle(ballY: number, paddleHeight: number, minAngle: number, maxAngle: number){
 		const relativePosition = ballY / paddleHeight;
 		const newAngle = minAngle + (maxAngle - minAngle) * relativePosition;
-	
 		return newAngle;
 	}
 }

@@ -58,7 +58,7 @@ export class GameGateway implements OnModuleInit{
     const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
       return;
-    targetSocket.emit('ongameRequest', {
+    targetSocket.emit('onGameRequest', {
         order: body.order
     });
   }  
@@ -69,7 +69,7 @@ export class GameGateway implements OnModuleInit{
     const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
       return;
-    targetSocket.emit('ongameRequest', {
+    targetSocket.emit('onGameRequest', {
       order: "scoreUp",
       leftScore: body.leftScore,
       rightScore: body.rightScore
@@ -82,7 +82,7 @@ export class GameGateway implements OnModuleInit{
     const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
       return;
-    targetSocket.emit('ongameRequest', {
+    targetSocket.emit('onGameRequest', {
       order:"paddleUp",
       x: body.x,
       y: body.y
@@ -95,7 +95,7 @@ export class GameGateway implements OnModuleInit{
     const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
     if (!targetSocket)
       return;
-    targetSocket.emit('ongameRequest', {
+    targetSocket.emit('onGameRequest', {
       order:"ballUp",
       angle: body.angle,
       x: body.x,

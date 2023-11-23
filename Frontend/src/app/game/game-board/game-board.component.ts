@@ -52,6 +52,7 @@ export class GameBoardComponent implements OnInit{
 		this.data.subscribe((payload: any) =>{
 			if (!payload.order)
 				return;
+			// console.log(payload.order)
 			this.handleOrder(payload.order, payload);
 		});
 		this.reset(false);
@@ -220,6 +221,11 @@ export class GameBoardComponent implements OnInit{
 	{
 		if (this.currentLead)
 			this.firstPlayer.newScore(this.paddleLeft.score, this.paddleRight.score);
+	}
+
+	beOtherPlayer(){
+		this.paddleLeft.currentUser = !this.paddleLeft.currentUser;
+		this.paddleRight.currentUser = !this.paddleRight.currentUser;
 	}
 
 	sendBall()

@@ -22,7 +22,7 @@ export class SocketDataService {
       // //console.log("Current Client: " + this.socket.id);
       //console.log("Connected " + this.isOnline);
     });
-    this.socket.on('ongameRequest', (payload: {order: string}) =>{
+    this.socket.on('onGameRequest', (payload: {order: string}) =>{
       data.next(payload);
     });
     this.socket.on('newPlayer', (payload: {order: string}) =>{
