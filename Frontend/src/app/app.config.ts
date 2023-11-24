@@ -10,9 +10,6 @@ export const appConfig: ApplicationConfig = {
 
 export function tokenGetter() {
 	let token = localStorage.getItem("access_token");
-
-	console.log("token Getter :", token);
-
 	if (token)
 		return token;
 	else

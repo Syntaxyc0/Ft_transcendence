@@ -66,15 +66,11 @@ export const routes: Routes = [{
 	loadComponent:    () => import('./chat/components/chat/chat.component').then(m => m.ChatComponent),
 },
 {
-	path:    'chat/create-room',
+	path:    'create-room',
 	title:	'Create-Room',
 	canActivate: [AuthGuard],
 	loadComponent:    () => import('./chat/components/create-room/create-room.component').then(m => m.CreateRoomComponent),
 },
-{ path: 'chat', component: ChatComponent },
-{ path: '', redirectTo: '/chat', pathMatch: 'full' },
-{ path: 'create-room', component: CreateRoomComponent },
-{ path: '', redirectTo: '/create-room', pathMatch: 'full' },
 ];
 
 @NgModule({

@@ -37,12 +37,6 @@ export class ChatComponent implements OnInit{
 	constructor(private route:ActivatedRoute, private router: Router, private chatService: ChatService, public http: HttpClient, private customSocket: CustomSocket) {}
 
 	ngOnInit() {
-		this.customSocket.disconnect();
-		this.customSocket.connect();
-		this.customSocket.on('connect', () => {
-			console.log('socket is connect');
-			this.customSocket.configSocket();
-		})
 		this.chatService.emitPaginateRooms(10, 0);
 	}
 
