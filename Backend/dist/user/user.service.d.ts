@@ -41,6 +41,10 @@ export declare class UserService {
     GetUserStatus(id: number): Promise<string>;
     GetUserFriendlist(uid: number): Promise<number[]>;
     GetUserFriendRequestsReceived(uid: number): Promise<number[]>;
+    GetUserFriendRequestsSent(uid: number): Promise<number[]>;
+    CancelRequest(uid: number, name: string): Promise<void>;
+    RefuseRequest(uid: number, id: number): Promise<void>;
+    AcceptRequest(uid: number, id: number): Promise<void>;
     AddFriend(uid: number, userName: string): Promise<void>;
     RemoveFriend(uid: number, userId: number): Promise<void>;
     uploadFile(uid: number, file: Express.Multer.File): Promise<void>;

@@ -12,12 +12,40 @@ import { FriendrequestComponent } from '../components/friendrequest/friendreques
 import { RequestSentComponent } from '../components/request-sent/request-sent.component';
 
 @Component({
-  selector: 'app-private-profile',
+  selector: 'app-requests',
   standalone: true,
   imports: [CommonModule, HeaderbarComponent, HttpClientModule, RouterModule, ProfilePictureComponent, GamehistoryComponent, PictureComponent,FriendrequestComponent, RequestSentComponent],
-  templateUrl: './private-profile.component.html',
-  styleUrls: ['./private-profile.component.scss']
+  templateUrl: './requests.component.html',
+  styleUrls: ['./requests.component.scss']
 })
-export class PrivateProfileComponent {
 
+export class RequestsComponent {
+	id:number = 0;
+	elo:number = 0;
+	friendrequestsreceived: number[] = [];
+	friendrequestssent: number[] = [];
+
+	constructor(public http: HttpClient, public router:Router, private route: ActivatedRoute){}
+	ngOnInit()
+	{
+		this.id = JSON.parse(localStorage.getItem('id')!)
+		this.getuserElo()
+		this.http.get<number[]>("http://localhost:3333/users/" + this.id + "/friendrequestsreceived").subscribe(res => {
+			this.friendrequestsreceived = res;
+		})	
+		this.http.get<number[]>("http://localhost:3333/users/" + this.id + "/friendrequestssent").subscribe(res => {
+			this.friendrequestssent = res;
+		})	
+	}
+	getuserElo()
+	{
+		this.http.get<number>('http://localhost:3333/users/' + this.id + '/getelo').subscribe(
+			res => {
+				this.elo = res
+			},
+			err => {
+				console.log(err)
+			}
+		)
+	}
 }

@@ -66,6 +66,12 @@ export class UserController {
 		return this.userService.GetUserFriendRequestsReceived(uid);
 	}
 
+	@Get(':uid/friendrequestssent')
+    GetUserFriendRequestsSent(@Param('uid', ParseIntPipe) uid:number)
+	{
+		return this.userService.GetUserFriendRequestsSent(uid);
+	}
+
 	@Get(":uid/login")
 	getUserLogin(@Param('uid', ParseIntPipe) uid: number)
 	{
@@ -88,6 +94,24 @@ export class UserController {
     AddFriend(@Param('uid', ParseIntPipe) uid:number, @Body() userName)
 	{
 		return this.userService.AddFriend(uid, userName['userName']);
+	}
+
+	@Patch(':uid/CancelRequest')
+    CancelRequest(@Param('uid', ParseIntPipe) uid:number, @Body() username)
+	{
+		return this.userService.CancelRequest(uid, username['username']);
+	}
+
+	@Patch(':uid/AcceptRequest')
+    AcceptRequest(@Param('uid', ParseIntPipe) uid:number, @Body() id)
+	{
+		return this.userService.AcceptRequest(uid, id['id']);
+	}
+
+	@Patch(':uid/RefuseRequest')
+    RefuseRequest(@Param('uid', ParseIntPipe) uid:number, @Body() id)
+	{
+		return this.userService.RefuseRequest(uid, id['id']);
 	}
 
 	@Patch(':uid/RemoveFriend')

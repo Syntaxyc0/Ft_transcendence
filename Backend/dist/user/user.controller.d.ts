@@ -40,10 +40,14 @@ export declare class UserController {
     GetUserStatus(uid: number): Promise<string>;
     GetUserFriendlist(uid: number): Promise<number[]>;
     GetUserFriendRequestsReceived(uid: number): Promise<number[]>;
+    GetUserFriendRequestsSent(uid: number): Promise<number[]>;
     getUserLogin(uid: number): Promise<string>;
     getUserElo(uid: number): Promise<number>;
     updateUserElo(uid: number, elo: number): Promise<void>;
     AddFriend(uid: number, userName: any): Promise<void>;
+    CancelRequest(uid: number, username: any): Promise<void>;
+    AcceptRequest(uid: number, id: any): Promise<void>;
+    RefuseRequest(uid: number, id: any): Promise<void>;
     RemoveFriend(uid: number, userId: any): Promise<void>;
     uploadFile(uid: number, file: Express.Multer.File): Promise<void>;
     getAvatar(uid: number, res: Response): Promise<void>;

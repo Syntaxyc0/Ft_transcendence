@@ -25,7 +25,7 @@ import { MatMenuTrigger } from '@angular/material/menu';
 export class SettingsComponent {
 	constructor(private readonly router: Router, public http: HttpClient) {}
 
-	@Input() id:number = 0
+	id:number = 0
 	selectedVal: string = 'disable'
 	
 	

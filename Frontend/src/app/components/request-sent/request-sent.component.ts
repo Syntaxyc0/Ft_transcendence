@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
-  selector: 'app-friendrequest',
+  selector: 'app-request-sent',
   standalone: true,
   imports: [CommonModule, HttpClientModule],
-  templateUrl: './friendrequest.component.html',
-  styleUrls: ['./friendrequest.component.scss']
+  templateUrl: './request-sent.component.html',
+  styleUrls: ['./request-sent.component.scss']
 })
-export class FriendrequestComponent {
+export class RequestSentComponent {
 
 	constructor(public http: HttpClient) {}
 	@Input() Id:number = 0;
@@ -48,10 +48,9 @@ export class FriendrequestComponent {
 		return this.http.get<Blob>("http://localhost:3333/users/" + this.Id + "/avatar", { responseType: 'Blob' as 'json' })
 	}
 
-
-	accept()
+	cancel()
 	{
-		this.http.patch("http://localhost:3333/users/" + localStorage.getItem('id') + "/AcceptRequest", {id: this.Id}).subscribe(
+		this.http.patch("http://localhost:3333/users/" + localStorage.getItem('id') + "/CancelRequest", {username: this.name}).subscribe(
 			res => {
 				window.location.reload()
 			},
@@ -59,17 +58,5 @@ export class FriendrequestComponent {
 				alert(err.error.message);
 			}
 			);
-		}
-		
-		deny()
-		{
-			this.http.patch("http://localhost:3333/users/" + localStorage.getItem('id') + "/RefuseRequest", {id: this.Id}).subscribe(
-				res => {
-					window.location.reload()
-				},
-				err => {
-					alert(err.error.message);
-				}
-				);
-		}
 	}
+}

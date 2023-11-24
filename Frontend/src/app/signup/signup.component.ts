@@ -42,8 +42,8 @@ export class SignupComponent {
 					this.router.navigate(['/home'])
 				},
 				err => {
-					alert('these credentials are taken')
-					console.log(err)
+					alert(err.error.message)
+					console.log(err.error.message)
 				})
 			}
 			

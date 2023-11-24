@@ -47,6 +47,9 @@ let UserController = class UserController {
     GetUserFriendRequestsReceived(uid) {
         return this.userService.GetUserFriendRequestsReceived(uid);
     }
+    GetUserFriendRequestsSent(uid) {
+        return this.userService.GetUserFriendRequestsSent(uid);
+    }
     getUserLogin(uid) {
         return this.userService.getlogin(uid);
     }
@@ -58,6 +61,15 @@ let UserController = class UserController {
     }
     AddFriend(uid, userName) {
         return this.userService.AddFriend(uid, userName['userName']);
+    }
+    CancelRequest(uid, username) {
+        return this.userService.CancelRequest(uid, username['username']);
+    }
+    AcceptRequest(uid, id) {
+        return this.userService.AcceptRequest(uid, id['id']);
+    }
+    RefuseRequest(uid, id) {
+        return this.userService.RefuseRequest(uid, id['id']);
     }
     RemoveFriend(uid, userId) {
         return this.userService.RemoveFriend(uid, userId['userId']);
@@ -146,6 +158,13 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUserFriendRequestsReceived", null);
 __decorate([
+    (0, common_1.Get)(':uid/friendrequestssent'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "GetUserFriendRequestsSent", null);
+__decorate([
     (0, common_1.Get)(":uid/login"),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -175,6 +194,30 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "AddFriend", null);
+__decorate([
+    (0, common_1.Patch)(':uid/CancelRequest'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "CancelRequest", null);
+__decorate([
+    (0, common_1.Patch)(':uid/AcceptRequest'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "AcceptRequest", null);
+__decorate([
+    (0, common_1.Patch)(':uid/RefuseRequest'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "RefuseRequest", null);
 __decorate([
     (0, common_1.Patch)(':uid/RemoveFriend'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),

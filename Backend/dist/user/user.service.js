@@ -97,6 +97,197 @@ let UserService = class UserService {
         }
         return user.FriendRequestsReceived;
     }
+    async GetUserFriendRequestsSent(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        return user.FriendRequestsEmitted;
+    }
+    async CancelRequest(uid, name) {
+        const friend = await this.prisma.user.findUnique({
+            where: {
+                login: name
+            },
+        });
+        if (!friend) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const friendrequestsemitted = user.FriendRequestsEmitted;
+        const friendrequestsreceived = friend.FriendRequestsReceived;
+        const newfriendrequestsreceived = [];
+        for (const i of friendrequestsreceived) {
+            if (i != uid)
+                newfriendrequestsreceived.push(i);
+        }
+        const newfriendrequestsemitted = [];
+        for (const j of friendrequestsemitted) {
+            if (j != friend.id)
+                newfriendrequestsemitted.push(j);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                FriendRequestsEmitted: newfriendrequestsemitted
+            }
+        });
+        await this.prisma.user.update({
+            where: {
+                login: name,
+            },
+            data: {
+                FriendRequestsReceived: newfriendrequestsreceived
+            }
+        });
+    }
+    async RefuseRequest(uid, id) {
+        const friend = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (!friend) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        const friendemitted = friend.FriendRequestsEmitted;
+        const newfriendemitted = [];
+        for (const i of friendemitted) {
+            if (i != uid)
+                newfriendemitted.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                FriendRequestsEmitted: newfriendemitted
+            }
+        });
+        const userreceived = user.FriendRequestsReceived;
+        const newuserreceived = [];
+        for (const i of userreceived) {
+            if (i != id)
+                newuserreceived.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                FriendRequestsReceived: newuserreceived
+            }
+        });
+    }
+    async AcceptRequest(uid, id) {
+        const friend = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (!friend) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        await this.prisma.user.update({
+            data: {
+                friendList: {
+                    push: uid
+                }
+            },
+            where: {
+                id: id,
+            }
+        });
+        await this.prisma.user.update({
+            data: {
+                friendList: {
+                    push: id
+                }
+            },
+            where: {
+                id: uid,
+            }
+        });
+        const friendemitted = friend.FriendRequestsEmitted;
+        const newfriendemitted = [];
+        for (const i of friendemitted) {
+            if (i != uid)
+                newfriendemitted.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                FriendRequestsEmitted: newfriendemitted
+            }
+        });
+        const friendreceived = friend.FriendRequestsReceived;
+        const newfriendreceived = [];
+        for (const i of friendreceived) {
+            if (i != uid)
+                newfriendreceived.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                FriendRequestsReceived: newfriendreceived
+            }
+        });
+        const useremitted = user.FriendRequestsEmitted;
+        const newuseremitted = [];
+        for (const i of useremitted) {
+            if (i != id)
+                newuseremitted.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                FriendRequestsEmitted: newuseremitted
+            }
+        });
+        const userreceived = user.FriendRequestsReceived;
+        const newuserreceived = [];
+        for (const i of userreceived) {
+            if (i != id)
+                newuserreceived.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                FriendRequestsReceived: newuserreceived
+            }
+        });
+    }
     async AddFriend(uid, userName) {
         const friend = await this.prisma.user.findUnique({
             where: {
@@ -154,6 +345,7 @@ let UserService = class UserService {
     }
     async RemoveFriend(uid, userId) {
         const newfriendlist = [];
+        const newfriendlist2 = [];
         const friend = await this.prisma.user.findUnique({
             where: {
                 id: userId
@@ -175,12 +367,25 @@ let UserService = class UserService {
             if (i != userId)
                 newfriendlist.push(i);
         }
+        const friendlist2 = friend.friendList;
+        for (const i of friendlist2) {
+            if (i != uid)
+                newfriendlist2.push(i);
+        }
         await this.prisma.user.update({
             where: {
                 id: uid,
             },
             data: {
                 friendList: newfriendlist
+            }
+        });
+        await this.prisma.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                friendList: newfriendlist2
             }
         });
     }
