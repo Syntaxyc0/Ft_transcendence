@@ -19,7 +19,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	async handleConnection( socket: Socket ) {
 		try {
-			console.log("\nHandleCo1")
 			const decodedToken = await this.authService.verifyJwt(socket.handshake.headers.authorization);
 			const user: UserI = await this.prisma.user.findUnique({
 				where: { id: decodedToken.sub },
