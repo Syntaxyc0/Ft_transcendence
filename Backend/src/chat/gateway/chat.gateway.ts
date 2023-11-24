@@ -17,14 +17,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	constructor( private authService: AuthService, private prisma: PrismaService ) {}
 
-	async handleConnection(socket: Socket) {
+	async handleConnection( socket: Socket ) {
 		try {
+			console.log("\nHandleCo1")
 			const decodedToken = await this.authService.verifyJwt(socket.handshake.headers.authorization);
-			console.log("after verifiy jwt");
 			const user: UserI = await this.prisma.user.findUnique({
 				where: { id: decodedToken.sub },
 			});
-			if (!user) {
+			if ( !user ) {
 				console.log("user not found");
 				return this.disconnect(socket);
 			} else {
@@ -34,7 +34,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					take: 10,
 					skip: 0,
 				});
-				console.log('\nHandleCo', user);
 
 				return this.server.to(socket.id).emit('roomsI', rooms);
 			}
@@ -120,7 +119,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		  });
 
 		const room = user.rooms;
-		console.log('backend getRooms');
 		
 		return this.server.to(socket.id).emit('roomsI', room);
 	}

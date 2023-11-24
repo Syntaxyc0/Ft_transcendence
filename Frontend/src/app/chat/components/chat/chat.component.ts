@@ -16,6 +16,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { CustomSocket } from '../../sockets/custom-socket';
 
 
 @Component({
@@ -33,9 +34,15 @@ export class ChatComponent implements OnInit{
 	userList :object[] = []
 
 
-	constructor(private route:ActivatedRoute, private router: Router, private chatService: ChatService, public http: HttpClient) {}
+	constructor(private route:ActivatedRoute, private router: Router, private chatService: ChatService, public http: HttpClient, private customSocket: CustomSocket) {}
 
 	ngOnInit() {
+		this.customSocket.disconnect();
+		this.customSocket.connect();
+		this.customSocket.on('connect', () => {
+			console.log('socket is connect');
+			this.customSocket.configSocket();
+		})
 		this.chatService.emitPaginateRooms(10, 0);
 	}
 

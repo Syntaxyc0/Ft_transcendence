@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { CustomSocket } from '../chat/sockets/custom-socket';
 
 @Component({
   selector: 'app-redirect',
@@ -24,7 +25,7 @@ export class RedirectComponent {
 				response => {
           localStorage.setItem('access_token', response['access_token'])
           localStorage.setItem('id', response['id'])
-		  this.http.patch<any>('http://localhost:3333/users/' + response['id'] + '/status', {status: "ONLINE"}).subscribe()
+		  this.http.patch<any>('http://localhost:3333/users/' + response['id'] + '/status', {status: "ONLINE"}).subscribe()		
           this.router.navigate(['home']);
 				},
 				error => {
