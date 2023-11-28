@@ -85,6 +85,14 @@ export class AuthController
 	async getUsers() {
 		return await this.prismaService.user.findMany();
 	}
+
+	@Get('coUsers')
+	async getConnectedUsers() {
+		return await this.prismaService.connectedUser.findMany({
+			// include: {user: true}
+		});
+	}
+
 	//--------------------// 
 	//        Test        //
 	//--------------------// 

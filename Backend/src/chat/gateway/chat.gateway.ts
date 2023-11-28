@@ -4,10 +4,11 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { PageI } from 'src/chat/model/page.interface';
-import { Prisma, User, Room } from '@prisma/client'; 
+import { Prisma, User, Room, ConnectedUser } from '@prisma/client'; 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { UserI } from '../model/user.interface';
+import { ConnectedUserService } from '../service/connectedUser.service';
 
 @WebSocketGateway({ cors: { origin: ['http://localhost:3333', 'http://localhost:4200'] } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -15,7 +16,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 
-	constructor( private authService: AuthService, private prisma: PrismaService ) {}
+	constructor( 
+		private authService: AuthService,
+		private prisma: PrismaService,
+		private connectedUserService: ConnectedUserService ) {}
 
 	async handleConnection( socket: Socket ) {
 		try {
@@ -34,6 +38,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					skip: 0,
 				});
 
+				await this.connectedUserService.create({ socketId: socket.id, user });
+
 				return this.server.to(socket.id).emit('roomsI', rooms);
 			}
 		} catch {
@@ -43,7 +49,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 
-	handleDisconnect(socket: Socket) {
+	async handleDisconnect(socket: Socket) {
+		await this.connectedUserService.deleteBySocketId(socket.id);
 		socket.disconnect();
 	}
 
