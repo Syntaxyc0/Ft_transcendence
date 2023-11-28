@@ -67,6 +67,9 @@ let AuthController = class AuthController {
     async getUsers() {
         return await this.prismaService.user.findMany();
     }
+    async getConnectedUsers() {
+        return await this.prismaService.connectedUser.findMany({});
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -111,6 +114,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getUsers", null);
+__decorate([
+    (0, common_1.Get)('coUsers'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "getConnectedUsers", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService, axios_1.HttpService, prisma_service_1.PrismaService])

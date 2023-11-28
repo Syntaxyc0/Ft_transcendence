@@ -11,12 +11,13 @@ import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
   providedIn: 'root'
 })
 export class SocketDataService implements OnDestroy{
-  private socket: Socket;
+
+	constructor(private socket: CustomSocket) {}
+
   private baseUrl = 'http://localhost:3333';
   private isOnline: boolean = false;
 
   getData(): Observable<any[]> {
-    this.socket = io(this.baseUrl);
     const data = new Subject<any>();
     const dataObservable = from(data);
 

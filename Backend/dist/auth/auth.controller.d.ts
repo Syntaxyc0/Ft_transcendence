@@ -54,4 +54,9 @@ export declare class AuthController {
         gameHistory: number[];
         friendList: number[];
     }[]>;
+    getConnectedUsers(): Promise<{
+        id: number;
+        socketId: string;
+        userId: number;
+    }[]>;
 }

@@ -38,7 +38,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					skip: 0,
 				});
 
-				await this.connectedUserService.create({ socketId: socket.id, user });
+				// await this.connectedUserService.create({ socketId: socket.id, user });
 
 				return this.server.to(socket.id).emit('roomsI', rooms);
 			}
@@ -50,7 +50,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 
 	async handleDisconnect(socket: Socket) {
-		await this.connectedUserService.deleteBySocketId(socket.id);
+		// await this.connectedUserService.deleteBySocketId(socket.id);
 		socket.disconnect();
 	}
 
