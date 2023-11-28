@@ -1,21 +1,19 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Options, Param, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, NotFoundException, Options, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { signinDto, signupDto } from "./dto";
 import { HttpService } from "@nestjs/axios";
 import { map } from "rxjs";
 import { Response } from "express";
-
 import fetch from "node-fetch";
+import { PrismaService } from '../prisma/prisma.service'; 
 
 var crypto = require("crypto");
-
-
 import FormData = require('form-data');
 
 @Controller('auth')
 export class AuthController
 {
-    constructor(private authService: AuthService, private http: HttpService) {}
+    constructor(private authService: AuthService, private http: HttpService, private prismaService: PrismaService) {}
 
 	token: string
     @Post('signup')
@@ -64,4 +62,31 @@ export class AuthController
 
 		
 	}
+
+	//--------------------// 
+	//  DataBase VIEWER   //
+	//--------------------// 
+
+	// @Get('rooms')
+	// async getRooms() {
+	// 	return await this.prismaService.room.findMany();
+	// }
+
+	@Get('rooms')
+	async getRooms() {
+  		return await this.prismaService.room.findMany({
+   			include: {
+     			users: true,
+   			},
+  		});
+	}
+
+	@Get('users')
+	async getUsers() {
+		return await this.prismaService.user.findMany();
+	}
+	//--------------------// 
+	//        Test        //
+	//--------------------// 
+
 }

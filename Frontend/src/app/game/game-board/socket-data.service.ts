@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Socket, io } from 'socket.io-client';
 import { Ball } from '../models/ball.model';
 import { Paddle } from '../models/paddle.model';
+import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
 
 
 @Injectable({

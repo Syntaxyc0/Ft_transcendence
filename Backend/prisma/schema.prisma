@@ -17,33 +17,43 @@ enum Status {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  email	String @unique
-  login String @unique
-  hash String
-  is2faenabled Boolean @default(false)
-  is2favalidated Boolean @default(false)
-  twofacode String @default("")
-  avatar	String	@default("")
-  elo		Int		@default(1000)
-  userStatus String	@default("OFFLINE")
-  gameHistory Int[] 
-  friendList Int[] @default([])
-  FriendRequest	FriendRequest[]
+  id				Int @id @default(autoincrement())
+  email				String @unique
+  login 			String @unique
+  hash 				String
+  is2faenabled		Boolean @default(false)
+  is2favalidated	Boolean @default(false)
+  twofacode 		String @default("")
+  avatar			String @default("")
+  elo				Int @default(1000)
+  userStatus 		String	@default("OFFLINE")
+  gameHistory 		Int[] 
+  friendList 		Int[] @default([])
+  FriendRequest		FriendRequest[]
+  rooms				Room[] @relation("UserRooms")
 }
 
 model FriendRequest {
-	id Int @id @default(autoincrement())
-	userId Int
-	User User	@relation(fields: [userId], references: [id])
-	Status Boolean @default(false)
+	id 				Int @id @default(autoincrement())
+	userId 			Int
+	User 			User @relation(fields: [userId], references: [id])
+	Status			Boolean @default(false)
 }
 
 model GameInfo {
-	id Int @id @default(autoincrement()) 
-	userId1	Int
-	userId2	Int
-	scoreUser1 Int
-	scoreUser2 Int
-	winnerId	Int
+	id				Int @id @default(autoincrement()) 
+	userId1			Int
+	userId2			Int
+	scoreUser1		Int
+	scoreUser2		Int
+	winnerId		Int
+}
+
+model Room {
+  id         Int       @id @default(autoincrement())
+  name       String
+  description String?  
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  users      User[]    @relation("UserRooms")
 }

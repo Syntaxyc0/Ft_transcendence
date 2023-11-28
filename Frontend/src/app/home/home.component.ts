@@ -6,6 +6,7 @@ import { ProfilePictureComponent } from '../components/profile-picture/profile-p
 import { User } from '../helpers/types';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CustomSocket } from '../chat/sockets/custom-socket';
 
 @Component({
   selector: 'app-home',
@@ -15,20 +16,24 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-	constructor(public http: HttpClient, private route:ActivatedRoute, private router: Router) {}
+
+	constructor(public http: HttpClient, private route:ActivatedRoute, private router: Router, private customSocket: CustomSocket) {}
 
 
 	id:number = 1;
 	code: string 
 	ngOnInit() {
-		
-		  this.id = JSON.parse(localStorage.getItem('id')!)
-	
-	  }
+		this.id = JSON.parse(localStorage.getItem('id')!)	
+	}
 
 	LaunchGame()
 	{
 		this.router.navigate(['game']);
 	}
 
+	LaunchChat()
+	{
+		this.router.navigate(['chat']);
+	}
+	
 }

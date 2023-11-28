@@ -3,7 +3,8 @@
 chown -R root:root /app/Backend
 chmod -R 755 /app/Backend
 cd /app/Backend
-npm install --legacy-peer-deps
+ncu -u -x node-fetch
+npm install --force --legacy-peer-deps
 npx prisma generate
 npx prisma migrate dev --name first-migration --schema='./prisma/schema.prisma' --preview-feature
 

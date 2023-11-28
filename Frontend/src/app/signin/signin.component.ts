@@ -7,6 +7,7 @@ import { CustomValidators } from '../helpers/custom-validators';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { RouterModule, Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { CustomSocket } from '../chat/sockets/custom-socket';
 
 
 @Component({
@@ -18,10 +19,11 @@ import { Observable } from 'rxjs';
 })
 export class SigninComponent {
 	constructor(public http: HttpClient, private router: Router) {}
+
 	public signinForm = new FormGroup({
-    login: new FormControl(null, [Validators.required]),
-    password: new FormControl(null, [Validators.required]),
-});
+    	login: new FormControl(null, [Validators.required]),
+    	password: new FormControl(null, [Validators.required]),
+	});
 
     signin(): void {
 		this.http.post<any>('http://localhost:3333/auth/signin', {login: this.login.value, password:this.password.value}).subscribe(
@@ -29,8 +31,8 @@ export class SigninComponent {
 					localStorage.setItem('access_token', res['access_token']);
 					localStorage.setItem('id', JSON.stringify(res['id']));
 					this.http.patch<any>('http://localhost:3333/users/' + res['id'] + '/status', {status: "ONLINE"}).subscribe()
-					this.http.get<any>('http://localhost:3333/users/' + res['id'] + '/get2fa').subscribe( res => {
-						if (res)
+					this.http.get<any>('http://localhost:3333/users/' + res['id'] + '/2faenabled').subscribe( res => {
+						if (!res)
 							this.router.navigate(['/home'])
 						else
 						{
