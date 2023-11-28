@@ -22,18 +22,24 @@ export class GameBoardComponent implements OnInit{
 	@ViewChild('canvas', {static: true}) gameCanvas!: ElementRef;
 	context!: CanvasRenderingContext2D;
 
+
 	width: number = 1000;
 	height: number = 640;
 
 	paddleLeft!: Paddle;
 	paddleRight!: Paddle;
 	ball!: Ball;
+	score: number = 0;
 
 	isGameRunning: boolean = false;
+	requestedMatchmaking = false;
+	isOnline = false;
+	currentLead: boolean = true;
+	// private isPageVisible: boolean = true;
+	otherVisible: boolean = true;
 
 	data: Observable<any>;
-	secondPlayer: string;
-	requestedMatchmaking = false;
+	oldTimeStamp = 0;
 
 
 	constructor(private firstPlayer: SocketDataService) {}
@@ -48,62 +54,106 @@ export class GameBoardComponent implements OnInit{
 		this.data.subscribe((payload: any) =>{
 			if (!payload.order)
 				return;
+			// console.log(payload.order)
 			this.handleOrder(payload.order, payload);
 		});
-		this.reset();
+		this.reset(false);
 		this.gameLoop = this.gameLoop.bind(this);
 		requestAnimationFrame(this.gameLoop);
 	}
 	
-	handleOrder(order:string, payload: any)
+	handleOrder(order:string, payload:any)
 	{
-		if(order == "stopGame")
-			this.isGameRunning = false;
-		else if (order == "startGame")
-			this.startGame(true);
-		else if (order == "newPlayer" && !this.secondPlayer)
-		{
-			this.newPlayer(payload.player, payload.first);
-			this.sendData();
+		switch(order){
+			case "paddleUp":
+				if (this.paddleRight.currentUser)
+				this.paddleLeft.newMultiPos(payload.x, payload.y);
+				else if (this.paddleLeft.currentUser)
+				this.paddleRight.newMultiPos(payload.x, payload.y);
+			break;
+			case "ballUp":
+				this.ball.newMultiPos(payload.angle, payload.x, payload.y);break;
+			case "scoreUp":
+				this.paddleLeft.score = payload.leftScore;
+				this.paddleRight.score = payload.rightScore;
+			break;
+			case "stopGame":
+				this.isGameRunning = false;break;
+			case "startGame":
+				this.startGame(false);break;
+			case "newPlayer":
+				this.newPlayer(payload.first);break;
+			case "resetRequest":
+				this.reset(false);break;
+			case "resetDone":
+				this.reset(false);
+				this.draw();
+			break;
+			case "otherDisconnected":
+				this.resetOnline();
+				this.multiplayer();
+			break;
+			case "changeLead":
+				this.currentLead = !this.currentLead;
+				this.firstPlayer.gameRequest("leadChanged")
+				console.log("changeLead: " + this.currentLead)
+			break;
+			case "leadChanged":
+				this.currentLead = !this.currentLead;
+				console.log("LeadChanged: " + this.currentLead)
+			break;
+			case "visibleChange":
+				this.otherVisible = !this.otherVisible;
+			break;
+			case "giveData":
+				this.sendData();break;
 		}
-		else if (order == "ballUp" && !this.paddleLeft.currentUser)
-			this.ball.newMultiPos(payload.angle, payload.x, payload.y);
-		else if (order == "resetRequest")
-		{
-			this.reset();
-			this.firstPlayer.GameRequest("resetDone", this.secondPlayer);
-		}
-		else if (order == "resetDone")
-			this.draw();
-		else if (order == "otherDisconnected")
-			this.resetOnline();
 	}
 
 	disconnect()
 	{
-		if (this.secondPlayer)
-			this.firstPlayer.disconnect(this.secondPlayer);
 		this.requestedMatchmaking = false;
 		this.resetOnline();
-
+		this.firstPlayer.disconnect();
 	}
 
 	resetOnline()
 	{
+		this.isOnline = false;
+		this.currentLead = true;
 		this.stopGame();
-		this.secondPlayer = '';
+		this.requestedMatchmaking = false;
 		this.paddleLeft.currentUser = true;
 		this.paddleRight.currentUser = false;
-		this.reset();
+		this.reset(false);
 	}
 
-	newPlayer(secondPlayer: string, first:boolean)
+	newPlayer(first:boolean)
 	{
-		this.secondPlayer = secondPlayer;
+		this.currentLead = first;
 		this.paddleLeft.currentUser = first;
 		this.paddleRight.currentUser = !first;
-		this.reset();
+		this.isOnline = true;
+		this.requestedMatchmaking = false;
+		this.reset(true);
+		this.sendBall();
 	}
+
+	@HostListener('document:visibilitychange', ['$event'])
+	onVisibilityChange(event: Event): void {
+		if (document.visibilityState === 'visible') {
+			// this.isPageVisible = true;
+			this.firstPlayer.gameRequest("visibleChange")
+			if (!this.otherVisible && !this.currentLead)
+				this.firstPlayer.gameRequest("changeLead")
+			}
+		else {
+			// this.isPageVisible = false;
+			this.firstPlayer.gameRequest("visibleChange")
+			if (this.otherVisible && this.currentLead)
+				this.firstPlayer.gameRequest("changeLead");
+		}
+	  }
 
 	draw()
 	{
@@ -116,69 +166,128 @@ export class GameBoardComponent implements OnInit{
 	}
 
 	multiplayer(){
-		if (!this.secondPlayer)
-		{
-			this.requestedMatchmaking = true;
-			this.firstPlayer.multiplayerRequest();
-		}
+		if (this.isOnline)
+			return;
+		this.requestedMatchmaking = true;
+		this.firstPlayer.multiplayerRequest();
 	}
 
-	reset() {
+	reset(request: boolean) {
 		this.stopGame();
-		if (this.secondPlayer && !this.paddleLeft.currentUser)
-		{
-			this.firstPlayer.GameRequest("resetRequest", this.secondPlayer);
-			return;
-		}
 		this.paddleLeft.reset();
 		this.paddleRight.reset();
+		if (!this.currentLead)
+		{
+			if (request)
+				this.firstPlayer.gameRequest("resetRequest");
+			return;
+		}
 		this.ball.reset();
 		this.draw();
-		this.sendData();
-		if (this.secondPlayer)
-			this.firstPlayer.GameRequest("resetDone", this.secondPlayer);
+		this.sendBall();
+		this.sendScore();
+		this.firstPlayer.gameRequest("resetDone");
 	}
 
 	startGame(request: boolean) {
 		if (this.isGameRunning)
 			return;
-		console.log(this.ball.speed);
 		this.isGameRunning = true;
-		if (this.secondPlayer && !request)
-			this.firstPlayer.GameRequest("startGame", this.secondPlayer);
+		if (request)
+			this.firstPlayer.gameRequest("startGame");
+		this.oldTimeStamp = Date.now()
 		this.gameLoop();
 	}
 
 	stopGame() {
 		this.isGameRunning = false;
-		if (this.secondPlayer)
-			this.firstPlayer.GameRequest("stopGame", this.secondPlayer);
+		this.firstPlayer.gameRequest("stopGame");
 	}
 
 	gameLoop()
 	{
 		if(!this.isGameRunning)
 			return;
+		const timeStamp = Date.now();
+		const secondsPassed = (timeStamp - this.oldTimeStamp)/1000;
+		this.oldTimeStamp = timeStamp;
+
+		// this.update(secondsPassed)
 		this.ball.updatePosition();
 		this.draw();
 		requestAnimationFrame(this.gameLoop);
 	}
 
+	update(secondsPassed: number){
+		// this.paddleLeft.x += (1000 * secondsPassed)
+		if (this.paddleLeft.targetY < this.paddleLeft.y)
+		{
+			this.paddleLeft.y -= (500 * secondsPassed)
+		}
+		else if (this.paddleLeft.targetY > this.paddleLeft.y)
+		{
+			this.paddleLeft.y += (500 * secondsPassed)
+		}
+	}
+
 	sendData()
 	{
-		if (this.secondPlayer && this.paddleLeft.currentUser)
-			this.firstPlayer.newBallPos(this.secondPlayer, this.ball.angle, this.ball.posx, this.ball.posy);
+		this.sendBall()
+		this.sendPaddle()
+		this.sendScore()
+	}
+
+	sendScore()
+	{
+		if (this.currentLead)
+			this.firstPlayer.newScore(this.paddleLeft.score, this.paddleRight.score);
+	}
+
+	beOtherPlayer(){
+		this.paddleLeft.currentUser = !this.paddleLeft.currentUser;
+		this.paddleRight.currentUser = !this.paddleRight.currentUser;
+	}
+
+	sendBall()
+	{
+		if (this.currentLead)
+			this.firstPlayer.newBallPos(this.ball.angle, this.ball.x, this.ball.y);
+	}
+
+	sendPaddle()
+	{
+		this.firstPlayer.newPaddlePos(this.paddleLeft.x, this.paddleLeft.y);
+		this.firstPlayer.newPaddlePos(this.paddleRight.x, this.paddleRight.y);
 	}
 
 	@HostListener('document:keydown', ['$event'])
 	handleKeyboardEvent(event: KeyboardEvent)
 	{
 		event.preventDefault();
-		this.startGame(false);
-		if(this.paddleLeft && this.paddleLeft.posy < this.height - this.paddleLeft.height/2 && (event.key == 'ArrowDown' || event.key == 's'))
-			this.paddleLeft.posy += this.paddleLeft.speed;
-		if(this.paddleLeft && this.paddleLeft.posy > this.paddleLeft.height/2 && (event.key == 'ArrowUp' || event.key == 'w'))
-			this.paddleLeft.posy -= this.paddleLeft.speed;
+		this.startGame(true)
+		if(this.paddleLeft.currentUser)
+			this.updatePaddlePosition(this.paddleLeft, event.key)
+		else if(this.paddleRight.currentUser)
+			this.updatePaddlePosition(this.paddleRight, event.key);
+	}
+
+	updatePaddlePosition(paddle: Paddle, event: string)
+	{
+		const top = this.height - paddle.height
+		const bottom = paddle.height
+		if(paddle && paddle.y < top && (event == 'ArrowDown' || event == 's'))
+		{
+			// paddle.targetY = paddle.y + paddle.speed
+			paddle.y += paddle.speed;
+			this.firstPlayer.newPaddlePos(paddle.x, paddle.y);
+		}
+		if(paddle && paddle.y > bottom && (event == 'ArrowUp' || event == 'w'))
+		{
+			// paddle.targetY = paddle.y - paddle.speed
+			paddle.y -= paddle.speed;
+			this.firstPlayer.newPaddlePos(paddle.x, paddle.y);
+
+		}
 	}
 
 }

@@ -4,8 +4,8 @@ export class Ball{
 	public speed!: number;
 	public radius: number = 15;
 	public angle: number =  Math.random() * 360;
-	public posx!: number;
-	public posy!: number;
+	public x!: number;
+	public y!: number;
 	constructor(public context: CanvasRenderingContext2D, public gameBoard: GameBoardComponent)
 	{
 		this.reset();
@@ -14,79 +14,109 @@ export class Ball{
 	newMultiPos(angle: number, x: number, y: number)
 	{
 		this.angle = angle;
-		this.posx = x;
-		this.posy = y;
+		this.x = x;
+		this.y = y;
 	}
 
 	updatePosition()
 	{
-		let hx: number = Math.cos((this.angle * Math.PI) / 180) * this.speed + this.posx;
-		let hy: number = Math.sin((this.angle * Math.PI) / 180) * this.speed + this.posy;
-		if (this.isCollidingPaddle(hx, hy, this.gameBoard.paddleLeft))
+		let hx: number = Math.cos((this.angle * Math.PI) / 180) * this.speed + this.x;
+		let hy: number = Math.sin((this.angle * Math.PI) / 180) * this.speed + this.y;
+
+		const bottom = this.radius;
+		const top = this.gameBoard.height - this.radius;
+
+		const left = this.radius;
+		const right = this.gameBoard.width - this.radius;
+
+		let playerColliding = this.xIsColliding(this.gameBoard.paddleRight, this.gameBoard.paddleLeft, hx)
+		if (playerColliding != 0 && this.gameBoard.currentLead){
+			if (playerColliding == 1 && this.yIsColliding(this.gameBoard.paddleRight, hy))
+				return this.updateCollide(this.gameBoard.paddleRight, hy, hx, playerColliding)
+			else if (this.yIsColliding(this.gameBoard.paddleLeft, hy) && playerColliding == -1)
+				return this.updateCollide(this.gameBoard.paddleLeft, hy, hx, playerColliding)
+		}
+		if (hx < right && hx > left && hy < top && hy > bottom)
 		{
-			this.angle = this.calculateReflectionAngle(hy - (this.gameBoard.paddleLeft.posy - this.gameBoard.paddleLeft.height / 2), this.gameBoard.paddleLeft.height);
-			this.posx = this.gameBoard.paddleLeft.width + this.radius;
-			this.gameBoard.sendData();
+			this.x = hx;
+			this.y = hy;
 			return;
 		}
-		if (hx < this.gameBoard.width - this.radius && hx >= this.radius && hy < this.gameBoard.height - this.radius && hy > this.radius)
-		{
-			this.posx = hx;
-			this.posy = hy;
-			return;
-		}
-		else {
-			if (hx <= this.radius || hx >= this.gameBoard.width - this.radius)
+		else if (this.gameBoard.currentLead){
+			if (hx <= left || hx >= right)
 			{
-				if (hx <= this.radius)
-					this.gameBoard.paddleRight.updateScore();
+				if (hx <= left)
+					this.gameBoard.paddleRight.score++;
 				else
-					this.gameBoard.paddleLeft.updateScore();
+					this.gameBoard.paddleLeft.score++;
+				this.gameBoard.sendScore()
 				this.reset();
-				this.gameBoard.sendData();
+				this.gameBoard.sendBall();
 			}
-			if (hy <= this.radius || hy >= this.gameBoard.height - this.radius)
+			if (hy <= bottom || hy >= top)
 			{
-				this.angle = (-this.angle) % 360;
-				this.gameBoard.sendData();
+				this.angle = (-this.angle);
+				this.gameBoard.sendBall();
 			}
 	  	}
 	
 	}
 
-	isCollidingPaddle(x:number, y:number ,paddle: Paddle) : boolean
+	updateCollide(paddle: Paddle, y: number, x: number, playerColliding: number)
 	{
-		if (x > this.radius + paddle.width)
-			return false;
-		if (y <= paddle.posy + paddle.height / 2 + this.radius && y >= paddle.posy - paddle.height / 2 - this.radius)
-			return true;
-		return false;
+		if (playerColliding == 1)
+			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, 225, 135);
+		else
+			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, -45, 45);
+		this.x = paddle.x + (-this.radius) * playerColliding + -playerColliding;
+		if (playerColliding == -1)
+			this.x += paddle.width;
+		this.gameBoard.sendBall()
+	}
+
+	xIsColliding(paddleRight: Paddle, paddleLeft: Paddle, x: number) : number
+	{
+		if(x - this.radius <= paddleLeft.width + paddleLeft.x)
+			return -1;
+		else if (x + this.radius >= paddleRight.x)
+			return 1;
+		return 0;
+	}
+
+	yIsColliding(paddle: Paddle, y: number): boolean
+	{
+		let paddleMin = paddle.y - (paddle.height / 2)
+		let paddleMax = paddle.y + (paddle.height / 2)
+
+		let ballMin = -this.radius + y
+		let ballMax = this.radius + y
+		if((ballMax < paddleMax && ballMax > paddleMin) || (ballMin < paddleMax && ballMin > paddleMin))
+			return true
+		return false
 	}
 
 	reset()
 	{
-		this.speed = 10;
-		this.posx = this.gameBoard.width / 2;
-		this.posy = this.gameBoard.height / 2;
+		this.speed = 20;
+		this.x = this.gameBoard.width / 2;
+		this.y = this.gameBoard.height / 2;
 		this.angle = Math.random() * 360;
+		while((this.angle >= 75 && this.angle <= 105) || (this.angle >= 255 && this.angle <= 285) )//|| (this.angle >= 0 && this.angle <= 15)
+			this.angle = Math.random() * 360;
 	}
 
 	draw()
 	{
 		this.context.beginPath();
-		this.context.arc(this.posx, this.posy, this.radius, 0, Math.PI * 2, false);
+		this.context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
 		this.context.fillStyle = 'blue';
 		this.context.fill();
 		this.context.closePath();
 	}
 
-	calculateReflectionAngle(ballY: number, paddleHeight: number): number {
-		// Define angle range for mapping (e.g., -45 degrees to 45 degrees)
-		const minAngle = -45;  // Angle at the bottom of the paddle
-		const maxAngle = 45;   // Angle at the top of the paddle
+	calculateReflectionAngle(ballY: number, paddleHeight: number, minAngle: number, maxAngle: number){
 		const relativePosition = ballY / paddleHeight;
 		const newAngle = minAngle + (maxAngle - minAngle) * relativePosition;
-	
 		return newAngle;
 	}
 }

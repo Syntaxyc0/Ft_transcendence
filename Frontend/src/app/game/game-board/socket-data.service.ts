@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Subject, from } from 'rxjs';
 import { Observable } from 'rxjs';
 import { Socket, io } from 'socket.io-client';
@@ -6,57 +6,78 @@ import { Ball } from '../models/ball.model';
 import { Paddle } from '../models/paddle.model';
 import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
 
+
 @Injectable({
   providedIn: 'root'
 })
-export class SocketDataService {
+export class SocketDataService implements OnDestroy{
   private socket: Socket;
   private baseUrl = 'http://localhost:3333';
+  private isOnline: boolean = false;
 
   getData(): Observable<any[]> {
     this.socket = io(this.baseUrl);
     const data = new Subject<any>();
     const dataObservable = from(data);
 
-    this.socket.on('playerFound', (payload: {player: string, first: boolean}) =>{
-      data.next(payload);
-      console.log(payload);
-    });
     this.socket.on('connect', () => {
-      // console.log("Current Client: " + this.socket.id);
-  });
-    this.socket.on('onBall', (payload: {angle: number, x: number, y: number}) =>{
-      data.next(payload);
+      // //console.log("Current Client: " + this.socket.id);
+      //console.log("Connected " + this.isOnline);
     });
     this.socket.on('onGameRequest', (payload: {order: string}) =>{
       data.next(payload);
     });
-    this.socket.on('otherDisconnected', (payload: {order: string}) =>{
-      console.log(payload.order);
+    this.socket.on('newPlayer', (payload: {order: string}) =>{
+      //console.log("newPlayer " + this.isOnline);
+      this.isOnline = true;
+      data.next(payload);
+    });
+    this.socket.on('otherDisconnected', (payload:{order: string})=> {
+    //console.log("otherDisconnected " + this.isOnline)
+      this.isOnline = false;
       data.next(payload);
     });
     return dataObservable;
   }
 
-  disconnect(secondPlayer: string)
+  ngOnDestroy()
   {
-    this.socket.emit('disconnectingClient', {secondPlayer});
+
   }
 
-  getSocket(): Socket{
-    return(this.socket);
+  disconnect()
+  {
+    //console.log("disconnect " + this.isOnline)
+    this.socket.emit('disconnectingClient');
+    this.isOnline = false;
   }
 
-  GameRequest(order: string, secondPlayer: string){
-    this.socket.emit('GameRequest', {order, secondPlayer});
+  gameRequest(order: string){
+    if (this.isOnline)
+      this.socket.emit('gameRequest', {order});
   }
 
   multiplayerRequest(){
+    //console.log("multiplayerRequest " + this.isOnline)
+    if (!this.isOnline)
       this.socket.emit('multiplayerRequest');
   }
 
-  newBallPos(secondPlayer: string, angle: number, x: number, y: number)
+  newPaddlePos(x: number, y: number)
   {
-    this.socket.emit('newBallPos', {secondPlayer, angle, x, y});
+    if (this.isOnline)
+      this.socket.emit('newPaddlePos', {x, y});
+  }
+
+  newBallPos(angle: number, x: number, y: number)
+  {
+    if (this.isOnline)
+      this.socket.emit('newBallPos', {angle, x, y});
+  }
+
+  newScore(leftScore: number, rightScore:number)
+  {
+    if (this.isOnline)
+      this.socket.emit('newScore', {leftScore, rightScore});
   }
 }

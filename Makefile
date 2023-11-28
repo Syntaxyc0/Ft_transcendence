@@ -16,7 +16,7 @@ nocache:
 	docker-compose -f docker-compose.yml build --no-cache
 
 reload:
-	docker-compose -f docker-compose.yml up -d --build
+	docker-compose -f docker-compose.yml up --build
 
 re: fclean all
 .PHONY: stop clean reload fclean all nocache
