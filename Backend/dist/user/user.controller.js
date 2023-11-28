@@ -85,6 +85,12 @@ let UserController = class UserController {
     get2faenabled(uid) {
         return this.userService.get2faenabled(uid);
     }
+    async findAllByLogin(login) {
+        return this.userService.findAllByLogin(login);
+    }
+    async getAllUsers() {
+        return this.userService.allUser();
+    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -200,6 +206,19 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "get2faenabled", null);
+__decorate([
+    (0, common_1.Get)('/find-by-login/:login'),
+    __param(0, (0, common_1.Param)('login')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "findAllByLogin", null);
+__decorate([
+    (0, common_1.Get)('/all-users'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getAllUsers", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])

@@ -44,4 +44,6 @@ export declare class UserController {
     getAvatar(uid: number, res: Response): Promise<void>;
     switch2fa(uid: number, activate: any): Promise<void>;
     get2faenabled(uid: number): Promise<boolean>;
+    findAllByLogin(login: string): Promise<import("../chat/model/user.interface").UserI[]>;
+    getAllUsers(): Promise<import("../chat/model/user.interface").UserI[]>;
 }

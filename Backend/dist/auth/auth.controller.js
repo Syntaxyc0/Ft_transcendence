@@ -18,12 +18,14 @@ const auth_service_1 = require("./auth.service");
 const dto_1 = require("./dto");
 const axios_1 = require("@nestjs/axios");
 const node_fetch_1 = require("node-fetch");
+const prisma_service_1 = require("../prisma/prisma.service");
 var crypto = require("crypto");
 const FormData = require("form-data");
 let AuthController = class AuthController {
-    constructor(authService, http) {
+    constructor(authService, http, prismaService) {
         this.authService = authService;
         this.http = http;
+        this.prismaService = prismaService;
     }
     signup(dto) {
         return this.authService.signup(dto);
@@ -54,6 +56,16 @@ let AuthController = class AuthController {
         const token = this.authService.create42user(data['login'], data['email']);
         res.status(common_1.HttpStatus.OK).send((await token));
         return;
+    }
+    async getRooms() {
+        return await this.prismaService.room.findMany({
+            include: {
+                users: true,
+            },
+        });
+    }
+    async getUsers() {
+        return await this.prismaService.user.findMany();
     }
 };
 exports.AuthController = AuthController;
@@ -87,8 +99,20 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "get42redirect", null);
+__decorate([
+    (0, common_1.Get)('rooms'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "getRooms", null);
+__decorate([
+    (0, common_1.Get)('users'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "getUsers", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService, axios_1.HttpService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService, axios_1.HttpService, prisma_service_1.PrismaService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

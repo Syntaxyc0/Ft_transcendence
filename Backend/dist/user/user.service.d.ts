@@ -1,5 +1,6 @@
 /// <reference types="multer" />
 import { PrismaService } from "src/prisma/prisma.service";
+import { UserI } from "src/chat/model/user.interface";
 export declare class UserService {
     private prisma;
     constructor(prisma: PrismaService);
@@ -45,4 +46,6 @@ export declare class UserService {
     get2favalidated(uid: number): Promise<boolean>;
     validate2FA(uid: number): Promise<void>;
     switch2fa(uid: any, activate: any): Promise<void>;
+    findAllByLogin(login: string): Promise<UserI[]>;
+    allUser(): Promise<UserI[]>;
 }

@@ -13,13 +13,13 @@ const user_module_1 = require("./user/user.module");
 const prisma_module_1 = require("./prisma/prisma.module");
 const config_1 = require("@nestjs/config");
 const game_module_1 = require("./game/game.module");
+const chat_module_1 = require("./chat/chat.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule.forRoot({ isGlobal: true, }), auth_module_1.AuthModule, user_module_1.UserModule, prisma_module_1.PrismaModule, game_module_1.GameModule],
-        providers: [],
+        imports: [config_1.ConfigModule.forRoot({ isGlobal: true, }), auth_module_1.AuthModule, user_module_1.UserModule, prisma_module_1.PrismaModule, game_module_1.GameModule, chat_module_1.ChatModule],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

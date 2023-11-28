@@ -270,6 +270,19 @@ let UserService = class UserService {
         }
         user.is2faenabled = activate['activated'];
     }
+    async findAllByLogin(login) {
+        const users = await this.prisma.user.findMany({
+            where: {
+                login: {
+                    contains: login.toLowerCase()
+                },
+            },
+        });
+        return users;
+    }
+    async allUser() {
+        return await this.prisma.user.findMany();
+    }
 };
 exports.UserService = UserService;
 __decorate([

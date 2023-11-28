@@ -27,4 +27,5 @@ export declare class AuthService {
     }>;
     generateRandomPassword(): string;
     check_token(token: any): boolean;
+    verifyJwt(jwt: string): Promise<any>;
 }

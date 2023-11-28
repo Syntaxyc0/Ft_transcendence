@@ -124,6 +124,9 @@ let AuthService = class AuthService {
         }
         return true;
     }
+    verifyJwt(jwt) {
+        return this.jwt.verifyAsync(jwt, { secret: process.env.JWT_SECRET });
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
