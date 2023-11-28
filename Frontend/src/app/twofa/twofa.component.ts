@@ -19,7 +19,7 @@ export class TwofaComponent {
     code: new FormControl(null, [Validators.required]),
 });
 
-@Input() id: number = 0;
+id: number = 0;
 
 ngOnInit() {
 	this.id = JSON.parse(localStorage.getItem('id')!);

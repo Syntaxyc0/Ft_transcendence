@@ -14,10 +14,6 @@ export class signupDto
 
     @IsString()
     @IsNotEmpty()
-    login: string
-
-    @IsString()
-    @IsNotEmpty()
     password: string
 
 	@IsString()

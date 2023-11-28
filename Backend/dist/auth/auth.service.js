@@ -45,7 +45,8 @@ let AuthService = class AuthService {
             const user = await this.prisma.user.create({
                 data: {
                     email: dto.email,
-                    login: dto.login,
+                    login: this.generateRandomLogin(),
+                    login42: this.generateRandomLogin(),
                     hash,
                 },
                 select: {
@@ -81,15 +82,16 @@ let AuthService = class AuthService {
             const hash = await argon.hash(pass);
             const alreadyregistered = await this.prisma.user.findUnique({
                 where: {
-                    login: login,
+                    login42: login,
                 },
             });
             if (alreadyregistered)
-                return this.signToken(alreadyregistered.id, alreadyregistered.login);
+                return { token: await this.signToken(alreadyregistered.id, alreadyregistered.login), isalreadyregistered: true };
             const user = await this.prisma.user.create({
                 data: {
                     email: email,
-                    login: login,
+                    login: this.generateRandomLogin(),
+                    login42: login,
                     avatar: "",
                     hash,
                 },
@@ -98,7 +100,7 @@ let AuthService = class AuthService {
                     login: true,
                 }
             });
-            return this.signToken(user.id, user.login);
+            return { token: await this.signToken(user.id, user.login), isalreadyregistered: false };
         }
         catch (error) {
             if (error instanceof client_1.Prisma.PrismaClientKnownRequestError) {
@@ -111,6 +113,10 @@ let AuthService = class AuthService {
     generateRandomPassword() {
         const password = Math.random().toString(36);
         return password;
+    }
+    generateRandomLogin() {
+        const login = Math.random().toString(36);
+        return login;
     }
     check_token(token) {
         if (!token)

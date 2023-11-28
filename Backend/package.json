@@ -46,6 +46,7 @@
     "fs": "^0.0.1-security",
     "node-fetch": "^2.6.7",
     "nodemailer": "^6.9.6",
+    "npm": "^10.2.4",
     "passport": "^0.6.0",
     "passport-42": "^1.2.6",
     "passport-jwt": "^4.0.1",

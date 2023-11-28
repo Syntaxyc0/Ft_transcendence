@@ -61,6 +61,34 @@ export class UserService
 			})
 	}
 
+	async ChangeNick(uid:number, name:string)
+	{
+		const user = await this.prisma.user.findUnique({
+			where: {
+				id: uid,
+			}
+		})
+		if (!user) {
+            throw new NotFoundException('User not found')
+        }
+		const checkname = await this.prisma.user.findUnique({
+			where: {
+				login: name,
+			}
+		})
+		if (checkname) {
+            throw new ConflictException( name + ' is already taken')
+        }
+		await this.prisma.user.update({
+			data: {
+				login: name
+			},
+			where: {
+				id: uid,
+			}
+		})
+	}
+
 	async GetUserStatus(id: number)
 	{
 		const user = await this.prisma.user.findUnique(

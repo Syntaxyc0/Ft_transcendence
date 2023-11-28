@@ -24,10 +24,14 @@ export declare class AuthService {
         id: number;
     }>;
     create42user(login: string, email: string): Promise<{
-        access_token: string;
-        id: number;
+        token: {
+            access_token: string;
+            id: number;
+        };
+        isalreadyregistered: boolean;
     }>;
     generateRandomPassword(): string;
+    generateRandomLogin(): string;
     check_token(token: any): boolean;
     SendMail(uid: number): Promise<void>;
     check2fa(uid: number): Promise<boolean>;

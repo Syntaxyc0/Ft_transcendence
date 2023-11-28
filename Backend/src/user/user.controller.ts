@@ -96,6 +96,12 @@ export class UserController {
 		return this.userService.AddFriend(uid, userName['userName']);
 	}
 
+	@Patch(':uid/ChangeNick')
+    ChangeNick(@Param('uid', ParseIntPipe) uid:number, @Body() userName)
+	{
+		return this.userService.ChangeNick(uid, userName['name']);
+	}
+
 	@Patch(':uid/CancelRequest')
     CancelRequest(@Param('uid', ParseIntPipe) uid:number, @Body() username)
 	{
@@ -153,7 +159,7 @@ export class UserController {
 			throw new NotFoundException('Image not Found');
 		}
 	}
-	
+
 	@Post('/:uid/switch2fa')
 	switch2fa(@Param('uid', ParseIntPipe) uid:number, @Body() activate)
 	{

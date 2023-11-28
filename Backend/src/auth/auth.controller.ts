@@ -59,7 +59,6 @@ export class AuthController
 			throw new Error('user not found')
 		const data = await resp2.json();
 		const token = this.authService.create42user(data['login'], data['email'])
-
 		res.status(HttpStatus.OK).send((await token))
 		return 	
 	}

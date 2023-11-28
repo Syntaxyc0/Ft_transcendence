@@ -62,6 +62,9 @@ let UserController = class UserController {
     AddFriend(uid, userName) {
         return this.userService.AddFriend(uid, userName['userName']);
     }
+    ChangeNick(uid, userName) {
+        return this.userService.ChangeNick(uid, userName['name']);
+    }
     CancelRequest(uid, username) {
         return this.userService.CancelRequest(uid, username['username']);
     }
@@ -194,6 +197,14 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "AddFriend", null);
+__decorate([
+    (0, common_1.Patch)(':uid/ChangeNick'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "ChangeNick", null);
 __decorate([
     (0, common_1.Patch)(':uid/CancelRequest'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),

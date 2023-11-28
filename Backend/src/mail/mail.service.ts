@@ -30,7 +30,7 @@ export class MailService {
 
     try {
       await this.transporter.sendMail(mailOptions);
-      console.log('Mail envoyé');
+      console.log('Mail envoyé a ' + destination);
       return;
     } catch (error) {
       console.error("Erreur de l'envoi :", error);

@@ -9,6 +9,7 @@ export declare class UserService {
         id: number;
         email: string;
         login: string;
+        login42: string;
         hash: string;
         is2faenabled: boolean;
         is2favalidated: boolean;
@@ -25,6 +26,7 @@ export declare class UserService {
         id: number;
         email: string;
         login: string;
+        login42: string;
         hash: string;
         is2faenabled: boolean;
         is2favalidated: boolean;
@@ -38,6 +40,7 @@ export declare class UserService {
         FriendRequestsReceived: number[];
     }>;
     updateUserStatus(id: number, status: any): Promise<void>;
+    ChangeNick(uid: number, name: string): Promise<void>;
     GetUserStatus(id: number): Promise<string>;
     GetUserFriendlist(uid: number): Promise<number[]>;
     GetUserFriendRequestsReceived(uid: number): Promise<number[]>;

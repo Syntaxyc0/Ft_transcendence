@@ -20,6 +20,7 @@ model User {
   id Int @id @default(autoincrement())
   email	String @unique
   login String @unique
+  login42 String @unique
   hash String
   is2faenabled Boolean @default(false)
   is2favalidated Boolean @default(false)

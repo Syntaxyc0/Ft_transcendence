@@ -27,6 +27,11 @@ export const routes: Routes = [{
 	loadComponent:    () => import('./signin/signin.component').then(m => m.SigninComponent),
 },
 {
+	path:	'edit',
+	title:	'Edit',
+	loadComponent:    () => import('./edit-page/edit-page.component').then(m => m.EditPageComponent),
+},
+{
 	path:	'twofa',
 	title:	'2FA',
 	loadComponent:    () => import('./twofa/twofa.component').then(m => m.TwofaComponent	),

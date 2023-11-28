@@ -8,6 +8,7 @@ export declare class UserController {
         id: number;
         email: string;
         login: string;
+        login42: string;
         hash: string;
         is2faenabled: boolean;
         is2favalidated: boolean;
@@ -24,6 +25,7 @@ export declare class UserController {
         id: number;
         email: string;
         login: string;
+        login42: string;
         hash: string;
         is2faenabled: boolean;
         is2favalidated: boolean;
@@ -45,6 +47,7 @@ export declare class UserController {
     getUserElo(uid: number): Promise<number>;
     updateUserElo(uid: number, elo: number): Promise<void>;
     AddFriend(uid: number, userName: any): Promise<void>;
+    ChangeNick(uid: number, userName: any): Promise<void>;
     CancelRequest(uid: number, username: any): Promise<void>;
     AcceptRequest(uid: number, id: any): Promise<void>;
     RefuseRequest(uid: number, id: any): Promise<void>;
