@@ -27,7 +27,7 @@ model User {
   avatar			String	@default("")
   elo				Int 	@default(1000)
   userStatus 		String	@default("OFFLINE")
-  gameHistory 		Int[] 
+  gameHistory 		Int[]	
   friendList 		Int[]	@default([])
   FriendRequest		FriendRequest[]
   rooms				Room[]	@relation("UserRooms")
@@ -62,6 +62,6 @@ model Room {
 model ConnectedUser {
   id		Int       @id @default(autoincrement())
   socketId	String
-  user     User     @relation(fields: [userId], references: [id])
-  userId   Int
+  user		User     @relation(fields: [userId], references: [id])
+  userId	Int
 }

@@ -14,5 +14,5 @@ export class LandingPageComponent {
 
 	constructor() {}
 	code: any
-	redirect_url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-980ee85e91e9700305eaf59b63ff7126254885dc1dc8b9321ac3d99cec810bd5&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fredirect&response_type=code"
+	redirect_url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-4b973edf6fe00427742801309510c161180a1daa57bf6b884c1bd6a5939788fe&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fredirect&response_type=code"
 }

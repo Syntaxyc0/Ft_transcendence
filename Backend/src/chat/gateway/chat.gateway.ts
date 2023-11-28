@@ -9,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { UserI } from '../model/user.interface';
 import { ConnectedUserService } from '../service/connectedUser.service';
+import { ConnectedUserI } from '../model/connectedUser.interface';
 
 @WebSocketGateway({ cors: { origin: ['http://localhost:3333', 'http://localhost:4200'] } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -38,7 +39,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					skip: 0,
 				});
 
-				// await this.connectedUserService.create({ socketId: socket.id, user });
+				await this.connectedUserService.create({ socketId: socket.id, user });
 
 				return this.server.to(socket.id).emit('roomsI', rooms);
 			}
@@ -50,7 +51,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 
 	async handleDisconnect(socket: Socket) {
-		// await this.connectedUserService.deleteBySocketId(socket.id);
+		await this.connectedUserService.deleteBySocketId(socket.id);
 		socket.disconnect();
 	}
 
@@ -83,8 +84,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			    connect: usersConnectArray,
 			  },
 			},
+			include : { users: true }
 		});
 
+
+		for (const user of createdRoom.users) {
+			const connected_user: ConnectedUser[] = await this.connectedUserService.findByUser(user);
+			console.log("CONNECTED USER",connected_user, "END");
+			
+			const rooms = await this.prisma.room.findMany({
+				where: { users: { some: { id: user.id } } },
+				take: 10,
+				skip: 0,
+			});
+			for (const connection of connected_user) {
+			  await this.server.to(connection.socketId).emit('rooms', rooms);
+			}
+		  }
 		return createdRoom;
 	}
 
