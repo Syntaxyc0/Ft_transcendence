@@ -36,7 +36,7 @@ export class GameBoardComponent implements OnInit{
 	isOnline = false;
 	currentLead: boolean = true;
 	// private isPageVisible: boolean = true;
-	otherVisible: boolean = true;
+	otherVisible: boolean = false;
 
 	data: Observable<any>;
 	oldTimeStamp = 0;
@@ -104,6 +104,7 @@ export class GameBoardComponent implements OnInit{
 			break;
 			case "visibleChange":
 				this.otherVisible = !this.otherVisible;
+				console.log("otherVisible: " + this.otherVisible)
 			break;
 			case "giveData":
 				this.sendData();break;
@@ -135,24 +136,26 @@ export class GameBoardComponent implements OnInit{
 		this.paddleRight.currentUser = !first;
 		this.isOnline = true;
 		this.requestedMatchmaking = false;
+		if (document.visibilityState === 'visible')
+			this.changeVisibility(!this.otherVisible && !this.currentLead)
 		this.reset(true);
 		this.sendBall();
 	}
 
+	changeVisibility(condition: boolean)
+	{
+		this.firstPlayer.gameRequest("visibleChange")
+		if (condition)
+			this.firstPlayer.gameRequest("changeLead")
+	}
+
 	@HostListener('document:visibilitychange', ['$event'])
 	onVisibilityChange(event: Event): void {
-		if (document.visibilityState === 'visible') {
-			// this.isPageVisible = true;
-			this.firstPlayer.gameRequest("visibleChange")
-			if (!this.otherVisible && !this.currentLead)
-				this.firstPlayer.gameRequest("changeLead")
-			}
-		else {
-			// this.isPageVisible = false;
-			this.firstPlayer.gameRequest("visibleChange")
-			if (this.otherVisible && this.currentLead)
-				this.firstPlayer.gameRequest("changeLead");
-		}
+		if (document.visibilityState === 'visible')
+				this.changeVisibility(!this.otherVisible && !this.currentLead)
+
+		else
+			this.changeVisibility(this.otherVisible && this.currentLead)
 	  }
 
 	draw()
