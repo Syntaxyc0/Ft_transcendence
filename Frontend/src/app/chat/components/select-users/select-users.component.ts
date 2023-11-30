@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { UserI } from 'src/app/chat/model/user.interface';
 import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
+import { Observable, debounceTime, distinctUntilChanged, of, switchMap, take, tap } from 'rxjs';
 import { UserService } from 'src/app/chat/services/user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -12,6 +12,9 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatOptionModule } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { Socket } from 'ngx-socket-io';
+import { CustomSocket } from '../../sockets/custom-socket';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
   selector: 'app-select-users',
@@ -38,20 +41,35 @@ export class SelectUsersComponent implements OnInit{
 	searchLogin = new FormControl();
 	filteredUsers: UserI[] = [];
 	selectedUser: UserI | null = null;
+	currentUser$: Observable<string> = this.socketService.getCurrentLogin();
+	
+	constructor( private userService: UserService, private socketService: SocketService ) {}
 
-	constructor(private userService: UserService) {}
-
+	
 	ngOnInit() : void {
+		this.socketService.emitGetCurrentLogin();
+
+		let currentUser: string;
+
+		this.currentUser$.pipe(take(1)).subscribe(value => {
+		  currentUser = value;
+		});
+
 		this.searchLogin.valueChanges.pipe(
 			debounceTime(500),
 			distinctUntilChanged(),
 			switchMap((login: string) => {
-				if (!login) {
+				if ( !login ) {
 					this.filteredUsers = []
 					return of([])
 				}
 				return this.userService.findByLogin(login).pipe(
-					tap((users: UserI[]) => this.filteredUsers = users)
+					tap((users: UserI[]) => {
+						for (const user of users)
+							if (user.login === currentUser)
+								users.splice(users.indexOf(user), 1);
+						this.filteredUsers = users
+					})
 				)
 			})
 		).subscribe();

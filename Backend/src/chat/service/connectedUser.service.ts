@@ -31,10 +31,10 @@ export class ConnectedUserService{
 		});
 	}
 
-	async findByUser(user_find: User) {
+	async findByUser(user_to_find: {id: number}) {
 		return await this.prisma.connectedUser.findMany({
 		  where: {
-			user: user_find,
+			userId: user_to_find.id,
 		  },
 		});
 	}

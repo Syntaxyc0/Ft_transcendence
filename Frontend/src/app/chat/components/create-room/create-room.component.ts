@@ -12,6 +12,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 
 import { RouterModule } from '@angular/router';
+import { SocketService } from '../../services/socket.service';
+import { Observable, take } from 'rxjs';
 
 
 @Component({
@@ -28,10 +30,9 @@ export class CreateRoomComponent {
 		description: new FormControl(null),
 		users: new FormArray([],[Validators.required])
 	});
+	currentUser$: Observable<string> = this.socketService.getCurrentLogin();
 
-	constructor(private chatService: ChatService, private router: Router, private activateRoute: ActivatedRoute) {
-
-	}
+	constructor(private chatService: ChatService, private router: Router, private activateRoute: ActivatedRoute, private socketService: SocketService) {}
 
 	create() {
 		if (this.form.valid) {

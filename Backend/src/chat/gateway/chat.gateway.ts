@@ -87,61 +87,65 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			include : { users: true }
 		});
 
-
+		// emit room if user is connected
 		for (const user of createdRoom.users) {
-			const connected_user: ConnectedUser[] = await this.connectedUserService.findByUser(user);
-			console.log("CONNECTED USER",connected_user, "END");
+			const connected_users: ConnectedUser[] = await this.connectedUserService.findByUser({id: user.id});
 			
 			const rooms = await this.prisma.room.findMany({
 				where: { users: { some: { id: user.id } } },
 				take: 10,
 				skip: 0,
 			});
-			for (const connection of connected_user) {
-			  await this.server.to(connection.socketId).emit('rooms', rooms);
+			for (const connection of connected_users) {
+				await this.server.to(connection.socketId).emit('roomsI', rooms);
 			}
 		  }
 		return createdRoom;
 	}
-
-
-	// @SubscribeMessage('paginateRooms')
-	// async onPaginateRoom(socket: Socket, page: PageI) {
-	// 	if (!socket.data.user) {
-	// 		console.log("1e except")
-	// 		throw new UnauthorizedException();
-	// 	}
-		
-	// 	page.limit = page.limit > 100 ? 100 : page.limit;
-	// 	page.page = page.page + 1;
-
-	// 	const user = await this.prisma.user.findUnique({
-	// 		where: { id: socket.data.user.id },
-	// 			include: { rooms: { take: page.limit, skip: (page.page - 1) * page.limit } },
-	// 	});
-
-	// 	if (!user) {
-	// 		console.log("2e except")
-	// 		throw new UnauthorizedException();
-	// 	}
-
-	// 	const rooms = user.rooms;
-	// 	console.log("on paginate room",rooms)
-
-	// 	return this.server.to(socket.id).emit('rooms', rooms);
-	// }
-
+	
 	@SubscribeMessage('roomsArray')
 	async getRooms(socket: Socket, page: PageI) {
 		const user = await this.prisma.user.findUnique({
 			where: { id: socket.data.user.id },
 			include: {
-			  rooms: true,
+				rooms: true,
 			},
-		  });
-
+		});
+		
 		const room = user.rooms;
 		
 		return this.server.to(socket.id).emit('roomsI', room);
 	}
+
+	@SubscribeMessage('getCurrentUser')
+	currentUser (socket: Socket) {
+		return socket.emit('currentUser', socket.data.user.login)
+	}
+
+	
+		// @SubscribeMessage('paginateRooms')
+		// async onPaginateRoom(socket: Socket, page: PageI) {
+		// 	if (!socket.data.user) {
+		// 		console.log("1e except")
+		// 		throw new UnauthorizedException();
+		// 	}
+			
+		// 	page.limit = page.limit > 100 ? 100 : page.limit;
+		// 	page.page = page.page + 1;
+	
+		// 	const user = await this.prisma.user.findUnique({
+		// 		where: { id: socket.data.user.id },
+		// 			include: { rooms: { take: page.limit, skip: (page.page - 1) * page.limit } },
+		// 	});
+	
+		// 	if (!user) {
+		// 		console.log("2e except")
+		// 		throw new UnauthorizedException();
+		// 	}
+	
+		// 	const rooms = user.rooms;
+		// 	console.log("on paginate room",rooms)
+	
+		// 	return this.server.to(socket.id).emit('rooms', rooms);
+		// }
 }
