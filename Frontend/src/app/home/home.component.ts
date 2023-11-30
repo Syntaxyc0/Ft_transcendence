@@ -5,11 +5,13 @@ import { HeaderbarComponent } from '../components/headerbar/headerbar.component'
 import { ProfilePictureComponent } from '../components/profile-picture/profile-picture.component';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PictureComponent } from '../components/picture/picture.component';
+import { FooterBarComponent } from '../components/footer-bar/footer-bar.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FriendlistComponent, HeaderbarComponent, ProfilePictureComponent, HttpClientModule],
+  imports: [CommonModule, FriendlistComponent, HeaderbarComponent, ProfilePictureComponent, HttpClientModule, PictureComponent, FooterBarComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })

@@ -1,21 +1,25 @@
-<app-headerbar></app-headerbar>
-<app-friendlist [id] = "id"></app-friendlist>
-<main class ="grid place-items-center h-screen w-full bg-gradient-to-r from-[#1187BF] to-[#2052F1] flex-row">
-	<div class="">
-		<div class=" text-[150px] h-28 font-fett flex tracking-wide text-gray-800">
-			PONG
+<div class="bg-gradient-to-r from-[#1187BF] to-[#2052F1]">
+
+	<app-headerbar></app-headerbar>
+	<app-friendlist [id] = "id"></app-friendlist>
+	<main class ="grid place-items-center h-screen w-full flex-row">
+		<div class="">
+			<div class=" text-[150px] h-28 font-marker flex text-gray-800">
+				PONG
+			</div>
+			<div class="my-5">
+				<app-picture [id]="id"></app-picture>
+			</div>
+			<div class="grid place-items-center my-32 font-start">
+				<button (click)="LaunchGame()" class=" bg-blue-300 px-16 py-10  transition ease-in duration-200 uppercase rounded-full hover:bg-slate-600 hover:text-white border-2 border-slate-600 focus:outline-none">
+					Play
+				</button>	
+			</div>
 		</div>
-		<div class="my-5">
-			<app-profile-picture [id]="id"></app-profile-picture>
-		</div>
-		<div class="grid place-items-center my-32">
-			<button (click)="LaunchGame()" class=" bg-blue-300 px-16 py-10  transition ease-in duration-200 uppercase rounded-full hover:bg-slate-600 hover:text-white border-2 border-slate-600 focus:outline-none">
-				Play
-			</button>	
-		</div>
-	</div>
-	<div></div>
-	<div></div>
-	<div></div>
-	
-</main >
+		<div></div>
+		<div></div>
+		<div></div>
+		
+	</main >
+	<app-footer-bar></app-footer-bar>
+</div>

@@ -45,6 +45,7 @@ export declare class UserController {
     GetUserFriendRequestsSent(uid: number): Promise<number[]>;
     getUserLogin(uid: number): Promise<string>;
     getUserElo(uid: number): Promise<number>;
+    editName(uid: number, name: any): Promise<void>;
     updateUserElo(uid: number, elo: number): Promise<void>;
     AddFriend(uid: number, userName: any): Promise<void>;
     ChangeNick(uid: number, userName: any): Promise<void>;

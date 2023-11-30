@@ -7,12 +7,13 @@ import { CustomValidators } from '../helpers/custom-validators';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { RouterModule, Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { FooterBarComponent } from '../components/footer-bar/footer-bar.component';
 
 
 @Component({
   selector: 'app-signin',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatFormFieldModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatFormFieldModule, RouterModule, FooterBarComponent],
   templateUrl: './signin.component.html',
   styleUrls: ['./signin.component.scss']
 })
@@ -31,7 +32,10 @@ export class SigninComponent {
 					// this.http.patch<any>('http://localhost:3333/users/' + res['id'] + '/status', {status: "ONLINE"}).subscribe()
 					this.http.get<any>('http://localhost:3333/users/' + res['id'] + '/2faenabled').subscribe( res => {
 						if (res === false)
+						{
+							localStorage.setItem('is_authenticated', 'true');
 							this.router.navigate(['/home'])
+						}
 						else
 						{
 							this.router.navigate(['/twofa'])

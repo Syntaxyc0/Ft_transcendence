@@ -36,7 +36,10 @@ export class EditPageComponent {
 	Edit(): void {
 		console.log(this.id)
 		this.http.patch<any>('http://localhost:3333/users/' + this.id + '/ChangeNick', {name: this.Nickname.value} ).subscribe(
-			res => {this.router.navigate(["/home"])},
+			res => {
+				localStorage.setItem('is_authenticated', 'true');
+				this.router.navigate(["/home"]);
+			},
 			err => { alert(err.error.message)}
 		)
 

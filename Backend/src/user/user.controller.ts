@@ -84,6 +84,12 @@ export class UserController {
 		return this.userService.getelo(uid) 
 	}
 
+	@Patch(':uid/editName')
+	editName(@Param('uid', ParseIntPipe) uid: number, @Body() name)
+	{
+		return this.userService.ChangeNick(uid, name['userName']);
+	}
+
 	@Patch(':uid/elo')
 	updateUserElo(@Param('uid', ParseIntPipe) uid: number, @Body() elo: number)
 	{

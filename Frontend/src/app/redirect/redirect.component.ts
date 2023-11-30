@@ -33,7 +33,10 @@ export class RedirectComponent {
 						if (res === true)
 							this.router.navigate(['/twofa'])
 						else
+						{
+							localStorage.setItem('is_authenticated', 'true');
 							this.router.navigate(['/home'])
+						}
 					}
 					else
 						this.router.navigate(['/edit'])

@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './auth.guard';
+import { AuthGuard} from './auth.guard';
+import { NoAuthGuard } from './no-auth.guard';
+import { NotFoundComponent } from './not-found-component/not-found-component';
 
 export const routes: Routes = [{
 	path:	'',
@@ -9,31 +11,37 @@ export const routes: Routes = [{
 {
 	path:	'landing',
 	title:	'Welcome',
+	canActivate: [NoAuthGuard],
 	loadComponent:    () => import('./landing-page/landing-page.component').then(m => m.LandingPageComponent),
 },
 {
 	path:	'redirect',
 	title:	'Redirect',
+	canActivate: [NoAuthGuard],
 	loadComponent:    () => import('./redirect/redirect.component').then(m => m.RedirectComponent),
 },
 {
 	path:	'signup',
 	title:	'Sign up',
+	canActivate: [NoAuthGuard],
 	loadComponent:    () => import('./signup/signup.component').then(m => m.SignupComponent),
 },
 {
 	path:	'signin',
 	title:	'Sign in',
+	canActivate: [NoAuthGuard],
 	loadComponent:    () => import('./signin/signin.component').then(m => m.SigninComponent),
 },
 {
 	path:	'edit',
 	title:	'Edit',
+	canActivate: [NoAuthGuard],
 	loadComponent:    () => import('./edit-page/edit-page.component').then(m => m.EditPageComponent),
 },
 {
 	path:	'twofa',
 	title:	'2FA',
+	canActivate: [NoAuthGuard],
 	loadComponent:    () => import('./twofa/twofa.component').then(m => m.TwofaComponent	),
 },
 {
@@ -78,4 +86,6 @@ export const routes: Routes = [{
 	canActivate: [AuthGuard],
 	loadComponent:    () => import('./game/game-board/game-board.component').then(m => m.GameBoardComponent),
 },
+{ path: '404', component: NotFoundComponent },
+{ path: '**', component: NotFoundComponent }
 ];

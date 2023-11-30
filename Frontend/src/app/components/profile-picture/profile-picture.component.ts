@@ -4,22 +4,24 @@ import { Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-profile-picture',
-  standalone: true,
-  imports: [CommonModule, HttpClientModule],
-  templateUrl: './profile-picture.component.html',
-  styleUrls: ['./profile-picture.component.scss']
+	selector: 'app-profile-picture',
+	standalone: true,
+	imports: [CommonModule, HttpClientModule, ReactiveFormsModule],
+	templateUrl: './profile-picture.component.html',
+	styleUrls: ['./profile-picture.component.scss']
 })
 export class ProfilePictureComponent {
-
+	
 	constructor(public http: HttpClient, private location: Location, private router: Router) {}
-
+	
 	@Input() id:number = 0;
 	name:string = '';
 	avatar: any ;
-
+	showModal = false;
+	
 	ngOnInit() {
         this.retrieveUser();
 	}
@@ -68,4 +70,35 @@ export class ProfilePictureComponent {
 		})
 	}
 
+
+	public editNameForm = new FormGroup({
+		name: new FormControl(null, [Validators.required])
+	});
+
+
+	toggleModal(){
+	  this.showModal = !this.showModal;
+	}
+	
+	editName(){
+		this.toggleModal()
+		this.http.patch("http://localhost:3333/users/" + this.id + "/editName", {userName:this.editNameForm.value.name}).subscribe(
+			res => {
+				window.location.reload()
+			},
+            err => {
+				alert(err.error.message);
+			}
+			);
+		this.editNameForm.reset();
+    }
+	
+	closeButton(){
+		this.editNameForm.reset(); 
+		this.toggleModal()
+	}
+
+	enterKey(){
+		this.editName()
+	  }
 }

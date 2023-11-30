@@ -56,6 +56,9 @@ let UserController = class UserController {
     getUserElo(uid) {
         return this.userService.getelo(uid);
     }
+    editName(uid, name) {
+        return this.userService.ChangeNick(uid, name['userName']);
+    }
     updateUserElo(uid, elo) {
         return this.userService.updateUserElo(uid, elo);
     }
@@ -181,6 +184,14 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "getUserElo", null);
+__decorate([
+    (0, common_1.Patch)(':uid/editName'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "editName", null);
 __decorate([
     (0, common_1.Patch)(':uid/elo'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),

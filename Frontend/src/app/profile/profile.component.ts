@@ -8,11 +8,12 @@ import { ProfilePictureComponent } from '../components/profile-picture/profile-p
 import { ActivatedRoute } from '@angular/router';
 import { GamehistoryComponent } from '../components/gamehistory/gamehistory.component';
 import { PictureComponent } from '../components/picture/picture.component';
+import { FooterBarComponent } from '../components/footer-bar/footer-bar.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, HeaderbarComponent, HttpClientModule, RouterModule, ProfilePictureComponent, GamehistoryComponent, PictureComponent],
+  imports: [CommonModule, HeaderbarComponent, HttpClientModule, RouterModule, ProfilePictureComponent, GamehistoryComponent, PictureComponent, FooterBarComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
