@@ -31,7 +31,8 @@ model User {
   friendList 		Int[]	@default([])
   FriendRequest		FriendRequest[]
   rooms				Room[]	@relation("UserRooms")
-  connectedUser		ConnectedUser[] 
+  connectedUser		ConnectedUser[]
+  joinedRoom		JoinedRoom[]
 }
 
 model FriendRequest {
@@ -64,4 +65,27 @@ model ConnectedUser {
   socketId	String
   user		User     @relation(fields: [userId], references: [id])
   userId	Int
+}
+
+model JoinedRoom {
+  id: 		Int @id @default(autoincrement())
+  socketId:	String
+  userId:	Int
+  roomId:	Int
+
+  user:		User @relation(fields: [userId], references: [id])
+  room:		Room @relation(fields: [roomId], references: [id])
+}
+
+model Message {
+  id:			Int @id @default(autoincrement())
+  text:			String
+  userId:		Int
+  roomId:		Int
+
+  user: 		User @relation(fields: [userId], references: [id])
+  room: 		Room @relation(fields: [roomId], references: [id])
+  
+  created_at:	DateTime @default(now())
+  updated_at:	DateTime @updatedAt
 }

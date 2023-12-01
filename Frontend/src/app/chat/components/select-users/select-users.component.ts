@@ -15,6 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Socket } from 'ngx-socket-io';
 import { CustomSocket } from '../../sockets/custom-socket';
 import { SocketService } from '../../services/socket.service';
+import { User } from 'src/app/helpers/types';
 
 @Component({
   selector: 'app-select-users',
@@ -41,15 +42,15 @@ export class SelectUsersComponent implements OnInit{
 	searchLogin = new FormControl();
 	filteredUsers: UserI[] = [];
 	selectedUser: UserI | null = null;
-	currentUser$: Observable<string> = this.socketService.getCurrentLogin();
+	currentUser$: Observable<User> = this.socketService.getCurrentUser();
 	
 	constructor( private userService: UserService, private socketService: SocketService ) {}
 
 	
 	ngOnInit() : void {
-		this.socketService.emitGetCurrentLogin();
+		this.socketService.emitGetCurrentUser();
 
-		let currentUser: string;
+		let currentUser: User;
 
 		this.currentUser$.pipe(take(1)).subscribe(value => {
 		  currentUser = value;
@@ -66,7 +67,7 @@ export class SelectUsersComponent implements OnInit{
 				return this.userService.findByLogin(login).pipe(
 					tap((users: UserI[]) => {
 						for (const user of users)
-							if (user.login === currentUser)
+							if (user.login === currentUser.login)
 								users.splice(users.indexOf(user), 1);
 						this.filteredUsers = users
 					})

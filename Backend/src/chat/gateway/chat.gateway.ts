@@ -75,13 +75,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			throw new UnauthorizedException();
 		}
 
-		const usersConnectArray = (roomInput.users as Array<{ id: number }>).map(user => ({ id: user.id }));
+		const usersArray = (roomInput.users as Array<{ id: number }>).map(user => ({ id: user.id }));
+		usersArray.push({ id: socket.data.user.id });
 
 		const createdRoom = await this.prisma.room.create({
 			data: {
 			  ...roomInput,
 			  users: {
-			    connect: usersConnectArray,
+			    connect: usersArray,
 			  },
 			},
 			include : { users: true }
@@ -100,6 +101,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				await this.server.to(connection.socketId).emit('roomsI', rooms);
 			}
 		  }
+
 		return createdRoom;
 	}
 	
@@ -119,7 +121,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('getCurrentUser')
 	currentUser (socket: Socket) {
-		return socket.emit('currentUser', socket.data.user.login)
+		return socket.emit('currentUser', socket.data.user)
 	}
 
 	

@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { CustomSocket } from "../sockets/custom-socket";
 import { Observable } from "rxjs";
+import { User } from "src/app/helpers/types";
 
 @Injectable({
 	providedIn: 'root'
@@ -9,11 +10,11 @@ import { Observable } from "rxjs";
 
 	constructor(private socket: CustomSocket) { }
 
-	emitGetCurrentLogin() {
+	emitGetCurrentUser() {
 		this.socket.emit('getCurrentUser');
 	}
 
-	getCurrentLogin(): Observable<string> {
+	getCurrentUser(): Observable<User> {
 		return this.socket.fromEvent('currentUser');
 	}
   }
