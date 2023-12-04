@@ -216,13 +216,11 @@ export class GameBoardComponent implements OnInit{
 		// secondsPassed = Math.min(secondsPassed, 0.1);
 		this.oldTimeStamp = timeStamp;
 
-		// this.updatePaddle(this.paddleLeft, secondsPassed)
-		this.paddleLeft.y = this.lerp(this.paddleLeft.y, this.paddleLeft.targetY, 30 * secondsPassed)
-		this.updatePaddle(this.paddleRight, secondsPassed)
+		this.paddleLeft.y = this.lerp(this.paddleLeft.y, this.paddleLeft.targetY, 25 * secondsPassed)
+		this.paddleRight.y = this.lerp(this.paddleRight.y, this.paddleRight.targetY, 25 * secondsPassed)
 		this.ball.updatePosition();
 		this.ball.x = this.lerp(this.ball.x, this.ball.targetX, this.ball.speed * secondsPassed)
 		this.ball.y = this.lerp(this.ball.y, this.ball.targetY, this.ball.speed * secondsPassed)
-		// this.updateBall(secondsPassed)
 		this.draw();
 		requestAnimationFrame(this.gameLoop);
 	}
