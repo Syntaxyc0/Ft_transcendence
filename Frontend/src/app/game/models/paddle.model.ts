@@ -6,7 +6,7 @@ export class Paddle{
 	width: number = 25;
 	x!: number;
 	y!: number;
-	targetY: number = 0;
+	targetY: number;
 	score: number = 0;
 	constructor(public currentUser: boolean, public context: CanvasRenderingContext2D, public gameBoard: GameBoardComponent)
 	{
@@ -26,13 +26,14 @@ export class Paddle{
 	newMultiPos(x: number, y: number)
 	{
 		this.x = x;
-		this.y = y;
+		this.targetY = y;
 	}
 
 	reset()
 	{
-		this.speed = 100;
+		this.speed = 150;
 		this.y = this.gameBoard.height / 2;
 		this.score = 0;
+		this.targetY = this.y
 	}
 }

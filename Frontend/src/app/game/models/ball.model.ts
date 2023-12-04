@@ -6,6 +6,9 @@ export class Ball{
 	public angle: number =  Math.random() * 360;
 	public x!: number;
 	public y!: number;
+
+	public targetX!:number;
+	public targetY!:number;
 	constructor(public context: CanvasRenderingContext2D, public gameBoard: GameBoardComponent)
 	{
 		this.reset();
@@ -38,8 +41,10 @@ export class Ball{
 		}
 		if (hx < right && hx > left && hy < top && hy > bottom)
 		{
-			this.x = hx;
-			this.y = hy;
+			// this.x = hx;
+			// this.y = hy;
+			this.targetX = hx;
+			this.targetY = hy;
 			return;
 		}
 		else if (this.gameBoard.currentLead){
@@ -64,6 +69,7 @@ export class Ball{
 
 	updateCollide(paddle: Paddle, y: number, x: number, playerColliding: number)
 	{
+		// console.log(this.x)
 		if (playerColliding == 1)
 			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, 225, 135);
 		else
@@ -71,6 +77,8 @@ export class Ball{
 		this.x = paddle.x + (-this.radius) * playerColliding + -playerColliding;
 		if (playerColliding == -1)
 			this.x += paddle.width;
+
+		console.log(this.x)
 		this.gameBoard.sendBall()
 	}
 
@@ -97,12 +105,14 @@ export class Ball{
 
 	reset()
 	{
-		this.speed = 20;
+		this.speed = 30;
 		this.x = this.gameBoard.width / 2;
 		this.y = this.gameBoard.height / 2;
 		this.angle = Math.random() * 360;
 		while((this.angle >= 75 && this.angle <= 105) || (this.angle >= 255 && this.angle <= 285) )//|| (this.angle >= 0 && this.angle <= 15)
 			this.angle = Math.random() * 360;
+		this.targetX = this.x;
+		this.targetY = this.y;
 	}
 
 	draw()

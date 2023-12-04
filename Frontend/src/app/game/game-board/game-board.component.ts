@@ -67,9 +67,9 @@ export class GameBoardComponent implements OnInit{
 		switch(order){
 			case "paddleUp":
 				if (this.paddleRight.currentUser)
-				this.paddleLeft.newMultiPos(payload.x, payload.y);
+					this.paddleLeft.newMultiPos(payload.x, payload.y);
 				else if (this.paddleLeft.currentUser)
-				this.paddleRight.newMultiPos(payload.x, payload.y);
+					this.paddleRight.newMultiPos(payload.x, payload.y);
 			break;
 			case "ballUp":
 				this.ball.newMultiPos(payload.angle, payload.x, payload.y);break;
@@ -212,26 +212,50 @@ export class GameBoardComponent implements OnInit{
 		if(!this.isGameRunning)
 			return;
 		const timeStamp = Date.now();
-		const secondsPassed = (timeStamp - this.oldTimeStamp)/1000;
+		const secondsPassed = Math.min((timeStamp - this.oldTimeStamp)/1000, 0.1);
+		// secondsPassed = Math.min(secondsPassed, 0.1);
 		this.oldTimeStamp = timeStamp;
 
-		// this.update(secondsPassed)
+		// this.updatePaddle(this.paddleLeft, secondsPassed)
+		this.paddleLeft.y = this.lerp(this.paddleLeft.y, this.paddleLeft.targetY, 30 * secondsPassed)
+		this.updatePaddle(this.paddleRight, secondsPassed)
 		this.ball.updatePosition();
+		this.ball.x = this.lerp(this.ball.x, this.ball.targetX, this.ball.speed * secondsPassed)
+		this.ball.y = this.lerp(this.ball.y, this.ball.targetY, this.ball.speed * secondsPassed)
+		// this.updateBall(secondsPassed)
 		this.draw();
 		requestAnimationFrame(this.gameLoop);
 	}
+	private lerp(start: number, end: number, t: number): number {
+		return start + t * (end - start);
+	  }
 
-	update(secondsPassed: number){
+	updatePaddle(paddle: Paddle ,secondsPassed: number){
 		// this.paddleLeft.x += (1000 * secondsPassed)
-		if (this.paddleLeft.targetY < this.paddleLeft.y)
+		const diff = (paddle.targetY - paddle.y)
+		// paddle.y += (diff * secondsPassed)
+		if (diff > 0)
 		{
-			this.paddleLeft.y -= (500 * secondsPassed)
+			console.log(paddle.y + " " + diff)
+			if (diff < 750)
+				paddle.y -= (diff * secondsPassed)
+			else
+				paddle.y -= (750 * secondsPassed)
 		}
-		else if (this.paddleLeft.targetY > this.paddleLeft.y)
+		else if (paddle.targetY > paddle.y)
 		{
-			this.paddleLeft.y += (500 * secondsPassed)
+			paddle.y += (750 * secondsPassed)
 		}
 	}
+
+	// updateBall(secondsPassed: number)
+	// {
+	// 	if (this.ball.targetX > this.ball.x)
+	// 		this.ball.x += (750 * secondsPassed)
+	// 	else if (this.ball.targetX < this.ball.x)
+	// 		this.ball.x -= (750 * secondsPassed)
+	// }
+
 
 	sendData()
 	{
@@ -259,8 +283,8 @@ export class GameBoardComponent implements OnInit{
 
 	sendPaddle()
 	{
-		this.firstPlayer.newPaddlePos(this.paddleLeft.x, this.paddleLeft.y);
-		this.firstPlayer.newPaddlePos(this.paddleRight.x, this.paddleRight.y);
+		this.firstPlayer.newPaddlePos(this.paddleLeft.x, this.paddleLeft.targetY);
+		this.firstPlayer.newPaddlePos(this.paddleRight.x, this.paddleRight.targetY);
 	}
 
 	@HostListener('document:keydown', ['$event'])
@@ -280,15 +304,13 @@ export class GameBoardComponent implements OnInit{
 		const bottom = paddle.height
 		if(paddle && paddle.y < top && (event == 'ArrowDown' || event == 's'))
 		{
-			// paddle.targetY = paddle.y + paddle.speed
-			paddle.y += paddle.speed;
-			this.firstPlayer.newPaddlePos(paddle.x, paddle.y);
+			paddle.targetY = paddle.y + paddle.speed
+			this.firstPlayer.newPaddlePos(paddle.x, paddle.targetY);
 		}
 		if(paddle && paddle.y > bottom && (event == 'ArrowUp' || event == 'w'))
 		{
-			// paddle.targetY = paddle.y - paddle.speed
-			paddle.y -= paddle.speed;
-			this.firstPlayer.newPaddlePos(paddle.x, paddle.y);
+			paddle.targetY = paddle.y - paddle.speed
+			this.firstPlayer.newPaddlePos(paddle.x, paddle.targetY);
 
 		}
 	}
