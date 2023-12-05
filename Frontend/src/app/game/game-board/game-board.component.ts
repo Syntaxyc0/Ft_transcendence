@@ -216,8 +216,9 @@ export class GameBoardComponent implements OnInit{
 		// secondsPassed = Math.min(secondsPassed, 0.1);
 		this.oldTimeStamp = timeStamp;
 
-		this.paddleLeft.y = this.lerp(this.paddleLeft.y, this.paddleLeft.targetY, 25 * secondsPassed)
-		this.paddleRight.y = this.lerp(this.paddleRight.y, this.paddleRight.targetY, 25 * secondsPassed)
+		this.paddleLeft.updatePosition(secondsPassed)
+		// this.paddleLeft.y = this.lerp(this.paddleLeft.y, this.paddleLeft.targetY, this.paddleLeft.velocity * secondsPassed)
+		this.paddleRight.y = this.lerp(this.paddleRight.y, this.paddleRight.targetY, 10 * secondsPassed)
 		this.ball.updatePosition();
 		this.ball.x = this.lerp(this.ball.x, this.ball.targetX, this.ball.speed * secondsPassed)
 		this.ball.y = this.lerp(this.ball.y, this.ball.targetY, this.ball.speed * secondsPassed)
@@ -227,33 +228,6 @@ export class GameBoardComponent implements OnInit{
 	private lerp(start: number, end: number, t: number): number {
 		return start + t * (end - start);
 	  }
-
-	updatePaddle(paddle: Paddle ,secondsPassed: number){
-		// this.paddleLeft.x += (1000 * secondsPassed)
-		const diff = (paddle.targetY - paddle.y)
-		// paddle.y += (diff * secondsPassed)
-		if (diff > 0)
-		{
-			console.log(paddle.y + " " + diff)
-			if (diff < 750)
-				paddle.y -= (diff * secondsPassed)
-			else
-				paddle.y -= (750 * secondsPassed)
-		}
-		else if (paddle.targetY > paddle.y)
-		{
-			paddle.y += (750 * secondsPassed)
-		}
-	}
-
-	// updateBall(secondsPassed: number)
-	// {
-	// 	if (this.ball.targetX > this.ball.x)
-	// 		this.ball.x += (750 * secondsPassed)
-	// 	else if (this.ball.targetX < this.ball.x)
-	// 		this.ball.x -= (750 * secondsPassed)
-	// }
-
 
 	sendData()
 	{
@@ -302,12 +276,12 @@ export class GameBoardComponent implements OnInit{
 		const bottom = paddle.height
 		if(paddle && paddle.y < top && (event == 'ArrowDown' || event == 's'))
 		{
-			paddle.targetY = paddle.y + paddle.speed
+			paddle.targetY = paddle.y + paddle.step
 			this.firstPlayer.newPaddlePos(paddle.x, paddle.targetY);
 		}
 		if(paddle && paddle.y > bottom && (event == 'ArrowUp' || event == 'w'))
 		{
-			paddle.targetY = paddle.y - paddle.speed
+			paddle.targetY = paddle.y - paddle.step
 			this.firstPlayer.newPaddlePos(paddle.x, paddle.targetY);
 
 		}
