@@ -9,7 +9,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { UserI } from '../model/user.interface';
 import { ConnectedUserService } from '../service/connectedUser.service';
-import { ConnectedUserI } from '../model/connectedUser.interface';
+import { JoinedRoomService } from '../service/joined-room.service';
+import { MessageService } from '../service/message.service';
+import { MessageI } from '../model/message.interface';
+import { RoomI } from '../model/room.interface';
+import { JoinedRoomI } from '../model/joinedRoom.interface';
+import { RoomService } from '../service/room.service';
 
 @WebSocketGateway({ cors: { origin: ['http://localhost:3333', 'http://localhost:4200'] } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -20,7 +25,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor( 
 		private authService: AuthService,
 		private prisma: PrismaService,
-		private connectedUserService: ConnectedUserService ) {}
+		private roomService: RoomService,
+		private connectedUserService: ConnectedUserService,
+		private joinedRoomService: JoinedRoomService,
+		private messageService: MessageService) { }
+
+		async onModuleInit() {
+			await this.connectedUserService.deleteAll();
+			await this.joinedRoomService.deleteAll();
+		  }
 
 	async handleConnection( socket: Socket ) {
 		try {
@@ -124,30 +137,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		return socket.emit('currentUser', socket.data.user)
 	}
 
-	
-		// @SubscribeMessage('paginateRooms')
-		// async onPaginateRoom(socket: Socket, page: PageI) {
-		// 	if (!socket.data.user) {
-		// 		console.log("1e except")
-		// 		throw new UnauthorizedException();
-		// 	}
-			
-		// 	page.limit = page.limit > 100 ? 100 : page.limit;
-		// 	page.page = page.page + 1;
-	
-		// 	const user = await this.prisma.user.findUnique({
-		// 		where: { id: socket.data.user.id },
-		// 			include: { rooms: { take: page.limit, skip: (page.page - 1) * page.limit } },
-		// 	});
-	
-		// 	if (!user) {
-		// 		console.log("2e except")
-		// 		throw new UnauthorizedException();
-		// 	}
-	
-		// 	const rooms = user.rooms;
-		// 	console.log("on paginate room",rooms)
-	
-		// 	return this.server.to(socket.id).emit('rooms', rooms);
-		// }
+	@SubscribeMessage('joinRoom')
+	async onJoinRoom(socket: Socket, room: RoomI) {
+	  const messages = await this.messageService.findMessagesForRoom(room);
+	  // Save Connection to Room
+	  await this.joinedRoomService.create({ socketId: socket.id, user: socket.data.user, room });
+	  // Send last messages from Room to User
+	  await this.server.to(socket.id).emit('messages', messages);
+	}
+  
+	@SubscribeMessage('leaveRoom')
+	async onLeaveRoom(socket: Socket) {
+	  // remove connection from JoinedRooms
+	  await this.joinedRoomService.deleteBySocketId(socket.id);
+	}
+  
+	@SubscribeMessage('addMessage')
+	async onAddMessage(socket: Socket, message: MessageI) {
+	  const createdMessage: MessageI = await this.messageService.create({...message, user: socket.data.user});
+	  const room: RoomI = await this.roomService.getRoom(createdMessage.room.id);
+	  const joinedUsers: JoinedRoomI[] = await this.joinedRoomService.findByRoom(room);
+	  // TODO: Send new Message to all joined Users of the room (currently online)
+	}
 }

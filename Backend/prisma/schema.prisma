@@ -2,9 +2,10 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider      = "prisma-client-js"
-  output = "../node_modules/.prisma/client"
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -17,75 +18,78 @@ enum Status {
 }
 
 model User {
-  id				Int		@id @default(autoincrement())
-  email				String	@unique
-  login 			String	@unique
-  hash 				String
-  is2faenabled		Boolean	@default(false)
-  is2favalidated	Boolean	@default(false)
-  twofacode 		String	@default("")
-  avatar			String	@default("")
-  elo				Int 	@default(1000)
-  userStatus 		String	@default("OFFLINE")
-  gameHistory 		Int[]	
-  friendList 		Int[]	@default([])
-  FriendRequest		FriendRequest[]
-  rooms				Room[]	@relation("UserRooms")
-  connectedUser		ConnectedUser[]
-  joinedRoom		JoinedRoom[]
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
+  login          String          @unique
+  hash           String
+  is2faenabled   Boolean         @default(false)
+  is2favalidated Boolean         @default(false)
+  twofacode      String          @default("")
+  avatar         String          @default("")
+  elo            Int             @default(1000)
+  userStatus     String          @default("OFFLINE")
+  gameHistory    Int[]
+  friendList     Int[]           @default([])
+  FriendRequest  FriendRequest[]
+  rooms          Room[]          @relation("UserRooms")
+  connectedUser  ConnectedUser[]
+  joinedRoom     JoinedRoom[]
+  Message        Message[]
 }
 
 model FriendRequest {
-	id 				Int @id @default(autoincrement())
-	userId 			Int
-	User 			User @relation(fields: [userId], references: [id])
-	Status			Boolean @default(false)
+  id     Int     @id @default(autoincrement())
+  userId Int
+  User   User    @relation(fields: [userId], references: [id])
+  Status Boolean @default(false)
 }
 
 model GameInfo {
-	id				Int @id @default(autoincrement()) 
-	userId1			Int
-	userId2			Int
-	scoreUser1		Int
-	scoreUser2		Int
-	winnerId		Int
+  id         Int @id @default(autoincrement())
+  userId1    Int
+  userId2    Int
+  scoreUser1 Int
+  scoreUser2 Int
+  winnerId   Int
 }
 
 model Room {
-  id         Int       @id @default(autoincrement())
-  name       String
-  description String?  
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  users      User[]    @relation("UserRooms")
+  id          Int          @id @default(autoincrement())
+  name        String
+  description String?
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  users       User[]       @relation("UserRooms")
+  JoinedRoom  JoinedRoom[]
+  Message     Message[]
 }
 
 model ConnectedUser {
-  id		Int       @id @default(autoincrement())
-  socketId	String
-  user		User     @relation(fields: [userId], references: [id])
-  userId	Int
+  id       Int    @id @default(autoincrement())
+  socketId String
+  user     User   @relation(fields: [userId], references: [id])
+  userId   Int
 }
 
 model JoinedRoom {
-  id: 		Int @id @default(autoincrement())
-  socketId:	String
-  userId:	Int
-  roomId:	Int
+  id		Int    @id @default(autoincrement())
+  socketId	String
+  userId	Int
+  roomId	Int
 
-  user:		User @relation(fields: [userId], references: [id])
-  room:		Room @relation(fields: [roomId], references: [id])
+  user		User @relation(fields: [userId], references: [id])
+  room 		Room @relation(fields: [roomId], references: [id])
 }
 
 model Message {
-  id:			Int @id @default(autoincrement())
-  text:			String
-  userId:		Int
-  roomId:		Int
+  id     	Int    @id @default(autoincrement())
+  text   	String
+  userId 	Int
+  roomId 	Int
 
-  user: 		User @relation(fields: [userId], references: [id])
-  room: 		Room @relation(fields: [roomId], references: [id])
-  
-  created_at:	DateTime @default(now())
-  updated_at:	DateTime @updatedAt
+  user 		User @relation(fields: [userId], references: [id])
+  room 		Room @relation(fields: [roomId], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
