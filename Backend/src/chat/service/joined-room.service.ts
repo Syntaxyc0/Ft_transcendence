@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JoinedRoom, Room, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JoinedRoomI } from '../model/joinedRoom.interface';
+import { RoomI } from '../model/room.interface';
 
 
 @Injectable()
@@ -37,7 +38,7 @@ export class JoinedRoomService {
 		});
 	  }
 	  
-	  async findByRoom(room: Room): Promise<JoinedRoom[]> {
+	  async findByRoom(room: RoomI): Promise<JoinedRoom[]> {
 		return this.prisma.joinedRoom.findMany({
 		  where: {
 			roomId: room.id,

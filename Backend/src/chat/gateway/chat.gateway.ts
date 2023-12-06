@@ -4,7 +4,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { PageI } from 'src/chat/model/page.interface';
-import { Prisma, User, Room, ConnectedUser } from '@prisma/client'; 
+import { Prisma, User, Room, ConnectedUser, Message } from '@prisma/client'; 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { UserI } from '../model/user.interface';
@@ -154,9 +154,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   
 	@SubscribeMessage('addMessage')
 	async onAddMessage(socket: Socket, message: MessageI) {
-	  const createdMessage: MessageI = await this.messageService.create({...message, user: socket.data.user});
-	  const room: RoomI = await this.roomService.getRoom(createdMessage.room.id);
-	  const joinedUsers: JoinedRoomI[] = await this.joinedRoomService.findByRoom(room);
+
+		const { id, ...messageWithoutId } = message;
+		const createdMessage = await this.prisma.message.create({
+			data: {
+				...messageWithoutId,
+				user: {
+					connect: { id: messageWithoutId.user.id},
+				},
+				room: {
+					connect: { id: messageWithoutId.room.id }, 
+				},
+			},
+			include: {
+				room: true,
+			}
+		});
+		
+		const room: RoomI = await this.roomService.getRoom(createdMessage.room.id);
+
+		const joinedUsers: JoinedRoomI[] = await this.prisma.joinedRoom.findMany({
+			where: {
+			  roomId: room.id,
+			},
+			include: {
+				room: true,
+				user: true,
+			}
+		  });
+		  
 	  // TODO: Send new Message to all joined Users of the room (currently online)
 	}
 }

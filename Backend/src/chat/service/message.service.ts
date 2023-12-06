@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Message } from '@prisma/client';
+import { Message, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RoomI } from '../model/room.interface';
 import { MessageI } from '../model/message.interface';
@@ -10,10 +10,21 @@ export class MessageService {
 	constructor(private readonly prisma: PrismaService) {}
 
 
-	async create(message: MessageI): Promise<Message> {
+	async create(message: MessageI, user_to_connect: User): Promise<Message> {
+		const { id, ...messageWithoutId } = message;
 		return this.prisma.message.create({
-			data:
-				message
+			data: {
+				...messageWithoutId,
+				user: {
+					connect: { id: messageWithoutId.user.id},
+				},
+				room: {
+					connect: { id: messageWithoutId.room.id }, 
+				},
+			},
+			include: {
+				room: true,
+			}
 		});
 	}
 	  
