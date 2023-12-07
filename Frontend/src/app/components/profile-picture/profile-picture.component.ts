@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CustomValidators } from 'src/app/helpers/custom-validators';
 
 @Component({
 	selector: 'app-profile-picture',
@@ -72,7 +73,7 @@ export class ProfilePictureComponent {
 
 
 	public editNameForm = new FormGroup({
-		name: new FormControl(null, [Validators.required])
+		name: new FormControl(null, [Validators.required, CustomValidators.nicktoolong ])
 	});
 
 
