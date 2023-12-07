@@ -35,8 +35,8 @@ export class GameBoardComponent implements OnInit{
 	requestedMatchmaking = false;
 	isOnline = false;
 	currentLead: boolean = true;
-	// private isPageVisible: boolean = true;
 	otherVisible: boolean = false;
+	keyDown: boolean = false;
 
 	data: Observable<any>;
 	oldTimeStamp = 0;
@@ -60,7 +60,19 @@ export class GameBoardComponent implements OnInit{
 		this.reset(false);
 		this.gameLoop = this.gameLoop.bind(this);
 		requestAnimationFrame(this.gameLoop);
+		document.addEventListener('keydown', this.handleKeyDown);
+    	document.addEventListener('keyup', this.handleKeyUp);
+		document.addEventListener('mousemove', this.handleMouseMove);
+    	document.addEventListener('touchstart', this.handleTouchStart);
 	}
+	
+	  handleMouseMove(event: MouseEvent): void {
+		// Handle mousemove event
+	  }
+	
+	  handleTouchStart(event: TouchEvent): void {
+		// Handle touchstart event
+	  }
 	
 	handleOrder(order:string, payload:any)
 	{
@@ -216,8 +228,9 @@ export class GameBoardComponent implements OnInit{
 		// secondsPassed = Math.min(secondsPassed, 0.1);
 		this.oldTimeStamp = timeStamp;
 
-		this.paddleLeft.updatePosition(secondsPassed)
-		// this.paddleLeft.y = this.lerp(this.paddleLeft.y, this.paddleLeft.targetY, this.paddleLeft.velocity * secondsPassed)
+		if (this.keyDown)
+			this.paddleLeft.updatePosition(secondsPassed)
+		this.paddleLeft.y = this.lerp(this.paddleLeft.y, this.paddleLeft.targetY, this.paddleLeft.velocity * secondsPassed)
 		this.paddleRight.y = this.lerp(this.paddleRight.y, this.paddleRight.targetY, 10 * secondsPassed)
 		this.ball.updatePosition();
 		this.ball.x = this.lerp(this.ball.x, this.ball.targetX, this.ball.speed * secondsPassed)
@@ -269,6 +282,17 @@ export class GameBoardComponent implements OnInit{
 		else if(this.paddleRight.currentUser)
 			this.updatePaddlePosition(this.paddleRight, event.key);
 	}
+
+	handleKeyDown(event: KeyboardEvent): void {
+		// console.log("keyDown")
+		this.keyDown = true
+	  }
+	
+	  handleKeyUp(event: KeyboardEvent): void {
+		// console.log("keyUp")
+		this.keyDown = false // /!\ HANDLE RIGHT PADDLE
+
+	  }
 
 	updatePaddlePosition(paddle: Paddle, event: string)
 	{

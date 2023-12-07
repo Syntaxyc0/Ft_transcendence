@@ -24,8 +24,8 @@ export class Paddle{
 			this.x = 0;
 	}
 
+
 	updatePosition(secondsPassed: number): void {
-		// Accelerate towards the target position:number
 		const direction = Math.sign(this.targetY - this.y);
 		if (this.y !== this.targetY) {
 		  
@@ -37,11 +37,8 @@ export class Paddle{
 		if (Math.abs(this.targetY - this.y) < 1) {
 		  this.velocity *= Math.pow(this.deceleration, secondsPassed);
 		}
-	
-		// Update the position based on velocity
-
-		this.y += this.velocity * secondsPassed;
-	  }
+	}
+	  
 
 	draw(){
 		this.context.fillStyle = 'red';
@@ -60,8 +57,8 @@ export class Paddle{
 	{
 		this.acceleration = 1000
 		this.deceleration = 1000
-		this.velocity = 20;
-		this.step = 5;
+		this.velocity = 10;
+		this.step = 20;
 		this.y = this.gameBoard.height / 2;
 		this.score = 0;
 		this.targetY = this.y
