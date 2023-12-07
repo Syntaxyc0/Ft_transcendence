@@ -1,6 +1,7 @@
 import { Body, OnModuleInit } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket} from "socket.io"
+import { CreatePlayerDto } from './dto/GameInfor.dto';
 
 @WebSocketGateway({
   cors: {

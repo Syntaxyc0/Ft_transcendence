@@ -9,9 +9,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GameInfoDto = void 0;
+exports.GameInfoDto = exports.CreatePlayerDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+class CreatePlayerDto {
+    constructor(user, score, socket, prismaClient) {
+        this.user = user;
+        this.score = score;
+        this.socket = socket;
+        this.prismaClient = prismaClient;
+    }
+}
+exports.CreatePlayerDto = CreatePlayerDto;
 class GameInfoDto {
 }
 exports.GameInfoDto = GameInfoDto;

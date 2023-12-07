@@ -15,6 +15,13 @@ const prisma_service_1 = require("../prisma/prisma.service");
 let GameService = class GameService {
     constructor(prisma) {
         this.prisma = prisma;
+        this.players = [];
+    }
+    create(player) {
+        this.players.push(player);
+    }
+    findAll() {
+        return this.players;
     }
     async newgame(gameinfo) {
         const game = await this.prisma.gameInfo.create({

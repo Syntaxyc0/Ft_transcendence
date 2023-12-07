@@ -1,8 +1,11 @@
-import { GameInfoDto } from './dto/GameInfor.dto';
+import { CreatePlayerDto, GameInfoDto } from './dto/GameInfor.dto';
 import { GameService } from './game.service';
+import { Player } from './interfaces/player.interface';
 export declare class GameController {
     private gameService;
     constructor(gameService: GameService);
+    findAll(): Promise<Player[]>;
+    create(createPlayerDto: CreatePlayerDto): Promise<void>;
     newGame(dto: GameInfoDto): Promise<void>;
     getGameHistory(uid: number): Promise<number[]>;
     getGameInfo(gid: number): Promise<{
