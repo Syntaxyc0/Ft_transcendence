@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { CustomSocket } from '../sockets/custom-socket';
 import { RoomI, RoomPaginateI } from 'src/app/chat/model/room.interface';
-import { UserI } from 'src/app/chat/model/user.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
+import { MessageI } from '../model/message.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +12,21 @@ export class ChatService {
 
   constructor(private socket: CustomSocket, private snackbar: MatSnackBar) { }
 
-	sendMessage() {
+
+	joinRoom(room: RoomI) {
+		this.socket.emit('joinRoom', room);
 	}
 
-	getMessage() {
-		return this.socket.fromEvent('message');
+	leaveRoom(room: RoomI) {
+		this.socket.emit('leaveRoom', room);
+	}
+
+	sendMessage(message: MessageI) {
+		this.socket.emit('addmessage', message);
+	}
+
+	getMessage(): Observable<MessageI[]> {
+		return this.socket.fromEvent<MessageI[]>('messages');
 	}
 
 	// Paginate(not use for the moment)
