@@ -19,19 +19,13 @@ export declare class AuthController {
     check_token(token: string): boolean;
     get42redirect(request: any, res: any): Promise<void>;
     getRooms(): Promise<({
-        users: {
+        message: {
             id: number;
-            email: string;
-            login: string;
-            hash: string;
-            is2faenabled: boolean;
-            is2favalidated: boolean;
-            twofacode: string;
-            avatar: string;
-            elo: number;
-            userStatus: string;
-            gameHistory: number[];
-            friendList: number[];
+            text: string;
+            userId: number;
+            roomId: number;
+            created_at: Date;
+            updated_at: Date;
         }[];
     } & {
         id: number;

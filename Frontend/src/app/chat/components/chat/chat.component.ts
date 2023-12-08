@@ -29,7 +29,6 @@ import { ChatRoomComponent } from '../chat-room/chat-room.component';
 })
 export class ChatComponent implements OnInit{
 	
-	rooms$: Observable<RoomPaginateI> = this.chatService.getMyRooms();
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
 	userList :object[] = []

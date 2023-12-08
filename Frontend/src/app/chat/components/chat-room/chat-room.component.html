@@ -1,3 +1,7 @@
+<head>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+
 <div *ngIf="chatRoom; else no_chatroom_selected">
 
 	<!-- Header -->
@@ -11,13 +15,13 @@
 	  </span>
 	  <span>
 		<h3 style="color: grey">{{chatRoom.description}}</h3>
-		<span *ngFor="let user of chatRoom.users">{{user.username}}, </span>
+		<span *ngFor="let user of chatRoom.users">{{user.login}}, </span>
 	  </span>
 	</div>
   
 	<!-- Messages -->
 	<div class="message">
-	  <span *ngFor="let message of (messages$ | async)?.items">
+	  <span *ngFor="let message of messages$ | async ">
 		<app-chat-message [message]="message"></app-chat-message>
 	  </span>
 	</div>

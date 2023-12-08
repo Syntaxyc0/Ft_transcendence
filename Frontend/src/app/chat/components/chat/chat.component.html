@@ -28,7 +28,7 @@
 			</div>
 		
 				<div class="chatroom">
-					<app-chat-room [chatRoom]="selectedRoom"></app-chat-room>
+					<app-chat-room *ngIf="selectedRoom" [chatRoom]="selectedRoom"></app-chat-room>
 				</div>
 		
 			</div>

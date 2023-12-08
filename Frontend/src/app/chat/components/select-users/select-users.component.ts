@@ -12,8 +12,6 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatOptionModule } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import { Socket } from 'ngx-socket-io';
-import { CustomSocket } from '../../sockets/custom-socket';
 import { SocketService } from '../../services/socket.service';
 import { User } from 'src/app/helpers/types';
 

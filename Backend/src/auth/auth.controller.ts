@@ -67,16 +67,11 @@ export class AuthController
 	//  DataBase VIEWER   //
 	//--------------------// 
 
-	// @Get('rooms')
-	// async getRooms() {
-	// 	return await this.prismaService.room.findMany();
-	// }
-
 	@Get('rooms')
 	async getRooms() {
   		return await this.prismaService.room.findMany({
    			include: {
-     			users: true,
+     			message: true,
    			},
   		});
 	}

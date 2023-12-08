@@ -154,13 +154,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   
 	@SubscribeMessage('addMessage')
 	async onAddMessage(socket: Socket, message: MessageI) {
-
 		const { id, ...messageWithoutId } = message;
 		const createdMessage = await this.prisma.message.create({
 			data: {
 				...messageWithoutId,
 				user: {
-					connect: { id: messageWithoutId.user.id},
+					connect: { id: socket.data.user.id},
 				},
 				room: {
 					connect: { id: messageWithoutId.room.id }, 
@@ -182,7 +181,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				user: true,
 			}
 		  });
-		  
+
+	  const messages = await this.messageService.findMessagesForRoom(room);
+	  await this.server.to(socket.id).emit('messages', messages);  
 	  // TODO: Send new Message to all joined Users of the room (currently online)
 	}
 }

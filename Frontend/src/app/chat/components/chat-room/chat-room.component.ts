@@ -11,13 +11,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { ChatMessageComponent } from '../chat-message/chat-message.component';
 
 @Component({
   selector: 'app-chat-room',
   standalone: true,
   templateUrl: './chat-room.component.html',
   styleUrls: ['./chat-room.component.scss'],
-  imports: [ ReactiveFormsModule, CommonModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatCardModule, RouterModule ],
+  imports: [ ReactiveFormsModule, CommonModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatCardModule, RouterModule, MatIconModule, ChatMessageComponent ],
 
 })
 export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy {
@@ -25,7 +27,6 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy {
   @Input() chatRoom: RoomI;
 
   messages$: Observable<MessageI[]> = this.chatService.getMessage();
-
   chatMessage: FormControl = new FormControl(null, [Validators.required]);
 
   constructor(private chatService: ChatService) { }

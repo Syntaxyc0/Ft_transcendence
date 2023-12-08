@@ -60,7 +60,7 @@ let AuthController = class AuthController {
     async getRooms() {
         return await this.prismaService.room.findMany({
             include: {
-                users: true,
+                message: true,
             },
         });
     }

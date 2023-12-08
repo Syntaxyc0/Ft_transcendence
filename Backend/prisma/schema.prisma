@@ -60,8 +60,8 @@ model Room {
   created_at  DateTime     @default(now())
   updated_at  DateTime     @updatedAt
   users       User[]       @relation("UserRooms")
-  JoinedRoom  JoinedRoom[]
-  Message     Message[]
+  joinedRoom  JoinedRoom[]
+  message     Message[]
 }
 
 model ConnectedUser {
