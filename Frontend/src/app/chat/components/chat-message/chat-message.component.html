@@ -1,5 +1,5 @@
 <span style="display: flex;" [class.ownContainer]="message.user?.id === (user | async)?.id">
 	<p [ngClass]="{ownMessage: message.user?.id === (user | async)?.id}">
-	  <em>{{message.user?.login}}</em> <br /> {{message.text}}
+	  <strong>{{message.user?.login}}</strong> <br /> {{message.text}}
 	</p>
 </span>

@@ -1,6 +1,6 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest, map, startWith, tap } from 'rxjs';
 import { RoomI } from 'src/app/chat/model/room.interface';
 import { MessageI } from '../../model/message.interface';
 import { ChatService } from '../../services/chat.service';
@@ -22,11 +22,32 @@ import { ChatMessageComponent } from '../chat-message/chat-message.component';
   imports: [ ReactiveFormsModule, CommonModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatCardModule, RouterModule, MatIconModule, ChatMessageComponent ],
 
 })
-export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy {
+export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
 
   @Input() chatRoom: RoomI;
+  @ViewChild('messages') private messagesScroller: ElementRef;
 
-  messages$: Observable<MessageI[]> = this.chatService.getMessage();
+//   messages$: Observable<MessageI[]> = this.chatService.getMessage();
+
+
+  messages$: Observable<MessageI[]> = combineLatest([this.chatService.getMessage(), this.chatService.getAddedMessage().pipe(startWith(null))]).pipe(
+    map(([messagePaginate, message]) => {
+      if (message && message.room.id === this.chatRoom.id && !messagePaginate.some(m => m.id === message.id)) {
+        messagePaginate.push(message);
+      }
+	  const items = messagePaginate.sort((a, b) => {
+		const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+		const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+		return dateA - dateB;
+	  });
+	  
+      messagePaginate = items;
+      return messagePaginate;
+    }),
+    tap(() => this.scrollToBottom())
+  )
+
+
   chatMessage: FormControl = new FormControl(null, [Validators.required]);
 
   constructor(private chatService: ChatService) { }
@@ -36,8 +57,12 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges) {
     if(this.chatRoom) {
-      this.chatService.joinRoom(this.chatRoom);
+    	this.chatService.joinRoom(this.chatRoom);
     }
+  }
+
+  ngAfterViewInit() {
+    this.scrollToBottom();
   }
 
   ngOnDestroy() {
@@ -49,4 +74,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy {
     this.chatMessage.reset();
   }
 
+  scrollToBottom(): void {
+    setTimeout(() => {this.messagesScroller.nativeElement.scrollTop = this.messagesScroller.nativeElement.scrollHeight}, 1);
+  }
 }

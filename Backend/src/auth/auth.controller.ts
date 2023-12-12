@@ -88,8 +88,9 @@ export class AuthController
 		});
 	}
 
-	//--------------------// 
-	//        Test        //
-	//--------------------// 
+	@Get('joinedRoom')
+	async getJoinedRoom() {
+		return await this.prismaService.joinedRoom.findMany();
+	}
 
 }

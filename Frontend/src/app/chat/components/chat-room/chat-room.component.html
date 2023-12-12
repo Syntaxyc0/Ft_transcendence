@@ -20,7 +20,7 @@
 	</div>
   
 	<!-- Messages -->
-	<div class="message">
+	<div #messages class="message">
 	  <span *ngFor="let message of messages$ | async ">
 		<app-chat-message [message]="message"></app-chat-message>
 	  </span>

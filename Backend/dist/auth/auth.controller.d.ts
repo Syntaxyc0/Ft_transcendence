@@ -53,4 +53,10 @@ export declare class AuthController {
         socketId: string;
         userId: number;
     }[]>;
+    getJoinedRoom(): Promise<{
+        id: number;
+        socketId: string;
+        userId: number;
+        roomId: number;
+    }[]>;
 }

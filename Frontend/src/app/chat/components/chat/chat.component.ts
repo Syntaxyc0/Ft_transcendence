@@ -18,6 +18,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { CustomSocket } from '../../sockets/custom-socket';
 import { ChatRoomComponent } from '../chat-room/chat-room.component';
+import { UserI } from '../../model/user.interface';
+import { SocketService } from '../../services/socket.service';
 
 
 @Component({
@@ -32,11 +34,18 @@ export class ChatComponent implements OnInit{
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
 	userList :object[] = []
+	user: Observable<UserI>;
 
 
-	constructor(private route:ActivatedRoute, private router: Router, private chatService: ChatService, public http: HttpClient, private customSocket: CustomSocket) {}
+	constructor(private route:ActivatedRoute,
+		private router: Router,
+		private chatService: ChatService,
+		public http: HttpClient,
+		private customSocket: CustomSocket,
+		private socketService: SocketService) {}
 
 	ngOnInit() {
+		this.user = this.socketService.getCurrentUser();
 		this.chatService.emitPaginateRooms(10, 0);
 	}
 

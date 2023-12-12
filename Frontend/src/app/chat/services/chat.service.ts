@@ -29,6 +29,10 @@ export class ChatService {
 		return this.socket.fromEvent<MessageI[]>('messages');
 	}
 
+	getAddedMessage(): Observable<MessageI> {
+		return this.socket.fromEvent<MessageI>('messageAdded');
+	}
+
 	getRooms(): Observable<RoomI[]> {
 		return this.socket.fromEvent('roomsI');
 	}  
