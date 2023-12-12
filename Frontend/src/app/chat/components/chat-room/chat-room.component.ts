@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable, combineLatest, map, startWith, tap } from 'rxjs';
+import { Observable, combineLatest, map, mergeMap, of, startWith, tap } from 'rxjs';
 import { RoomI } from 'src/app/chat/model/room.interface';
 import { MessageI } from '../../model/message.interface';
 import { ChatService } from '../../services/chat.service';
@@ -30,19 +30,26 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 //   messages$: Observable<MessageI[]> = this.chatService.getMessage();
 
 
-  messages$: Observable<MessageI[]> = combineLatest([this.chatService.getMessage(), this.chatService.getAddedMessage().pipe(startWith(null))]).pipe(
-    map(([messagePaginate, message]) => {
-      if (message && message.room.id === this.chatRoom.id && !messagePaginate.some(m => m.id === message.id)) {
-        messagePaginate.push(message);
+  messages$: Observable<MessageI[]> = combineLatest([
+	this.chatService.getMessage(), 
+	this.chatService.getAddedMessage().pipe(startWith(null))
+	]).pipe(
+    mergeMap(([allMessages, message]) => {
+      if (message && message.room.id === this.chatRoom.id && !allMessages.some(m => m.id === message.id)) {
+        allMessages.push(message);
       }
-	  const items = messagePaginate.sort((a, b) => {
+
+	  console.log('allMessages:', allMessages);
+	  console.log('addedMessage:', message);
+
+	  const items = allMessages.sort((a, b) => {
 		const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
 		const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
 		return dateA - dateB;
 	  });
-	  
-      messagePaginate = items;
-      return messagePaginate;
+
+      allMessages = items;
+      return of(allMessages);
     }),
     tap(() => this.scrollToBottom())
   )

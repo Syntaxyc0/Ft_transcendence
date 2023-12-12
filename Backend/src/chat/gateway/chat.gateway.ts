@@ -30,10 +30,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private joinedRoomService: JoinedRoomService,
 		private messageService: MessageService) { }
 
-		async onModuleInit() {
-			await this.connectedUserService.deleteAll();
-			await this.joinedRoomService.deleteAll();
-		  }
+	async onModuleInit() {
+		await this.connectedUserService.deleteAll();
+		await this.joinedRoomService.deleteAll();
+	}
 
 	async handleConnection( socket: Socket ) {
 		try {

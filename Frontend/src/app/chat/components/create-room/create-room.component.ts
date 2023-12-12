@@ -15,6 +15,7 @@ import { RouterModule } from '@angular/router';
 import { SocketService } from '../../services/socket.service';
 import { Observable, take } from 'rxjs';
 import { User } from 'src/app/helpers/types';
+import { CustomSocket } from '../../sockets/custom-socket';
 
 
 @Component({
@@ -32,9 +33,9 @@ export class CreateRoomComponent {
 		users: new FormArray([],[Validators.required])
 	});
 	currentUser$: Observable<UserI> = this.socketService.getCurrentUser();
-
-	constructor(private chatService: ChatService, private router: Router, private activateRoute: ActivatedRoute, private socketService: SocketService) {}
-
+	
+	constructor(private chatService: ChatService, private router: Router, private activateRoute: ActivatedRoute, private socketService: SocketService, private socket: CustomSocket) {}
+	
 	create() {
 		if (this.form.valid) {
 			this.chatService.createRoom(this.form.getRawValue());
