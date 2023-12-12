@@ -40,7 +40,7 @@ export class SelectUsersComponent implements OnInit{
 	searchLogin = new FormControl();
 	filteredUsers: UserI[] = [];
 	selectedUser: UserI | null = null;
-	currentUser$: Observable<User> = this.socketService.getCurrentUser();
+	currentUser$: Observable<UserI> = this.socketService.getCurrentUser();
 	
 	constructor( private userService: UserService, private socketService: SocketService ) {}
 
@@ -48,7 +48,7 @@ export class SelectUsersComponent implements OnInit{
 	ngOnInit() : void {
 		this.socketService.emitGetCurrentUser();
 
-		let currentUser: User;
+		let currentUser: UserI;
 
 		this.currentUser$.pipe(take(1)).subscribe(value => {
 		  currentUser = value;

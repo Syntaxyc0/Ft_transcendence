@@ -6,7 +6,6 @@ export type User = {
 	userstatus: string,
 	friendlist: number[],
 	friendrequests: FriendRequest[]
-
 }
 
 export type FriendRequest = {

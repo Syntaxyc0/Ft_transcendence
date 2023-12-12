@@ -31,7 +31,7 @@ export class CreateRoomComponent {
 		description: new FormControl(null),
 		users: new FormArray([],[Validators.required])
 	});
-	currentUser$: Observable<User> = this.socketService.getCurrentUser();
+	currentUser$: Observable<UserI> = this.socketService.getCurrentUser();
 
 	constructor(private chatService: ChatService, private router: Router, private activateRoute: ActivatedRoute, private socketService: SocketService) {}
 

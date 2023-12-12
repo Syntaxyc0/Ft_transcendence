@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MessageI } from 'src/app/chat/model/message.interface';
 import { SocketService } from '../../services/socket.service';
 import { Observable } from 'rxjs';
-import { User } from 'src/app/helpers/types';
 import { CommonModule } from '@angular/common';
+import { UserI } from '../../model/user.interface';
+import { MessageI } from '../../model/message.interface';
+import { User } from 'src/app/helpers/types';
 
 @Component({
   selector: 'app-chat-message',
@@ -15,7 +16,7 @@ import { CommonModule } from '@angular/common';
 export class ChatMessageComponent implements OnInit{
 
   @Input() message: MessageI;
-  user: Observable<User>;
+  user: Observable<UserI>;
 
   constructor(private socketService: SocketService) {}
 
