@@ -416,10 +416,8 @@ let UserService = class UserService {
         });
     }
     async uploadFile(uid, file) {
-        console.log(file);
         if (file.size > 1000000) {
             console.log("file is too big");
-            console.log(file.size);
             return;
         }
         else if (!this.validate_extension(path.extname(file.filename))) {
@@ -439,7 +437,7 @@ let UserService = class UserService {
                 id: uid,
             },
             data: {
-                avatar: file['originalname']
+                avatar: file['filename']
             }
         });
     }

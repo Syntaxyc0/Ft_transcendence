@@ -460,11 +460,9 @@ export class UserService
 
 	async uploadFile(uid:number, file: Express.Multer.File)
 	{
-		console.log(file);
 		if (file.size > 1000000)
 		{
 			console.log("file is too big")
-			console.log(file.size)
 			return 
 
 		}
@@ -487,7 +485,7 @@ export class UserService
 				id: uid,
             },
 			data: {
-                avatar: file['originalname']
+                avatar: file['filename']
             }
 		});
 	}

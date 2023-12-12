@@ -11,6 +11,8 @@ import { JwtGuard } from 'src/auth/guard';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MailService } from 'src/mail/mail.service';
+import { multerOptions } from './multer.config';
+
 
 
 // @UseGuards(JwtGuard)
@@ -133,15 +135,7 @@ export class UserController {
 	}
 
 	@Post(':uid/upload')
-	@UseInterceptors(FileInterceptor('file', {
-		storage: diskStorage({
-			destination: './assets',
-			filename: (req, file, cb) => {
-			  cb(null, file.originalname);
-			},
-		  }),
-		}),
-	  )
+	@UseInterceptors(FileInterceptor('file', multerOptions))
 	uploadFile(@Param('uid', ParseIntPipe) uid: number, @UploadedFile() file: Express.Multer.File)
 	{
 		return this.userService.uploadFile(uid, file);

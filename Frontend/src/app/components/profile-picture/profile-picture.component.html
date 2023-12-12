@@ -18,14 +18,16 @@
 					</h3>
 					
 					<button class="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none" (click)="toggleModal()">
-					  <span class="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
-						
-					  </span>
+						<span class="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
+							
+						</span>
 					</button>
-				  </div>
-				  <div class="relative p-6 flex-auto">
-					  <div class="md:w-2/3 mt-4">
-							  <input (keydown.enter)="enterKey()" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-cyan-600" id="names" type="name" placeholder="Enter a name" formControlName="name">
+				</div>
+				<div class="relative p-6 flex-auto">
+					<div class="md:w-2/3 mt-4">
+						<input class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-cyan-600" id="Nickname" type="name" placeholder="Enter a name" formControlName="Nickname">
+						<mat-error class= "text-red-600" *ngIf="Nickname.touched && Nickname.hasError('required')">Nickname is required</mat-error>
+						<mat-error class= "text-red-600" *ngIf="editNameForm.hasError('nickTooLong')">Nickname must contain less than 10 characters</mat-error>
 					  </div>
 					<p class="my-4 text-slate-500 text-lg leading-relaxed">
 					</p>
@@ -34,7 +36,7 @@
 					<button class="text-red-400 background-transparent font-bold font-henny uppercase px-12 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="closeButton()">
 					  Close
 					</button>
-					<button class="bg-emerald-500 text-white active:bg-emerald-700 font-henny font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="submit">
+					<button [disabled]= "!editNameForm.valid" class="bg-emerald-500 text-white active:bg-emerald-700 font-henny font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="submit">
 					  Modify
 					</button>
 				  </div>

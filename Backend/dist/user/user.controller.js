@@ -14,9 +14,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
-const multer_1 = require("multer");
 const user_service_1 = require("./user.service");
 const platform_express_1 = require("@nestjs/platform-express");
+const multer_config_1 = require("./multer.config");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -250,14 +250,7 @@ __decorate([
 ], UserController.prototype, "RemoveFriend", null);
 __decorate([
     (0, common_1.Post)(':uid/upload'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './assets',
-            filename: (req, file, cb) => {
-                cb(null, file.originalname);
-            },
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', multer_config_1.multerOptions)),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
     __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),

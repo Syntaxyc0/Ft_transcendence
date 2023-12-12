@@ -6,17 +6,23 @@ import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http'
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CustomValidators } from 'src/app/helpers/custom-validators';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
 	selector: 'app-profile-picture',
 	standalone: true,
-	imports: [CommonModule, HttpClientModule, ReactiveFormsModule],
+	imports: [CommonModule, HttpClientModule, ReactiveFormsModule, MatFormFieldModule],
 	templateUrl: './profile-picture.component.html',
 	styleUrls: ['./profile-picture.component.scss']
 })
 export class ProfilePictureComponent {
 	
 	constructor(public http: HttpClient, private location: Location, private router: Router) {}
+	public editNameForm = new FormGroup({
+		Nickname: new FormControl(null, [Validators.required]),
+	
+	},
+	{validators: [CustomValidators.nicktoolong]});
 	
 	@Input() id:number = 0;
 	name:string = '';
@@ -26,6 +32,7 @@ export class ProfilePictureComponent {
 	ngOnInit() {
         this.retrieveUser();
 	}
+
 	retrieveUser() {
 	 this.http.get<any>("http://localhost:3333/users/" + this.id).subscribe (
 		res => {
@@ -55,6 +62,11 @@ export class ProfilePictureComponent {
 		return this.http.get<Blob>("http://localhost:3333/users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
 	}
 
+	get	Nickname(): FormControl
+	{
+		return this.editNameForm.get('Nickname') as FormControl;
+	}
+
 	selectedFile: File
 
 	onFileChanged(event) {
@@ -67,14 +79,9 @@ export class ProfilePictureComponent {
 	  
 		this.http.post<any>(url, formData).subscribe({
 		  next: (data: any) => window.location.reload(),
-		  error: (error: any) => console.log(error)
+		  error: (error: any) => alert(error.error.message)
 		})
 	}
-
-
-	public editNameForm = new FormGroup({
-		name: new FormControl(null, [Validators.required, CustomValidators.nicktoolong ])
-	});
 
 
 	toggleModal(){
@@ -83,7 +90,7 @@ export class ProfilePictureComponent {
 	
 	editName(){
 		this.toggleModal()
-		this.http.patch("http://localhost:3333/users/" + this.id + "/editName", {userName:this.editNameForm.value.name}).subscribe(
+		this.http.patch("http://localhost:3333/users/" + this.id + "/editName", {userName:this.editNameForm.value.Nickname}).subscribe(
 			res => {
 				window.location.reload()
 			},
