@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post} from '@nestjs/common';
-import { CreatePlayerDto, GameInfoDto } from './dto/GameInfor.dto';
+import {GameInfoDto } from './dto/GameInfor.dto';
 import { GameService } from './game.service';
 import { Player } from './interfaces/player.interface';
 
@@ -8,17 +8,17 @@ export class GameController {
 
 	constructor(private gameService : GameService) {}
 
-	@Get()
-	async findAll(): Promise<Player[]>{
-		console.log("findAll")
-		return this.gameService.findAll();
-	}
+	// @Get()
+	// async findAll(): Promise<Player[]>{
+	// 	console.log("findAll")
+	// 	return this.gameService.findAll();
+	// }
 
-	@Post()
-	async create(@Body() createPlayerDto: CreatePlayerDto){
-		console.log("create")
-		this.gameService.create(createPlayerDto);
-	}
+	// @Post()
+	// async create(@Body() createPlayerDto: CreatePlayerDto){
+	// 	console.log("create")
+	// 	this.gameService.create(createPlayerDto);
+	// }
 	
 	@Post('newgame')
 	newGame(@Body() dto: GameInfoDto){

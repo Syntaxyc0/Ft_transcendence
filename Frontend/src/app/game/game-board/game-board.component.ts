@@ -22,6 +22,7 @@ export class GameBoardComponent implements OnInit{
 	@ViewChild('canvas', {static: true}) gameCanvas!: ElementRef;
 	context!: CanvasRenderingContext2D;
 
+	username: string;
 
 	width: number = 1000;
 	height: number = 640;
@@ -120,6 +121,8 @@ export class GameBoardComponent implements OnInit{
 			break;
 			case "giveData":
 				this.sendData();break;
+			case "initPlayer":
+				this.username = payload.username
 		}
 	}
 

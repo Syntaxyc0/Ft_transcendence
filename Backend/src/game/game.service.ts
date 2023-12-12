@@ -6,17 +6,24 @@ import { Player } from './interfaces/player.interface';
 @Injectable()
 export class GameService {
 
-	private readonly players: Player[] = []
+	// private readonly players: Player[] = []
 
 	constructor(private prisma: PrismaService) {}
 
-	create(player: Player){
-		this.players.push(player)
-	}
+	// create(player: Player){
+	// 	this.players.push(player)
+	// }
 	
-	findAll(): Player[]{
-		return this.players;
-	}
+	// findAll(): Player[]{
+	// 	return this.players;
+	// }
+	
+	// async getLogin(user)
+	// {
+	// 	return this.prisma.user.findMany({
+	// 		where: { user}
+	// })
+	// }
 
 	async newgame(gameinfo: GameInfoDto)
 	{

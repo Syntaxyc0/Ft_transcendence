@@ -20,14 +20,6 @@ let GameController = class GameController {
     constructor(gameService) {
         this.gameService = gameService;
     }
-    async findAll() {
-        console.log("findAll");
-        return this.gameService.findAll();
-    }
-    async create(createPlayerDto) {
-        console.log("create");
-        this.gameService.create(createPlayerDto);
-    }
     newGame(dto) {
         console.log(dto);
         return this.gameService.newgame(dto);
@@ -40,19 +32,6 @@ let GameController = class GameController {
     }
 };
 exports.GameController = GameController;
-__decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], GameController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [GameInfor_dto_1.CreatePlayerDto]),
-    __metadata("design:returntype", Promise)
-], GameController.prototype, "create", null);
 __decorate([
     (0, common_1.Post)('newgame'),
     __param(0, (0, common_1.Body)()),

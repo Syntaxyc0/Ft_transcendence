@@ -1,7 +1,9 @@
 import { Body, OnModuleInit } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket} from "socket.io"
-import { CreatePlayerDto } from './dto/GameInfor.dto';
+import { Player } from './services/room.service'; 
+import { Room} from './services/room.service';
+import { User } from '@prisma/client';
 
 @WebSocketGateway({
   cors: {
@@ -12,37 +14,37 @@ export class GameGateway implements OnModuleInit{
   @WebSocketServer()
   server: Server;
 
-  private connectedSockets: Map<string, Socket> = new Map();
-  private lookingForPlayerSockets: Map<string, Socket> = new Map();
-  private pairedSockets: Map<string, string> = new Map();
+
+  private connectedPlayers: Map<string, Player> = new Map()
+  private rooms: Room[] = []
 
   onModuleInit(){
     console.log("Server up")
     this.server.on('connection', (socket) => {
-      
-      this.connectedSockets.set(socket.id, socket);
+
       console.log(socket.id + ' has connected');
 
       socket.on('disconnect', () => {
         console.log(socket.id + " has disconnected");
-        const targetId = this.pairedSockets.get(socket.id);
-        const targetSocket = this.connectedSockets.get(targetId);
 
         this.disconnectClient(socket.id);
-        this.connectedSockets.delete(socket.id);
+
+        this.connectedPlayers.delete(socket.id)
         if (targetSocket)
           targetSocket.emit('otherDisconnected', {order: 'otherDisconnected'})
       });
     });
   }
 
+  @SubscribeMessage("socketInit")
+  initPlayer(@ConnectedSocket() client: Socket)
+  {
+    this.connectedPlayers.set(client.id, new Player(client, client.data.user.login))
+    client.emit("onGameRequest",{order: "initPlayer", username: client.data.user.login})
+  }
+
   disconnectClient(clientId: string) {
-    const targetId = this.pairedSockets.get(clientId);
-    this.pairedSockets.delete(clientId);
-    this.pairedSockets.delete(targetId); // Remove the target as well
-    this.lookingForPlayerSockets.delete(clientId);
-    this.lookingForPlayerSockets.delete(targetId); // Remove the target as well
-    console.log("erase happened")
+
 }
 
   @SubscribeMessage('disconnectingClient')
@@ -107,25 +109,25 @@ export class GameGateway implements OnModuleInit{
 
   @SubscribeMessage('multiplayerRequest')
   searchMultiplayer(@ConnectedSocket() client: Socket) {
-    console.log("Client looking for player: " + client.id);
-    for (const [socketId, socket] of this.lookingForPlayerSockets) {
-      if (socket.id != client.id)
+    console.log("looking for player: " + this.connectedPlayers.get(client.id).username);
+    for (const [socketId, player] of this.connectedPlayers) {
+      if (player.socket.id != client.id)
       {
-        console.log("Player found: " + socket.id);
+        console.log("Player found: " + player.socket.id);
         client.emit('newPlayer', {
           order: "newPlayer",
           first: true,
         });
-        socket.emit('newPlayer', {
+        player.socket.emit('newPlayer', {
           order: "newPlayer",
           first: false,
         });
-        this.lookingForPlayerSockets.delete(socket.id);
-        this.pairedSockets.set(socket.id, client.id);
-        this.pairedSockets.set(client.id, socket.id);
+
+        this.rooms.push(new Room(this.connectedPlayers.get(client.id), player))
         return;
       }
     }
-    this.lookingForPlayerSockets.set(client.id, client);
+    // this.lookingForPlayerSockets.set(client.id, client);
+    this.connectedPlayers.get(client.id).lookingForPlayer = true
   }
 }

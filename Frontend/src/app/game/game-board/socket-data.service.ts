@@ -23,7 +23,7 @@ export class SocketDataService implements OnDestroy{
 
     this.socket.on('connect', () => {
       // //console.log("Current Client: " + this.socket.id);
-      //console.log("Connected " + this.isOnline);
+      this.socket.emit("socketInit")
     });
     this.socket.on('onGameRequest', (payload: {order: string}) =>{
       data.next(payload);
@@ -45,7 +45,7 @@ export class SocketDataService implements OnDestroy{
   {
 
   }
-
+  
   disconnect()
   {
     //console.log("disconnect " + this.isOnline)
