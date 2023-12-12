@@ -23,7 +23,6 @@ export class RedirectComponent {
     try {
 			this.http.post("http://localhost:3333/auth/42redirect", {code: this.code}).subscribe(
 				response => {
-					console.log(response)
           localStorage.setItem('access_token', response['token']['access_token'])
           localStorage.setItem('id', response['token']['id'])
 		  this.id = response['token']['id']

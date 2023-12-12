@@ -20,6 +20,12 @@ import { multerOptions } from './multer.config';
 export class UserController {
 	constructor(private userService: UserService) {}
 
+	@Get(':login/id')
+	getUserIdFromLogin(@Param('login') login)
+	{
+		return this.userService.getUserIdFromLogin(login)
+	}
+
 	@Get(':uid')
 	getUserFromId(@Param('uid', ParseIntPipe) uid: number)
 	{
@@ -31,16 +37,6 @@ export class UserController {
 		return user;
 	}
 
-	@Get(':login')
-    getUserFromLogin(@Param('login') login: string)
-	{
-		const user = this.userService.getUserFromLogin(login)
-		if (!user)
-		{
-            throw new NotFoundException('User not found');
-        }
-		return user;
-	}
 
 	//Modify user status
 	@Patch(':uid/status')

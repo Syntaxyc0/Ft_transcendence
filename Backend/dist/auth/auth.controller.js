@@ -33,8 +33,8 @@ let AuthController = class AuthController {
     signin(dto) {
         return this.authService.signin(dto);
     }
-    check_token(token) {
-        return this.authService.check_token(token);
+    check_token(body) {
+        return this.authService.check_token(body['token'], body['id']);
     }
     async get42redirect(request, res) {
         const formData = new FormData();
@@ -87,7 +87,7 @@ __decorate([
     (0, common_1.Post)('check'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "check_token", null);
 __decorate([

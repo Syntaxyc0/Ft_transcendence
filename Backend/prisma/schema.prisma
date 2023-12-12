@@ -22,6 +22,7 @@ model User {
   login String @unique
   login42 String @unique
   hash String
+  access_token	String	@default("")
   is2faenabled Boolean @default(false)
   is2favalidated Boolean @default(false)
   twofacode String @default("")

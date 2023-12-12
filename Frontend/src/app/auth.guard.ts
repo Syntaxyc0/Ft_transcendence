@@ -21,7 +21,7 @@ export class AuthGuard {
       return false;
     }
     try {
-      this.check_token(localStorage.getItem('access_token')).subscribe({
+      this.check_token(localStorage.getItem('access_token'), parseInt(localStorage.getItem('id') || '{}')).subscribe({
         next: (val) => {
           if (!val) {
 		      	localStorage.clear();
@@ -63,8 +63,8 @@ export class AuthGuard {
     return true;
   }
 
-  check_token(token) {
-    return this.http.post("http://localhost:3333/auth/check", {token})
+  check_token(token, id) {
+    return this.http.post("http://localhost:3333/auth/check", {token: token, id: id})
 	}
 
   check_2fastatus(id)

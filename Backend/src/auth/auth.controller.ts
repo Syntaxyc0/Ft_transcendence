@@ -32,9 +32,9 @@ export class AuthController
     }
 
 	@Post('check')
-	check_token(@Body() token: string)
+	check_token(@Body() body)
 	{
-		return this.authService.check_token(token)
+		return this.authService.check_token(body['token'], body['id'])
 	}
 
 	@Post('42redirect')

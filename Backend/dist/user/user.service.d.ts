@@ -11,6 +11,7 @@ export declare class UserService {
         login: string;
         login42: string;
         hash: string;
+        access_token: string;
         is2faenabled: boolean;
         is2favalidated: boolean;
         twofacode: string;
@@ -22,23 +23,7 @@ export declare class UserService {
         FriendRequestsEmitted: number[];
         FriendRequestsReceived: number[];
     }>;
-    getUserFromLogin(login: string): Promise<{
-        id: number;
-        email: string;
-        login: string;
-        login42: string;
-        hash: string;
-        is2faenabled: boolean;
-        is2favalidated: boolean;
-        twofacode: string;
-        avatar: string;
-        elo: number;
-        userStatus: string;
-        gameHistory: number[];
-        friendList: number[];
-        FriendRequestsEmitted: number[];
-        FriendRequestsReceived: number[];
-    }>;
+    getUserIdFromLogin(login: string): Promise<number>;
     updateUserStatus(id: number, status: any): Promise<void>;
     ChangeNick(uid: number, name: string): Promise<void>;
     GetUserStatus(id: number): Promise<string>;

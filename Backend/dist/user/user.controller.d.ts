@@ -4,29 +4,14 @@ import { UserService } from './user.service';
 export declare class UserController {
     private userService;
     constructor(userService: UserService);
+    getUserIdFromLogin(login: any): Promise<number>;
     getUserFromId(uid: number): Promise<{
         id: number;
         email: string;
         login: string;
         login42: string;
         hash: string;
-        is2faenabled: boolean;
-        is2favalidated: boolean;
-        twofacode: string;
-        avatar: string;
-        elo: number;
-        userStatus: string;
-        gameHistory: number[];
-        friendList: number[];
-        FriendRequestsEmitted: number[];
-        FriendRequestsReceived: number[];
-    }>;
-    getUserFromLogin(login: string): Promise<{
-        id: number;
-        email: string;
-        login: string;
-        login42: string;
-        hash: string;
+        access_token: string;
         is2faenabled: boolean;
         is2favalidated: boolean;
         twofacode: string;

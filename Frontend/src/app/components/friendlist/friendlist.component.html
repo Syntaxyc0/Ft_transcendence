@@ -3,6 +3,7 @@
 	<a class="bg-[#1D5DE8] text-black active:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" href="/requests">
 		Requests
 	</a>
+	<app-search-user></app-search-user>
 	<li *ngFor="let friend of friendList" class="flex">
 		<div>
 			<app-friend [id]="friend"></app-friend>

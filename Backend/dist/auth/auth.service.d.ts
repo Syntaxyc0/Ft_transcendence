@@ -32,7 +32,7 @@ export declare class AuthService {
     }>;
     generateRandomPassword(): string;
     generateRandomLogin(): string;
-    check_token(token: any): boolean;
+    check_token(token: any, id: number): Promise<boolean>;
     SendMail(uid: number): Promise<void>;
     check2fa(uid: number): Promise<boolean>;
     generateRandom6digitCode(): string;

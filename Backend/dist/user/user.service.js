@@ -35,7 +35,7 @@ let UserService = class UserService {
         }
         return user;
     }
-    async getUserFromLogin(login) {
+    async getUserIdFromLogin(login) {
         const user = await this.prisma.user.findUnique({
             where: {
                 login: login
@@ -44,7 +44,7 @@ let UserService = class UserService {
         if (!user) {
             throw new common_2.NotFoundException("User not found");
         }
-        return user;
+        return user.id;
     }
     async updateUserStatus(id, status) {
         const user = await this.prisma.user.findUnique({

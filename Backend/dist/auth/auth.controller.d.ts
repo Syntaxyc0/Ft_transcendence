@@ -16,7 +16,7 @@ export declare class AuthController {
         access_token: string;
         id: number;
     }>;
-    check_token(token: string): boolean;
+    check_token(body: any): Promise<boolean>;
     get42redirect(request: any, res: any): Promise<void>;
     SendMail(uid: number): Promise<void>;
     check2fa(uid: number): Promise<boolean>;

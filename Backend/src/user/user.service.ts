@@ -27,7 +27,7 @@ export class UserService
 		return user;
     }
 
-	async getUserFromLogin(login: string) {
+	async getUserIdFromLogin(login: string) {
         const user = await this.prisma.user.findUnique(
 			{
 				where: {
@@ -38,7 +38,7 @@ export class UserService
 		if (!user) {
 			throw new NotFoundException("User not found")
     	}
-		return user
+		return user.id
 	}
 
 	async updateUserStatus(id: number, @Body() status)

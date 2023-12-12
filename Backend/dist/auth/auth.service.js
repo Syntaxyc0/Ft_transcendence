@@ -74,6 +74,14 @@ let AuthService = class AuthService {
             expiresIn: '180m',
             secret: secret
         });
+        await this.prisma.user.update({
+            data: {
+                access_token: token
+            },
+            where: {
+                id: userId,
+            }
+        });
         return { access_token: token, id: userId };
     }
     async create42user(login, email) {
@@ -118,11 +126,20 @@ let AuthService = class AuthService {
         const login = Math.random().toString(36);
         return login;
     }
-    check_token(token) {
-        if (!token)
+    async check_token(token, id) {
+        if (!token || !id)
+            return false;
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: id
+            },
+        });
+        if (!user)
+            return false;
+        if (user.access_token != token)
             return false;
         try {
-            const payload = this.jwt.verify(token.token, { secret: process.env.JWT_SECRET });
+            const payload = this.jwt.verify(user.access_token, { secret: process.env.JWT_SECRET });
             if (!payload)
                 return false;
         }
