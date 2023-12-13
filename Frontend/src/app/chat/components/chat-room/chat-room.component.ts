@@ -26,7 +26,6 @@ import { UserI } from '../../model/user.interface';
 export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
 
   @Input() chatRoom: RoomI;
-  @Input() current_user: Observable<UserI>;
   @ViewChild('messages') private messagesScroller: ElementRef;
 
 
