@@ -15,11 +15,8 @@ import { MessageI } from '../../model/message.interface';
 export class ChatMessageComponent {
 
   @Input() message: MessageI;
-  @Input() user: UserI;
-
+  user = this.socketService.user;
+  
   constructor(private socketService: SocketService) {}
-
-  ngOnInit(): void {
-	this.socketService.emitGetCurrentUser();
-  }
+  
 }
