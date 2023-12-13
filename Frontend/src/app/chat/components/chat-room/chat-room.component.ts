@@ -34,7 +34,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 	this.chatService.getMessage(), 
 	this.chatService.getAddedMessage().pipe(startWith(null))
 	]).pipe(
-    mergeMap(([allMessages, message]) => {
+    map(([allMessages, message]) => {
       if (message && message.room.id === this.chatRoom.id && !allMessages.some(m => m.id === message.id)) {
         allMessages.push(message);
       }
@@ -49,7 +49,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 	  });
 
       allMessages = items;
-      return of(allMessages);
+      return allMessages;
     }),
     tap(() => this.scrollToBottom())
   )

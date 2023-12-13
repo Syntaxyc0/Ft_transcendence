@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { UserI } from '../../model/user.interface';
 import { MessageI } from '../../model/message.interface';
-import { User } from 'src/app/helpers/types';
 
 @Component({
   selector: 'app-chat-message',
@@ -13,15 +12,11 @@ import { User } from 'src/app/helpers/types';
   imports: [ CommonModule ],
   styleUrls: ['./chat-message.component.scss']
 })
-export class ChatMessageComponent implements OnInit{
+export class ChatMessageComponent {
 
   @Input() message: MessageI;
-  user: Observable<UserI>;
-
+  user = this.socketService.user;
+  
   constructor(private socketService: SocketService) {}
-
-  ngOnInit(): void {
-	this.socketService.emitGetCurrentUser();
-	this.user = this.socketService.getCurrentUser();
-  }
+  
 }
