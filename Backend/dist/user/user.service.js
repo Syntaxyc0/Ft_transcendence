@@ -416,12 +416,8 @@ let UserService = class UserService {
         });
     }
     async uploadFile(uid, file) {
-        if (file.size > 1000000) {
-            console.log("file is too big");
-            return;
-        }
-        else if (!this.validate_extension(path.extname(file.filename))) {
-            console.log('Wrong file extension');
+        if (!file) {
+            console.log("unrecognized file");
             return;
         }
         const user = await this.prisma.user.findUnique({

@@ -460,16 +460,10 @@ export class UserService
 
 	async uploadFile(uid:number, file: Express.Multer.File)
 	{
-		if (file.size > 1000000)
+		if (!file)
 		{
-			console.log("file is too big")
-			return 
-
-		}
-		else if (!this.validate_extension(path.extname(file.filename)))
-		{
-			console.log('Wrong file extension')
-			return 
+			console.log("unrecognized file")
+			return
 		}
         const user = await this.prisma.user.findUnique({
             where: {

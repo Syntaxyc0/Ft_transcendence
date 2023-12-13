@@ -1,45 +1,43 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider      = "prisma-client-js"
-  output = "../node_modules/.prisma/client"
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
+
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://user:password@postgres:5432/db?schema=public"
+}
+
+model User {
+  id                     Int     @id @default(autoincrement())
+  email                  String  @unique
+  login                  String  @unique
+  login42                String  @unique
+  hash                   String
+  access_token           String  @default("")
+  is2faenabled           Boolean @default(false)
+  is2favalidated         Boolean @default(false)
+  twofacode              String  @default("")
+  avatar                 String  @default("")
+  elo                    Int     @default(1000)
+  userStatus             String  @default("OFFLINE")
+  gameHistory            Int[]
+  friendList             Int[]   @default([])
+  FriendRequestsEmitted  Int[]   @default([])
+  FriendRequestsReceived Int[]   @default([])
+}
+
+model GameInfo {
+  id         Int @id @default(autoincrement())
+  userId1    Int
+  userId2    Int
+  scoreUser1 Int
+  scoreUser2 Int
+  winnerId   Int
 }
 
 enum Status {
   ONLINE
   OFFLINE
   INGAME
-}
-
-model User {
-  id Int @id @default(autoincrement())
-  email	String @unique
-  login String @unique
-  login42 String @unique
-  hash String
-  access_token	String	@default("")
-  is2faenabled Boolean @default(false)
-  is2favalidated Boolean @default(false)
-  twofacode String @default("")
-  avatar	String	@default("")
-  elo		Int		@default(1000)
-  userStatus String	@default("OFFLINE")
-  gameHistory Int[] 
-  friendList Int[] @default([])
-  FriendRequestsEmitted	Int[] @default([])
-  FriendRequestsReceived	Int[] @default([])
-}
-
-model GameInfo {
-	id Int @id @default(autoincrement()) 
-	userId1	Int
-	userId2	Int
-	scoreUser1 Int
-	scoreUser2 Int
-	winnerId	Int
 }
