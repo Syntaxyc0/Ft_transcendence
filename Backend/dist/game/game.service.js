@@ -9,9 +9,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GameService = void 0;
+exports.GameService = exports.HEIGHT = exports.WIDTH = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+exports.WIDTH = 1000;
+exports.HEIGHT = 640;
 let GameService = class GameService {
     constructor(prisma) {
         this.prisma = prisma;

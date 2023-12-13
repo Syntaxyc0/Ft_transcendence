@@ -1,21 +1,12 @@
 <div class="h-screen grid place-items-center ">
 
 <div class = grid>
-	<button (click)="reset(true)"> Reset </button>
-	<button (click)="stopGame()"> Stop Game</button>
-	<button (click)="startGame(true)"> Start</button>
-	<button (click)="multiplayer()"> Multiplayer</button>
-	<button (click)="disconnect()">Disconnect</button>
-	<button (click)="beOtherPlayer()"> Change Player </button>
+	
 </div>
-<p *ngIf = "requestedMatchmaking"> Looking for players...</p>
-<p *ngIf = "isOnline"> Connected </p>
 <canvas #canvas width="1000" height="640" class="game-board">
 	Fallback
 </canvas>
-<p *ngIf = "paddleLeft.currentUser"> Player1 {{username}} </p>
-<p *ngIf = "paddleRight.currentUser"> Player2 {{username}} </p>
 <p *ngIf = "!isGameRunning"> Game Paused</p>
 <p> Score: <br> 
-	{{paddleLeft.score}} || {{paddleRight.score}}</p>
+	</p>
 </div>

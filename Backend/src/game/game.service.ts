@@ -1,29 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { GameInfoDto } from './dto/GameInfor.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Player } from './interfaces/player.interface';
+
+export const WIDTH = 1000
+export const HEIGHT = 640
 
 @Injectable()
 export class GameService {
 
-	// private readonly players: Player[] = []
 
 	constructor(private prisma: PrismaService) {}
-
-	// create(player: Player){
-	// 	this.players.push(player)
-	// }
-	
-	// findAll(): Player[]{
-	// 	return this.players;
-	// }
-	
-	// async getLogin(user)
-	// {
-	// 	return this.prisma.user.findMany({
-	// 		where: { user}
-	// })
-	// }
 
 	async newgame(gameinfo: GameInfoDto)
 	{
