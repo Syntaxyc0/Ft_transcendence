@@ -14,6 +14,7 @@ import { CustomSocket } from '../chat/sockets/custom-socket';
 export class RedirectComponent {
   constructor(public http: HttpClient, private route: ActivatedRoute, private router: Router) {}
 
+  id: number = 0
   code: any
   ngOnInit()
 	{
@@ -23,10 +24,23 @@ export class RedirectComponent {
     try {
 			this.http.post("http://localhost:3333/auth/42redirect", {code: this.code}).subscribe(
 				response => {
-          localStorage.setItem('access_token', response['access_token'])
-          localStorage.setItem('id', response['id'])
-		  this.http.patch<any>('http://localhost:3333/users/' + response['id'] + '/status', {status: "ONLINE"}).subscribe()		
-          this.router.navigate(['home']);
+          localStorage.setItem('access_token', response['token']['access_token'])
+          localStorage.setItem('id', response['token']['id'])
+		  this.id = response['token']['id']
+          this.http.get<any>('http://localhost:3333/users/' + this.id + '/2faenabled').subscribe( res => {
+			  		if (response['isalreadyregistered'] === true)
+					{
+						if (res === true)
+							this.router.navigate(['/twofa'])
+						else
+						{
+							localStorage.setItem('is_authenticated', 'true');
+							this.router.navigate(['/home'])
+						}
+					}
+					else
+						this.router.navigate(['/edit'])
+					})
 				},
 				error => {
 					console.log(error)

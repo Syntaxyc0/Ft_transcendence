@@ -1,9 +1,11 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, NotFoundException, Options, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, NotFoundException, Options, Param, ParseIntPipe, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { signinDto, signupDto } from "./dto";
 import { HttpService } from "@nestjs/axios";
 import { map } from "rxjs";
 import { Response } from "express";
+
+import { MailService } from "src/mail/mail.service";
 import fetch from "node-fetch";
 import { PrismaService } from '../prisma/prisma.service'; 
 
@@ -13,7 +15,7 @@ import FormData = require('form-data');
 @Controller('auth')
 export class AuthController
 {
-    constructor(private authService: AuthService, private http: HttpService, private prismaService: PrismaService) {}
+    constructor(private authService: AuthService, private http: HttpService, private prismaService: PrismaService, private mailService: MailService) {}
 
 	token: string
     @Post('signup')
@@ -29,9 +31,9 @@ export class AuthController
     }
 
 	@Post('check')
-	check_token(@Body() token: string)
+	check_token(@Body() body)
 	{
-		return this.authService.check_token(token)
+		return this.authService.check_token(body['token'], body['id'])
 	}
 
 	@Post('42redirect')
@@ -56,11 +58,26 @@ export class AuthController
 			throw new Error('user not found')
 		const data = await resp2.json();
 		const token = this.authService.create42user(data['login'], data['email'])
-
 		res.status(HttpStatus.OK).send((await token))
 		return 	
+	}
 
-		
+	@Get(':uid/SendMail')
+    SendMail(@Param('uid', ParseIntPipe) uid:number)
+	{
+		return this.authService.SendMail(uid);
+	}
+
+	@Get(':uid/check2fa')
+    check2fa(@Param('uid', ParseIntPipe) uid:number)
+	{
+		return this.authService.check2fa(uid);
+	}
+
+	@Get('/geturl')
+	geturl()
+	{
+		return this.authService.geturl()
 	}
 
 	//--------------------// 

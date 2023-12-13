@@ -1,12 +1,14 @@
 import { AuthService } from "./auth.service";
 import { signinDto, signupDto } from "./dto";
 import { HttpService } from "@nestjs/axios";
+import { MailService } from "src/mail/mail.service";
 import { PrismaService } from '../prisma/prisma.service';
 export declare class AuthController {
     private authService;
     private http;
     private prismaService;
-    constructor(authService: AuthService, http: HttpService, prismaService: PrismaService);
+    private mailService;
+    constructor(authService: AuthService, http: HttpService, prismaService: PrismaService, mailService: MailService);
     token: string;
     signup(dto: signupDto): Promise<{
         access_token: string;
@@ -16,14 +18,21 @@ export declare class AuthController {
         access_token: string;
         id: number;
     }>;
-    check_token(token: string): boolean;
+    check_token(body: any): Promise<boolean>;
     get42redirect(request: any, res: any): Promise<void>;
+    SendMail(uid: number): Promise<void>;
+    check2fa(uid: number): Promise<boolean>;
+    geturl(): {
+        url: string;
+    };
     getRooms(): Promise<({
         users: {
             id: number;
             email: string;
             login: string;
+            login42: string;
             hash: string;
+            access_token: string;
             is2faenabled: boolean;
             is2favalidated: boolean;
             twofacode: string;
@@ -32,6 +41,8 @@ export declare class AuthController {
             userStatus: string;
             gameHistory: number[];
             friendList: number[];
+            FriendRequestsEmitted: number[];
+            FriendRequestsReceived: number[];
         }[];
     } & {
         id: number;
@@ -44,7 +55,9 @@ export declare class AuthController {
         id: number;
         email: string;
         login: string;
+        login42: string;
         hash: string;
+        access_token: string;
         is2faenabled: boolean;
         is2favalidated: boolean;
         twofacode: string;
@@ -53,6 +66,8 @@ export declare class AuthController {
         userStatus: string;
         gameHistory: number[];
         friendList: number[];
+        FriendRequestsEmitted: number[];
+        FriendRequestsReceived: number[];
     }[]>;
     getConnectedUsers(): Promise<{
         id: number;

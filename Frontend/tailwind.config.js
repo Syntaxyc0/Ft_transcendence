@@ -4,7 +4,18 @@ module.exports = {
   theme: {
     extend: {
 		fontFamily:{
-			'fett': 'Monofett'
+			'fett': 'Monofett',
+			'marker': 'Permanent Marker',
+			'banger': 'Bangers',
+			'henny': 'Henny Penny',
+			'courgette': 'Courgette',
+			'audiowide': 'Audiowide',
+			'cabin': 'Cabin Sketch',
+			'gloria': 'Gloria Hallelujah',
+			'kaushan': 'Kaushan Script',
+			'nanum': 'Nanum Pen Script',
+			'start': 'Press Start',
+
 		},
 	},
   },

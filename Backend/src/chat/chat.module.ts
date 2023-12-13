@@ -7,10 +7,11 @@ import { AuthService } from 'src/auth/auth.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { HttpModule } from '@nestjs/axios';
 import { ConnectedUserService } from './service/connectedUser.service';
+import { MailService } from 'src/mail/mail.service';
 
 @Module({
 	imports: [ AuthModule, UserModule, JwtModule, HttpModule],
-	providers: [ChatGateway, RoomService, AuthService, ConnectedUserService]
+	providers: [ChatGateway, RoomService, AuthService, ConnectedUserService, MailService]
 })
 export class ChatModule {
 }

@@ -6,13 +6,24 @@ import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http'
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HttpClientModule],
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.scss']
 })
 export class LandingPageComponent {
 
-	constructor() {}
+	constructor(public http: HttpClient) {}
 	code: any
-	redirect_url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-980ee85e91e9700305eaf59b63ff7126254885dc1dc8b9321ac3d99cec810bd5&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fredirect&response_type=code"
+	redirect_url : string = ""
+	ngOnInit()
+	{
+		this.http.get('http://localhost:3333/auth/geturl').subscribe(
+			res => {
+				this.redirect_url = res['url']
+			},
+			err => {
+				console.log(err)
+			}
+		)
+	}
 }

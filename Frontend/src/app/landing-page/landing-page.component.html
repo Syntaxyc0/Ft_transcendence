@@ -1,25 +1,27 @@
 
-<div class="bg-gradient-to-r from-blue-700 to-blue-500 mx-auto py-20">
-	<div class="items-center justify-center text-[150px]  font-fett flex tracking-wide text-gray-800 ">
-		WELCOME
-	</div>
-	<div class="flex items-center h-screen justify-between ">
+<div class="bg-gradient-to-r from-blue-700 to-blue-500 mx-auto py-20 h-screen">
+    <div class="text-9xl font-marker text-center text-gray-800 mb-64">
+        WELCOME
+    </div>
 
-		<a href="/signup/" >
-			<div class=" items-center justify-center ms-8 box-border w-44 h-44 bg-blue-00 py-5 px-4 flex space-y-2 cursor-pointer rounded-md hover:bg-[#2555C2] shadow  font-serif" >
-				<a class="px-4 text-[26px]">Sign up</a>
-			</div>
-		</a>
-		<a href="/signin/" >
-			<div class="items-center justify-center box-border w-44 h-44 bg-blue-600 py-5 px-4 flex space-y-2 cursor-pointer rounded-md hover:bg-[#2555C2] shadow  font-serif" >
-				<a class="text-[26px]">Sign in</a>
-			</div>
-		</a>
-		<a href={{redirect_url}}>
-			<div class=" items-center justify-center me-8 box-border w-44 h-44 bg-blue- py-5 px-4 flex space-y-2 cursor-pointer rounded-md hover:bg-[#2555C2] shadow  font-serif" >
-				<a class=" text-[26px] ">Log in with 42</a>
-			</div>
-		</a> >
-	</div>
+    <div class="flex items-center justify-center space-x-8">
+        <a href="/signup/">
+            <div class="w-64 h-64 bg-blue-500 p-8 flex flex-col items-center justify-center cursor-pointer rounded-md hover:bg-[#2555C2] shadow font-serif transition duration-300">
+                <span class="font-marker text-3xl text-gray-300">Sign up</span>
+            </div>
+        </a>
 
+        <a href="/signin/">
+            <div class="w-64 h-64 bg-blue-600 p-8 flex flex-col items-center justify-center cursor-pointer rounded-md hover:bg-[#2555C2] shadow font-serif transition duration-300">
+                <span class="font-marker text-3xl text-gray-300">Sign in</span>
+            </div>
+        </a>
+
+        <a [href]="redirect_url">
+            <div class="w-64 h-64 bg-blue-700 p-8 flex flex-col items-center justify-center cursor-pointer rounded-md hover:bg-[#2555C2] shadow font-serif transition duration-300">
+                <span class="font-marker text-3xl text-gray-300">Log in with</span>
+				<span class="font-marker text-3xl text-gray-300">42</span>
+            </div>
+        </a>
+    </div>
 </div>

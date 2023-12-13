@@ -12,7 +12,9 @@ export declare class JwtStrategy extends JwtStrategy_base {
         id: number;
         email: string;
         login: string;
+        login42: string;
         hash: string;
+        access_token: string;
         is2faenabled: boolean;
         is2favalidated: boolean;
         twofacode: string;
@@ -21,6 +23,8 @@ export declare class JwtStrategy extends JwtStrategy_base {
         userStatus: string;
         gameHistory: number[];
         friendList: number[];
+        FriendRequestsEmitted: number[];
+        FriendRequestsReceived: number[];
     }>;
 }
 export {};
