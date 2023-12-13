@@ -40,7 +40,7 @@ export class SelectUsersComponent implements OnInit{
 	searchLogin = new FormControl();
 	filteredUsers: UserI[] = [];
 	selectedUser: UserI | null = null;
-	currentUser$: Observable<UserI> = this.socketService.user;
+	currentUser$: Observable<UserI> = this.socketService.getCurrentUser();
 	
 	constructor( private userService: UserService, private socketService: SocketService ) {}
 

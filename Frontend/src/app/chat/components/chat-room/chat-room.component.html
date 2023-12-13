@@ -22,7 +22,7 @@
 	<!-- Messages -->
 	<div #messages class="message">
 	  <span *ngFor="let message of messages$ | async ">
-		<app-chat-message [message]="message"></app-chat-message>
+		<app-chat-message [user]="current_user" [message]="message"></app-chat-message>
 	  </span>
 	</div>
   

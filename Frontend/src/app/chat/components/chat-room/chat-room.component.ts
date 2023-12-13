@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { ChatMessageComponent } from '../chat-message/chat-message.component';
+import { UserI } from '../../model/user.interface';
 
 @Component({
   selector: 'app-chat-room',
@@ -25,9 +26,8 @@ import { ChatMessageComponent } from '../chat-message/chat-message.component';
 export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
 
   @Input() chatRoom: RoomI;
+  @Input() current_user: Observable<UserI>;
   @ViewChild('messages') private messagesScroller: ElementRef;
-
-//   messages$: Observable<MessageI[]> = this.chatService.getMessage();
 
 
   messages$: Observable<MessageI[]> = combineLatest([

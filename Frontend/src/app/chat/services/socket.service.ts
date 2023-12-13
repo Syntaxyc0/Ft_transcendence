@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { CustomSocket } from "../sockets/custom-socket";
 import { Observable } from "rxjs";
 import { User } from "src/app/helpers/types";
@@ -7,18 +7,16 @@ import { UserI } from "../model/user.interface";
 @Injectable({
 	providedIn: 'root'
   })
-  export class SocketService implements OnInit{
+  export class SocketService {
 
 	constructor(private socket: CustomSocket) { }
 
-	user: Observable<UserI> = this.socket.fromEvent('currentUser');
-
-	ngOnInit(): void {
-		this.emitGetCurrentUser();
-	}
-
 	emitGetCurrentUser() {
 		this.socket.emit('getCurrentUser');
+	}
+
+	getCurrentUser(): Observable<UserI> {
+		return this.socket.fromEvent('currentUser');
 	}
 
 	// getCurrentUserByJwt() {
