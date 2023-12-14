@@ -20,6 +20,7 @@ export declare class UserService {
         elo: number;
         userStatus: string;
         gameHistory: number[];
+        gamesWon: number;
         friendList: number[];
         FriendRequestsEmitted: number[];
         FriendRequestsReceived: number[];

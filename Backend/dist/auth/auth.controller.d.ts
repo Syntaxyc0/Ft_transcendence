@@ -55,6 +55,7 @@ export declare class AuthController {
         elo: number;
         userStatus: string;
         gameHistory: number[];
+        gamesWon: number;
         friendList: number[];
         FriendRequestsEmitted: number[];
         FriendRequestsReceived: number[];

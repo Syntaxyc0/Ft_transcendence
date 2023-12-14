@@ -22,6 +22,7 @@ export declare class JwtStrategy extends JwtStrategy_base {
         elo: number;
         userStatus: string;
         gameHistory: number[];
+        gamesWon: number;
         friendList: number[];
         FriendRequestsEmitted: number[];
         FriendRequestsReceived: number[];

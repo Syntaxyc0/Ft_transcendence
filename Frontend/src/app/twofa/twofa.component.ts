@@ -35,6 +35,7 @@ validate()
 {
 	this.http.post('http://localhost:3333/users/' + this.id + '/verify2facode', {code: this.code.value} ).subscribe(
 		res => {
+				localStorage.setItem('is_authenticated', 'true');
 				this.router.navigate(['/home'])
 		},
 		err => {

@@ -2,3 +2,5 @@ node_modules
 assets
 dist
 .env
+
+prisma/migrations

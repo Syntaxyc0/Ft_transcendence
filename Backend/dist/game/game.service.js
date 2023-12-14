@@ -58,7 +58,16 @@ let GameService = class GameService {
                 }
             }
         });
-        console.log(game);
+        await this.prisma.user.update({
+            where: {
+                id: gameinfo.winnerId
+            },
+            data: {
+                gamesWon: {
+                    increment: 1
+                }
+            }
+        });
     }
     async getGameHistory(uid) {
         const user = await this.prisma.user.findUnique({
