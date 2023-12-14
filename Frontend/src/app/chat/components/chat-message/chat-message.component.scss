@@ -7,10 +7,14 @@ p {
 	margin: 7px;
   }
 
-.ownContainer {
+  .ownContainer {
 	justify-content: flex-end;
   }
   
   .ownMessage {
 	background-color: lightblue;
+	border-radius: 8px;
+	margin: 7px;
+	padding: 10px;
   }
+  
