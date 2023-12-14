@@ -13,11 +13,18 @@ export class Room{
     id: number;
 
     ball: Ball
+    paddleLeft: Paddle
+    paddleRight: Paddle
+
+    isGameRunning: boolean
 
     constructor(roomId: number, playerOne: Player, playerTwo: Player){
 
         this.multiplayer = new MultiplayerService(this)
         this.ball = new Ball
+
+        this.paddleLeft = new Paddle(0)
+        this.paddleRight = new Paddle(1)
 
         this.id = roomId
         this.players.push(playerOne)

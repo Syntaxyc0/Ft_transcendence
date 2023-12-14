@@ -57,7 +57,7 @@ export class GameGateway implements OnModuleInit{
   @SubscribeMessage('disconnectingClient')
   warnOther(@ConnectedSocket() client: Socket)
   {
-    
+    this.disconnectClient(client.id)
   }
 
   @SubscribeMessage('gameRequest')
@@ -90,15 +90,6 @@ export class GameGateway implements OnModuleInit{
     for (const [socketId, player] of this.connectedPlayers) {
       if (player.socket.id != client.id && player.lookingForPlayer)
       {
-        client.emit('newPlayer', {
-          order: "newPlayer",
-          first: true,
-        });
-        player.socket.emit('newPlayer', {
-          order: "newPlayer",
-          first: false,
-        });
-
         this.rooms.push(new Room(this.rooms.length ,this.connectedPlayers.get(client.id), player))
         return;
       }

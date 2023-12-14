@@ -16,7 +16,7 @@ export class Paddle{
 
 	score: number = 0;
 
-	constructor(public currentUser: boolean, public context: CanvasRenderingContext2D, public gameBoard: GameBoardComponent)
+	constructor( public context: CanvasRenderingContext2D, public gameBoard: GameBoardComponent)
 	{
 		// if (!currentUser)
 		// 	this.x = WIDTH - this.width;
@@ -42,8 +42,7 @@ export class Paddle{
 
 	draw(){
 		this.context.fillStyle = 'red';
-		if(!this.currentUser)
-			this.context.fillRect(this.x, this.y - this.height/2, this.width, this.height);
+		this.context.fillRect(this.x, this.y - this.height/2, this.width, this.height);
 		this.context.fillRect(this.x, this.y - this.height/2, this.width, this.height);
 	}
 

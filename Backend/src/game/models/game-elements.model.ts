@@ -11,15 +11,14 @@ export class Paddle{
 
 	x: number = 0;
 	y!: number;
-	side: number
 	targetY: number;
 
 	score: number = 0;
 
-    constructor(public currentUser: boolean, public context: CanvasRenderingContext2D)
+    constructor(public side: number)
 	{
         this.reset()
-        if (!currentUser)
+        if (!side)
 			this.x = WIDTH - this.width;
 		else
 			this.x = 0;

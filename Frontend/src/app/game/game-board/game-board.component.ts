@@ -28,6 +28,9 @@ export const HEIGHT = 640
 	data: Observable<any>;
 	
 	ball: Ball;
+
+	userPaddle: Paddle;
+
 	paddleLeft: Paddle;
 	paddleRight: Paddle;
 
@@ -35,8 +38,8 @@ export const HEIGHT = 640
 
 	ngOnInit(): void {
 		this.context = this.gameCanvas.nativeElement.getContext('2d');
-		this.paddleLeft = new Paddle(true, this.context, this);
-		this.paddleRight = new Paddle(false, this.context, this);
+		this.paddleLeft = new Paddle(this.context, this);
+		this.paddleRight = new Paddle(this.context, this);
 		this.ball = new Ball(this.context, this);
 		this.data = this.player.getData();
 		this.data.subscribe((payload: any) =>{
@@ -72,6 +75,19 @@ export const HEIGHT = 640
 		this.player.sendRequest("multiplayerRequest")
 	}
 
+	drawBoard()
+	{
+		this.context.fillStyle = 'black';
+		this.context.clearRect(0, 0, WIDTH, HEIGHT);
+		this.context?.fillRect(0, 0, WIDTH, HEIGHT);
+	}
+
+	disconnect()
+	{
+		this.player.sendRequest("disconnectingClient")
+		this.drawBoard()
+	}
+
 	handleOrder(order:string, payload:any)
 	{
 		switch(order){
@@ -79,12 +95,30 @@ export const HEIGHT = 640
 				this.ball.x = payload.x
 				this.ball.y = payload.y
 				this.ball.angle = payload.angle
-				this.draw()
 			break;
 			case "paddlePosition":
+				if(!payload.side)
+					this.newPaddlePosition(this.paddleLeft, payload.x, payload.y)
+				else
+					this.newPaddlePosition(this.paddleRight, payload.x, payload.y)
+			break;
+			case "usersPaddle":
+				if (!payload.side)
+					this.userPaddle = this.paddleLeft
+				else
+					this.userPaddle = this.paddleRight
+			break;
+			case "setGameBoard":
+				this.draw()
 			break;
 
 		}
+	}
+
+	newPaddlePosition(paddle: Paddle, x: number, y: number)
+	{
+		paddle.x = x;
+		paddle.y = y;
 	}
 
   }

@@ -17,16 +17,21 @@ export class MultiplayerService{
         this.gameRequest({order: "ballPosition", x: ball.x, y: ball.y, angle: ball.angle})
     }
 
-    paddleData(paddle: Paddle)
+    setPaddle(paddle: Paddle)
     {
-        this.gameRequest({order: "paddlePosition", x: paddle.x, y: paddle.y})
+        this.gameRequest({order: "paddlePosition", side: paddle.side, x: paddle.x, y: paddle.y})
+        this.room.players[0].socket.emit('usersPaddle', {order: 'usersPaddle', side: 0})
+        this.room.players[1].socket.emit('usersPaddle', {order: 'usersPaddle', side: 1})
+
     }
 
 
     gameBoardInit()
     {
-        this.gameRequest({order: "setGameBoard"})
         this.ballData(this.room.ball)
+        this.setPaddle(this.room.paddleLeft)
+        this.setPaddle(this.room.paddleRight)
+        this.gameRequest({order: "setGameBoard"})
     }
 
 }
