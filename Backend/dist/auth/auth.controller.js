@@ -71,7 +71,7 @@ let AuthController = class AuthController {
     async getRooms() {
         return await this.prismaService.room.findMany({
             include: {
-                users: true,
+                message: true,
             },
         });
     }
@@ -80,6 +80,9 @@ let AuthController = class AuthController {
     }
     async getConnectedUsers() {
         return await this.prismaService.connectedUser.findMany({});
+    }
+    async getJoinedRoom() {
+        return await this.prismaService.joinedRoom.findMany();
     }
 };
 exports.AuthController = AuthController;
@@ -151,6 +154,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getConnectedUsers", null);
+__decorate([
+    (0, common_1.Get)('joinedRoom'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "getJoinedRoom", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService, axios_1.HttpService, prisma_service_1.PrismaService, mail_service_1.MailService])

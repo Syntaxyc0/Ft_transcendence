@@ -26,23 +26,13 @@ export declare class AuthController {
         url: string;
     };
     getRooms(): Promise<({
-        users: {
+        message: {
             id: number;
-            email: string;
-            login: string;
-            login42: string;
-            hash: string;
-            access_token: string;
-            is2faenabled: boolean;
-            is2favalidated: boolean;
-            twofacode: string;
-            avatar: string;
-            elo: number;
-            userStatus: string;
-            gameHistory: number[];
-            friendList: number[];
-            FriendRequestsEmitted: number[];
-            FriendRequestsReceived: number[];
+            text: string;
+            userId: number;
+            roomId: number;
+            created_at: Date;
+            updated_at: Date;
         }[];
     } & {
         id: number;
@@ -73,5 +63,11 @@ export declare class AuthController {
         id: number;
         socketId: string;
         userId: number;
+    }[]>;
+    getJoinedRoom(): Promise<{
+        id: number;
+        socketId: string;
+        userId: number;
+        roomId: number;
     }[]>;
 }
