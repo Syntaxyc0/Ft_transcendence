@@ -16,10 +16,13 @@ exports.UserService = void 0;
 const prisma_service_1 = require("../prisma/prisma.service");
 const common_1 = require("@nestjs/common");
 const common_2 = require("@nestjs/common");
+const argon = require("argon2");
+const mail_service_1 = require("../mail/mail.service");
 var path = require('path');
 let UserService = class UserService {
-    constructor(prisma) {
+    constructor(prisma, mail) {
         this.prisma = prisma;
+        this.mail = mail;
     }
     async getUserFromId(id) {
         const user = await this.prisma.user.findUnique({
@@ -32,7 +35,7 @@ let UserService = class UserService {
         }
         return user;
     }
-    async getUserFromLogin(login) {
+    async getUserIdFromLogin(login) {
         const user = await this.prisma.user.findUnique({
             where: {
                 login: login
@@ -41,7 +44,7 @@ let UserService = class UserService {
         if (!user) {
             throw new common_2.NotFoundException("User not found");
         }
-        return user;
+        return user.id;
     }
     async updateUserStatus(id, status) {
         const user = await this.prisma.user.findUnique({
@@ -58,6 +61,32 @@ let UserService = class UserService {
             },
             where: {
                 id: id,
+            }
+        });
+    }
+    async ChangeNick(uid, name) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid,
+            }
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const checkname = await this.prisma.user.findUnique({
+            where: {
+                login: name,
+            }
+        });
+        if (checkname) {
+            throw new common_1.ConflictException(name + ' is already taken');
+        }
+        await this.prisma.user.update({
+            data: {
+                login: name
+            },
+            where: {
+                id: uid,
             }
         });
     }
@@ -82,6 +111,208 @@ let UserService = class UserService {
             throw new common_2.NotFoundException('User not found');
         }
         return user.friendList;
+    }
+    async GetUserFriendRequestsReceived(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        return user.FriendRequestsReceived;
+    }
+    async GetUserFriendRequestsSent(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        return user.FriendRequestsEmitted;
+    }
+    async CancelRequest(uid, name) {
+        const friend = await this.prisma.user.findUnique({
+            where: {
+                login: name
+            },
+        });
+        if (!friend) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const friendrequestsemitted = user.FriendRequestsEmitted;
+        const friendrequestsreceived = friend.FriendRequestsReceived;
+        const newfriendrequestsreceived = [];
+        for (const i of friendrequestsreceived) {
+            if (i != uid)
+                newfriendrequestsreceived.push(i);
+        }
+        const newfriendrequestsemitted = [];
+        for (const j of friendrequestsemitted) {
+            if (j != friend.id)
+                newfriendrequestsemitted.push(j);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                FriendRequestsEmitted: newfriendrequestsemitted
+            }
+        });
+        await this.prisma.user.update({
+            where: {
+                login: name,
+            },
+            data: {
+                FriendRequestsReceived: newfriendrequestsreceived
+            }
+        });
+    }
+    async RefuseRequest(uid, id) {
+        const friend = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (!friend) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        const friendemitted = friend.FriendRequestsEmitted;
+        const newfriendemitted = [];
+        for (const i of friendemitted) {
+            if (i != uid)
+                newfriendemitted.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                FriendRequestsEmitted: newfriendemitted
+            }
+        });
+        const userreceived = user.FriendRequestsReceived;
+        const newuserreceived = [];
+        for (const i of userreceived) {
+            if (i != id)
+                newuserreceived.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                FriendRequestsReceived: newuserreceived
+            }
+        });
+    }
+    async AcceptRequest(uid, id) {
+        const friend = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (!friend) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        await this.prisma.user.update({
+            data: {
+                friendList: {
+                    push: uid
+                }
+            },
+            where: {
+                id: id,
+            }
+        });
+        await this.prisma.user.update({
+            data: {
+                friendList: {
+                    push: id
+                }
+            },
+            where: {
+                id: uid,
+            }
+        });
+        const friendemitted = friend.FriendRequestsEmitted;
+        const newfriendemitted = [];
+        for (const i of friendemitted) {
+            if (i != uid)
+                newfriendemitted.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                FriendRequestsEmitted: newfriendemitted
+            }
+        });
+        const friendreceived = friend.FriendRequestsReceived;
+        const newfriendreceived = [];
+        for (const i of friendreceived) {
+            if (i != uid)
+                newfriendreceived.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                FriendRequestsReceived: newfriendreceived
+            }
+        });
+        const useremitted = user.FriendRequestsEmitted;
+        const newuseremitted = [];
+        for (const i of useremitted) {
+            if (i != id)
+                newuseremitted.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                FriendRequestsEmitted: newuseremitted
+            }
+        });
+        const userreceived = user.FriendRequestsReceived;
+        const newuserreceived = [];
+        for (const i of userreceived) {
+            if (i != id)
+                newuserreceived.push(i);
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                FriendRequestsReceived: newuserreceived
+            }
+        });
     }
     async AddFriend(uid, userName) {
         const friend = await this.prisma.user.findUnique({
@@ -110,9 +341,16 @@ let UserService = class UserService {
                     throw new common_1.ConflictException(friend.login + " is already a friend");
             }
         }
+        const friendrequests = user.FriendRequestsEmitted;
+        for (const i of friendrequests) {
+            {
+                if (i == friend.id)
+                    throw new common_1.ConflictException(friend.login + " has already been added");
+            }
+        }
         await this.prisma.user.update({
             data: {
-                friendList: {
+                FriendRequestsEmitted: {
                     push: friend.id
                 }
             },
@@ -120,9 +358,20 @@ let UserService = class UserService {
                 id: uid,
             }
         });
+        await this.prisma.user.update({
+            data: {
+                FriendRequestsReceived: {
+                    push: user.id
+                }
+            },
+            where: {
+                id: friend.id,
+            }
+        });
     }
     async RemoveFriend(uid, userId) {
         const newfriendlist = [];
+        const newfriendlist2 = [];
         const friend = await this.prisma.user.findUnique({
             where: {
                 id: userId
@@ -144,6 +393,11 @@ let UserService = class UserService {
             if (i != userId)
                 newfriendlist.push(i);
         }
+        const friendlist2 = friend.friendList;
+        for (const i of friendlist2) {
+            if (i != uid)
+                newfriendlist2.push(i);
+        }
         await this.prisma.user.update({
             where: {
                 id: uid,
@@ -152,16 +406,18 @@ let UserService = class UserService {
                 friendList: newfriendlist
             }
         });
+        await this.prisma.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                friendList: newfriendlist2
+            }
+        });
     }
     async uploadFile(uid, file) {
-        console.log(file);
-        if (file.size > 1000000) {
-            console.log("file is too big");
-            console.log(file.size);
-            return;
-        }
-        else if (!this.validate_extension(path.extname(file.filename))) {
-            console.log('Wrong file extension');
+        if (!file) {
+            console.log("unrecognized file");
             return;
         }
         const user = await this.prisma.user.findUnique({
@@ -177,7 +433,7 @@ let UserService = class UserService {
                 id: uid,
             },
             data: {
-                avatar: file['originalname']
+                avatar: file['filename']
             }
         });
     }
@@ -257,7 +513,14 @@ let UserService = class UserService {
         if (!user) {
             throw new common_2.NotFoundException('User not found');
         }
-        user.is2favalidated = true;
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                is2favalidated: true
+            }
+        });
     }
     async switch2fa(uid, activate) {
         const user = await this.prisma.user.findUnique({
@@ -268,7 +531,80 @@ let UserService = class UserService {
         if (!user) {
             throw new common_2.NotFoundException('User not found');
         }
-        user.is2faenabled = activate['activated'];
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                is2faenabled: activate['activated']
+            }
+        });
+    }
+    async verify2facode(uid, code) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        const CodeMatches = await argon.verify(user.twofacode, code);
+        if (!CodeMatches)
+            throw new common_1.ForbiddenException("Wrong code");
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                is2favalidated: true
+            }
+        });
+        return true;
+    }
+    async get2facode(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        if (user.twofacode) {
+            return user.twofacode;
+        }
+    }
+    generateRandom6digitCode() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+    async logout(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        if (user.is2faenabled) {
+            await this.prisma.user.update({
+                where: {
+                    id: uid,
+                },
+                data: {
+                    is2favalidated: false
+                }
+            });
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                userStatus: 'OFFLINE'
+            }
+        });
     }
     async findAllByLogin(login) {
         const users = await this.prisma.user.findMany({
@@ -293,6 +629,6 @@ __decorate([
 ], UserService.prototype, "updateUserStatus", null);
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, mail_service_1.MailService])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

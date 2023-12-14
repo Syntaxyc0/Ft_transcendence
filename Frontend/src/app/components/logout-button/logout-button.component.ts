@@ -19,8 +19,6 @@ export class LogoutButtonComponent {
 	logout()
 	{
 		this.id = localStorage.getItem('id')
-		this.http.patch<any>('http://localhost:3333/users/' + this.id + '/status', {status: "OFFLINE"}).subscribe()
-		console.log("test")
 		localStorage.clear()
 		this.router.navigate(['/landing'])
 		this.customSocket.disconnect();

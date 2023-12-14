@@ -17,15 +17,17 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const dto_1 = require("./dto");
 const axios_1 = require("@nestjs/axios");
+const mail_service_1 = require("../mail/mail.service");
 const node_fetch_1 = require("node-fetch");
 const prisma_service_1 = require("../prisma/prisma.service");
 var crypto = require("crypto");
 const FormData = require("form-data");
 let AuthController = class AuthController {
-    constructor(authService, http, prismaService) {
+    constructor(authService, http, prismaService, mailService) {
         this.authService = authService;
         this.http = http;
         this.prismaService = prismaService;
+        this.mailService = mailService;
     }
     signup(dto) {
         return this.authService.signup(dto);
@@ -33,8 +35,8 @@ let AuthController = class AuthController {
     signin(dto) {
         return this.authService.signin(dto);
     }
-    check_token(token) {
-        return this.authService.check_token(token);
+    check_token(body) {
+        return this.authService.check_token(body['token'], body['id']);
     }
     async get42redirect(request, res) {
         const formData = new FormData();
@@ -56,6 +58,15 @@ let AuthController = class AuthController {
         const token = this.authService.create42user(data['login'], data['email']);
         res.status(common_1.HttpStatus.OK).send((await token));
         return;
+    }
+    SendMail(uid) {
+        return this.authService.SendMail(uid);
+    }
+    check2fa(uid) {
+        return this.authService.check2fa(uid);
+    }
+    geturl() {
+        return this.authService.geturl();
     }
     async getRooms() {
         return await this.prismaService.room.findMany({
@@ -94,7 +105,7 @@ __decorate([
     (0, common_1.Post)('check'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "check_token", null);
 __decorate([
@@ -105,6 +116,26 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "get42redirect", null);
+__decorate([
+    (0, common_1.Get)(':uid/SendMail'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "SendMail", null);
+__decorate([
+    (0, common_1.Get)(':uid/check2fa'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "check2fa", null);
+__decorate([
+    (0, common_1.Get)('/geturl'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "geturl", null);
 __decorate([
     (0, common_1.Get)('rooms'),
     __metadata("design:type", Function),
@@ -131,6 +162,6 @@ __decorate([
 ], AuthController.prototype, "getJoinedRoom", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService, axios_1.HttpService, prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService, axios_1.HttpService, prisma_service_1.PrismaService, mail_service_1.MailService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map
