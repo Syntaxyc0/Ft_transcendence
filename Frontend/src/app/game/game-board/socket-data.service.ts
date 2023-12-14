@@ -30,4 +30,9 @@ export class SocketDataService{
     });
     return dataObservable;
   }
+
+  sendRequest(order: string)
+  {
+    this.socket.emit(order)
+  }
 }

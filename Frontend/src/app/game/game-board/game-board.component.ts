@@ -35,6 +35,9 @@ export const HEIGHT = 640
 
 	ngOnInit(): void {
 		this.context = this.gameCanvas.nativeElement.getContext('2d');
+		this.paddleLeft = new Paddle(true, this.context, this);
+		this.paddleRight = new Paddle(false, this.context, this);
+		this.ball = new Ball(this.context, this);
 		this.data = this.player.getData();
 		this.data.subscribe((payload: any) =>{
 			if (!payload.order)
@@ -48,6 +51,8 @@ export const HEIGHT = 640
 
 	gameLoop()
 	{
+		if (!this.isGameRunning)
+			return
 		this.draw();
 		requestAnimationFrame(this.gameLoop);
 	}
@@ -62,10 +67,22 @@ export const HEIGHT = 640
 		this.paddleRight.draw();
 	}
 
+	multiplayerRequest()
+	{
+		this.player.sendRequest("multiplayerRequest")
+	}
+
 	handleOrder(order:string, payload:any)
 	{
 		switch(order){
-			
+			case "ballPosition":
+				this.ball.x = payload.x
+				this.ball.y = payload.y
+				this.ball.angle = payload.angle
+				this.draw()
+			break;
+			case "paddlePosition":
+			break;
 
 		}
 	}

@@ -11,6 +11,7 @@ export class Paddle{
 
 	x: number = 0;
 	y!: number;
+	side: number
 	targetY: number;
 
 	score: number = 0;

@@ -39,8 +39,18 @@ export class GameGateway implements OnModuleInit{
   //   client.emit("onGameRequest",{order: "initPlayer", username: client.data.user.login})
   // }
 
+  disconnectRoom(clientId: string){
+    const targetRoom = this.connectedPlayers.get(clientId).room;
+    if (targetRoom)
+    {
+      console.log("Destroying Room " + targetRoom.id)
+      targetRoom.destroyRoom()
+      this.rooms.splice(targetRoom.id, 1);
+    }
+  }
+
   disconnectClient(clientId: string) {
-    this.rooms.splice(this.connectedPlayers.get(clientId).room.roomId, 1);
+    this.disconnectRoom(clientId)
     this.connectedPlayers.delete(clientId)
 }
 
@@ -76,8 +86,9 @@ export class GameGateway implements OnModuleInit{
 
   @SubscribeMessage('multiplayerRequest')
   searchMultiplayer(@ConnectedSocket() client: Socket) {
+    console.log(client.data.login + " is looking for another player.")
     for (const [socketId, player] of this.connectedPlayers) {
-      if (player.socket.id != client.id)
+      if (player.socket.id != client.id && player.lookingForPlayer)
       {
         client.emit('newPlayer', {
           order: "newPlayer",
@@ -92,7 +103,6 @@ export class GameGateway implements OnModuleInit{
         return;
       }
     }
-    // this.lookingForPlayerSockets.set(client.id, client);
     this.connectedPlayers.get(client.id).lookingForPlayer = true
   }
 }
