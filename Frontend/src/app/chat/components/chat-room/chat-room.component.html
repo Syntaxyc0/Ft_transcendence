@@ -14,7 +14,7 @@
 		</span>
 	  </span>
 	  <span>
-		<h3 style="color: grey">{{chatRoom.description}}</h3>
+		<h3 style="color: rgb(230, 213, 213)">{{chatRoom.description}}</h3>
 		<span *ngFor="let user of chatRoom.users">{{user.login}}, </span>
 	  </span>
 	</div>
@@ -33,7 +33,7 @@
 	  </mat-form-field>
 	  <button mat-button [disabled]="!chatMessage.valid" (click)="sendMessage()">
 		<span style="display: flex; flex-direction: row; align-items: center;">
-		  <mat-icon style="margin-left: 15px;">send</mat-icon>
+		  <mat-icon style="margin-left: 10px;">send</mat-icon>
 		  <p>Send</p>
 		</span>
 	  </button>

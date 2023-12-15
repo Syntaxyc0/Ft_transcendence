@@ -1,6 +1,7 @@
 .container {
 	display: flex;
 	justify-content: center;
+	min-width: 600px;
   
 	mat-card {
 	  position: fixed;
@@ -9,7 +10,7 @@
   
 	  .rooms {
 		height: 400px;
-		width: 250;
+		width: 250px;
 		overflow-y: scroll;
 		scrollbar-color: lightgrey darkgrey;
 		scrollbar-width: thin;
@@ -19,6 +20,10 @@
 		width: 600px;
 	  }
 	}
+  }
+
+  mat-list-option[aria-selected="true"] {
+	background: rgba(193, 220, 220, 0.7);
   }
   
   ::-webkit-scrollbar-track {

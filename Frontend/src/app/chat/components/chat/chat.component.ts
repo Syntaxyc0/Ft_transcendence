@@ -34,7 +34,7 @@ export class ChatComponent implements OnInit{
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
 	userList :object[] = []
-	user: Observable<UserI>;
+	user: UserI;
 
 
 	constructor(private route:ActivatedRoute,
@@ -45,9 +45,14 @@ export class ChatComponent implements OnInit{
 		private socketService: SocketService) {}
 
 	ngOnInit() {
-		this.user = this.socketService.getCurrentUser();
+		this.socketService.emitGetCurrentUser();
+		this.socketService.getCurrentUser().pipe(take(1)).subscribe( value => {
+			this.user = value;
+		});
 		this.chatService.emitPaginateRooms(10, 0);
 	}
+
+	
 
 	onSelectRoom(event: MatSelectionListChange) {
 		this.selectedRoom = event.source.selectedOptions.selected[0].value;
