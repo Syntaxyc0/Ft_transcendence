@@ -20,9 +20,15 @@
 						
 						<mat-form-field>
 							<input type ="text" matInput placeholder="Descritpion" formControlName="description">
+						</mat-form-field>	
+						
+						<mat-checkbox [(ngModel)]="form.value.public" formControlName="public">Public</mat-checkbox>
+
+						<mat-form-field>
+							<input type ="text" matInput placeholder="Password" formControlName="password" [attr.disabled]="form.get('public')?.value ? true : null">
 						</mat-form-field>
 
-						<app-select-users [users]="users.value || []" (addUser)="addUser(initUser($event))" (removeuser)="removeUser($event.id)"></app-select-users>
+						<app-select-users [public]= "form.get('public')?.value" [users]="users.value || []" (addUser)="addUser(initUser($event))" (removeuser)="removeUser($event.id)"></app-select-users>
 						
 						<mat-hint *ngIf="!form.valid"><small>Please fill out needed information</small></mat-hint>
 

@@ -34,6 +34,7 @@ import { User } from 'src/app/helpers/types';
 export class SelectUsersComponent implements OnInit{
 
 	@Input() users: UserI[] | null = null;
+	@Input() public: boolean;
 	@Output() addUser: EventEmitter<UserI> = new EventEmitter<UserI>();
 	@Output() removeuser: EventEmitter<UserI> = new EventEmitter<UserI>();
 

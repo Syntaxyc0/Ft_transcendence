@@ -54,14 +54,18 @@ model GameInfo {
 }
 
 model Room {
-  id          Int          @id @default(autoincrement())
-  name        String
-  description String?
-  created_at  DateTime     @default(now())
-  updated_at  DateTime     @updatedAt
-  users       User[]       @relation("UserRooms")
-  joinedRoom  JoinedRoom[]
-  message     Message[]
+  id			Int          @id @default(autoincrement())
+  name			String
+  description	String?
+  created_at	DateTime     @default(now())
+  updated_at	DateTime     @updatedAt
+  users			User[]       @relation("UserRooms")
+  joinedRoom	JoinedRoom[]
+  message		Message[]
+  creator		User
+  admin			admin[]
+  Public		Boolean
+  password		String?
 }
 
 model ConnectedUser {

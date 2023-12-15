@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormGroup, FormControl, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { UserI } from 'src/app/chat/model/user.interface';
 import { ChatService } from '../../services/chat.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,21 +7,21 @@ import { CommonModule } from '@angular/common';
 import { SelectUsersComponent } from 'src/app/chat/components/select-users/select-users.component'
 
 import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox'; 
 
 import { RouterModule } from '@angular/router';
 import { SocketService } from '../../services/socket.service';
 import { Observable, take } from 'rxjs';
-import { User } from 'src/app/helpers/types';
 import { CustomSocket } from '../../sockets/custom-socket';
 
 
 @Component({
   selector: 'app-create-room',
   standalone: true,
-  imports: [ ReactiveFormsModule, CommonModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatCardModule, RouterModule, SelectUsersComponent ],
+  imports: [ ReactiveFormsModule, FormsModule, CommonModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatCardModule, MatCheckboxModule, RouterModule, SelectUsersComponent ],
   templateUrl: './create-room.component.html',
   styleUrls: ['./create-room.component.scss']
 })
@@ -30,7 +30,9 @@ export class CreateRoomComponent {
 	form: FormGroup = new FormGroup({
 		name: new FormControl(null, [Validators.required]),
 		description: new FormControl(null),
-		users: new FormArray([],[Validators.required])
+		users: new FormArray([],[Validators.required]),
+		public: new FormControl(false),
+		password: new FormControl(null),
 	});
 	currentUser$: Observable<UserI> = this.socketService.getCurrentUser();
 	
@@ -74,6 +76,10 @@ export class CreateRoomComponent {
 
 	get users(): FormControl {
 		return this.form.get('users') as FormControl;
+	}
+
+	get public(): FormControl {
+		return this.form.get('public') as FormControl;
 	}
 
 	goToDashboard() {
