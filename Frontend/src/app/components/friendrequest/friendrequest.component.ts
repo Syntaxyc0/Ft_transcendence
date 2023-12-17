@@ -61,15 +61,15 @@ export class FriendrequestComponent {
 			);
 		}
 		
-		deny()
-		{
-			this.http.patch("http://localhost:3333/users/" + localStorage.getItem('id') + "/RefuseRequest", {id: this.Id}).subscribe(
-				res => {
-					window.location.reload()
-				},
-				err => {
-					alert(err.error.message);
-				}
-				);
-		}
+	deny()
+	{
+		this.http.patch("http://localhost:3333/users/" + localStorage.getItem('id') + "/RefuseRequest", {id: this.Id}).subscribe(
+			res => {
+				window.location.reload()
+			},
+			err => {
+				alert(err.error.message);
+			}
+			);
 	}
+}

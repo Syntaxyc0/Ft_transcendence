@@ -108,6 +108,14 @@ let AuthService = class AuthService {
                     login: true,
                 }
             });
+            await this.prisma.user.update({
+                where: {
+                    id: user.id,
+                },
+                data: {
+                    api_used: 1
+                }
+            });
             return { token: await this.signToken(user.id, user.login), isalreadyregistered: false };
         }
         catch (error) {

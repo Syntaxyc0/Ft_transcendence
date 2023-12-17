@@ -24,6 +24,16 @@ export declare class UserService {
         friendList: number[];
         FriendRequestsEmitted: number[];
         FriendRequestsReceived: number[];
+        api_used: number;
+        twofa_used: number;
+        quit_count: number;
+        friends_added: number;
+        friends_removed: number;
+        name_changed: number;
+        picture_changed: number;
+        profiles_searched: number;
+        cancelled_count: number;
+        refused_count: number;
     }>;
     getUserIdFromLogin(login: string): Promise<number>;
     updateUserStatus(id: number, status: any): Promise<void>;
@@ -50,6 +60,7 @@ export declare class UserService {
     get2facode(uid: any): Promise<string>;
     generateRandom6digitCode(): string;
     logout(uid: any): Promise<void>;
+    achievements(uid: number): Promise<any[]>;
     findAllByLogin(login: string): Promise<UserI[]>;
     allUser(): Promise<UserI[]>;
 }

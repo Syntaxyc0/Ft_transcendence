@@ -23,6 +23,16 @@ export declare class UserController {
         friendList: number[];
         FriendRequestsEmitted: number[];
         FriendRequestsReceived: number[];
+        api_used: number;
+        twofa_used: number;
+        quit_count: number;
+        friends_added: number;
+        friends_removed: number;
+        name_changed: number;
+        picture_changed: number;
+        profiles_searched: number;
+        cancelled_count: number;
+        refused_count: number;
     }>;
     updateUserStatus(uid: number, status: string): Promise<void>;
     GetUserStatus(uid: number): Promise<string>;
@@ -49,4 +59,5 @@ export declare class UserController {
     get2facode(uid: number): Promise<string>;
     getelo(uid: number): Promise<number>;
     logout(uid: number): Promise<void>;
+    achievements(uid: number): Promise<any[]>;
 }

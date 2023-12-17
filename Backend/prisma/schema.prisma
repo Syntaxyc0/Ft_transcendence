@@ -29,7 +29,19 @@ model User {
   rooms				Room[]	@relation("UserRooms")
   connectedUser		ConnectedUser[]
   joinedRoom     JoinedRoom[]
-  Message        Message[] 
+  Message        Message[]
+  
+  api_used                    	  Int     @default(0)
+  twofa_used                   	  Int    @default(0)
+  quit_count                      Int     @default(0)
+  friends_added                   Int     @default(0)
+  friends_removed                 Int     @default(0)
+  name_changed                    Int     @default(-1)
+  picture_changed                 Int     @default(0)
+  profiles_searched               Int     @default(0)
+  cancelled_count                 Int     @default(0)
+  refused_count                   Int     @default(0)
+
 }
 
 model GameInfo {

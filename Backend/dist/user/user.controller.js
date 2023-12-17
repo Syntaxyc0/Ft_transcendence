@@ -120,6 +120,9 @@ let UserController = class UserController {
     logout(uid) {
         return this.userService.logout(uid);
     }
+    achievements(uid) {
+        return this.userService.achievements(uid);
+    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -324,6 +327,13 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "logout", null);
+__decorate([
+    (0, common_1.Get)('/:uid/achievements'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "achievements", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])

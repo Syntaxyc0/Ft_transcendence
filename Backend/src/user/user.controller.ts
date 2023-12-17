@@ -202,6 +202,12 @@ export class UserController {
 		return this.userService.logout(uid)
 	}
 
+	@Get('/:uid/achievements')
+	achievements(@Param('uid', ParseIntPipe) uid:number)
+	{
+		return this.userService.achievements(uid)
+	}
+
 
 	
 }

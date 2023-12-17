@@ -26,6 +26,16 @@ export declare class JwtStrategy extends JwtStrategy_base {
         friendList: number[];
         FriendRequestsEmitted: number[];
         FriendRequestsReceived: number[];
+        api_used: number;
+        twofa_used: number;
+        quit_count: number;
+        friends_added: number;
+        friends_removed: number;
+        name_changed: number;
+        picture_changed: number;
+        profiles_searched: number;
+        cancelled_count: number;
+        refused_count: number;
     }>;
 }
 export {};
