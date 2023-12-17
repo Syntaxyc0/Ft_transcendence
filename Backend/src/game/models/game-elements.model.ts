@@ -1,4 +1,5 @@
 import { WIDTH, HEIGHT } from "../game.service";
+import { MultiplayerService } from "../services/multiplayer.service";
 
 export class Paddle{
     velocity!:number;
@@ -18,7 +19,7 @@ export class Paddle{
     constructor(public side: number)
 	{
         this.reset()
-        if (!side)
+        if (side)
 			this.x = WIDTH - this.width;
 		else
 			this.x = 0;
@@ -47,7 +48,9 @@ export class Ball{
     targetX: number;
     targetY: number;
 
-    constructor(){
+	
+
+    constructor(private multiplayer: MultiplayerService){
         this.reset()
     }
 	
@@ -61,5 +64,99 @@ export class Ball{
 			this.angle = Math.random() * 360;
 		this.targetX = this.x;
 		this.targetY = this.y;
+	}
+
+		calculateReflectionAngle(ballY: number, paddleHeight: number, minAngle: number, maxAngle: number){
+		const relativePosition = ballY / paddleHeight;
+		const newAngle = minAngle + (maxAngle - minAngle) * relativePosition;
+		return newAngle;
+	}
+
+	updateCollide(paddle: Paddle, y: number, x: number, playerColliding: number)
+	{
+		// console.log(this.x)
+		if (playerColliding == 1)
+			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, 225, 135);
+		else
+			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, -45, 45);
+		this.x = paddle.x + (-this.radius) * playerColliding + -playerColliding;
+		if (playerColliding == -1)
+			this.x += paddle.width;
+
+		// console.log(this.x)
+		// this.gameBoard.sendBall()
+		// console.log("allo3")
+		this.multiplayer.ballData(this)
+
+	}
+
+	xIsColliding(paddleRight: Paddle, paddleLeft: Paddle, x: number) : number
+	{
+		console.log("paddleLeft: " + paddleLeft.width + paddleLeft.x)
+		console.log("paddleRight: " + paddleRight.x)
+		console.log("x: " + x)
+
+		if(x - this.radius <= paddleLeft.width + paddleLeft.x)
+			return -1;
+		else if (x + this.radius >= paddleRight.x)
+			return 1;
+		return 0;
+	}
+
+	yIsColliding(paddle: Paddle, y: number): boolean
+	{
+		let paddleMin = paddle.y - (paddle.height / 2)
+		let paddleMax = paddle.y + (paddle.height / 2)
+
+		let ballMin = -this.radius + y
+		let ballMax = this.radius + y
+		if((ballMax < paddleMax && ballMax > paddleMin) || (ballMin < paddleMax && ballMin > paddleMin))
+			return true
+		return false
+	}
+
+	updatePosition(paddleLeft: Paddle, paddleRight: Paddle)
+	{
+		let hx: number = Math.cos((this.angle * Math.PI) / 180) * this.speed  + this.x;
+		let hy: number = Math.sin((this.angle * Math.PI) / 180) * this.speed  + this.y;
+
+		const bottom = this.radius;
+		const top = HEIGHT - this.radius;
+
+		const left = this.radius;
+		const right = WIDTH - this.radius;
+		console.log(hx + " " + hy)
+
+		let playerColliding = this.xIsColliding(paddleRight, paddleLeft, hx)
+		console.log(playerColliding)
+		if (playerColliding != 0){
+			if (playerColliding == 1 && this.yIsColliding(paddleRight, hy))
+				return this.updateCollide(paddleRight, hy, hx, playerColliding)
+			else if (this.yIsColliding(paddleLeft, hy) && playerColliding == -1)
+				return this.updateCollide(paddleLeft, hy, hx, playerColliding)
+		}
+		if (hx < right && hx > left && hy < top && hy > bottom)
+		{
+			this.x = hx;
+			this.y = hy;
+			return;
+		}
+		if (hx <= left || hx >= right)
+		{
+			if (hx <= left)
+				paddleRight.score++;
+			else
+				paddleLeft.score++;
+			this.reset();
+			this.multiplayer.ballData(this)
+		}
+		if (hy <= bottom || hy >= top)
+		{
+
+			this.angle = (-this.angle);
+			this.multiplayer.ballData(this)
+
+		}
+	
 	}
 }

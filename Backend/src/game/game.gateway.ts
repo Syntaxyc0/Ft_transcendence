@@ -27,7 +27,10 @@ export class GameGateway implements OnModuleInit{
 
       socket.on('disconnect', () => {
         console.log(socket.id + " has disconnected");
-        this.disconnectClient(socket.id);
+
+        this.disconnectRoom(socket.id);
+        this.connectedPlayers.delete(socket.id)
+
       });
     });
   }
@@ -40,6 +43,8 @@ export class GameGateway implements OnModuleInit{
   // }
 
   disconnectRoom(clientId: string){
+    if (!this.connectedPlayers.get(clientId))
+      return;
     const targetRoom = this.connectedPlayers.get(clientId).room;
     if (targetRoom)
     {
@@ -51,13 +56,12 @@ export class GameGateway implements OnModuleInit{
 
   disconnectClient(clientId: string) {
     this.disconnectRoom(clientId)
-    this.connectedPlayers.delete(clientId)
 }
 
   @SubscribeMessage('disconnectingClient')
   warnOther(@ConnectedSocket() client: Socket)
   {
-    this.disconnectClient(client.id)
+    this.disconnectRoom(client.id)
   }
 
   @SubscribeMessage('gameRequest')
@@ -76,12 +80,6 @@ export class GameGateway implements OnModuleInit{
   newPaddlePos(@MessageBody() body: {x: number, y: number}, @ConnectedSocket() client: Socket)
   {
    
-  }
-
-  @SubscribeMessage('newBallPos')
-  newBallPos(@MessageBody() body: {angle: number, x: number, y: number}, @ConnectedSocket() client: Socket)
-  {
-    
   }
 
   @SubscribeMessage('multiplayerRequest')

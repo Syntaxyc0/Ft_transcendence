@@ -16,19 +16,20 @@ export class Room{
     paddleLeft: Paddle
     paddleRight: Paddle
 
-    isGameRunning: boolean
+    isGameRunning: boolean = false
 
     constructor(roomId: number, playerOne: Player, playerTwo: Player){
 
         this.multiplayer = new MultiplayerService(this)
-        this.ball = new Ball
-
-        this.paddleLeft = new Paddle(0)
-        this.paddleRight = new Paddle(1)
 
         this.id = roomId
         this.players.push(playerOne)
         this.players.push(playerTwo)
+
+        this.ball = new Ball(this.multiplayer)
+
+        this.paddleLeft = new Paddle(0)
+        this.paddleRight = new Paddle(1)
 
         for (let i: number = 0; i < 2; i++)
         {
@@ -43,6 +44,8 @@ export class Room{
 
     destroyRoom()
     {
+        this.multiplayer.gameRequest({order: "stopGame"})
+        this.isGameRunning = false
         for (let i: number = 0; i < 2; i++)
         {
             this.players[i].room = undefined

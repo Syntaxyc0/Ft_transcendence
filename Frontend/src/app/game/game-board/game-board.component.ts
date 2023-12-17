@@ -34,7 +34,8 @@ export const HEIGHT = 640
 	paddleLeft: Paddle;
 	paddleRight: Paddle;
 
-	isGameRunning: false;
+	isGameRunning: boolean;
+	isOnline: boolean;
 
 	ngOnInit(): void {
 		this.context = this.gameCanvas.nativeElement.getContext('2d');
@@ -52,11 +53,44 @@ export const HEIGHT = 640
 		requestAnimationFrame(this.gameLoop);
 	}
 
+	handleOrder(order:string, payload:any)
+	{
+		switch(order){
+			case "ballPosition":
+				this.ball.x = payload.x
+				this.ball.y = payload.y
+				this.ball.angle = payload.angle
+			break;
+			case "paddlePosition":
+				if(!payload.side)
+					this.newPaddlePosition(this.paddleLeft, payload.x, payload.y)
+				else
+					this.newPaddlePosition(this.paddleRight, payload.x, payload.y)
+			break;
+			case "usersPaddle":
+				if (!payload.side)
+					this.userPaddle = this.paddleLeft
+				else
+					this.userPaddle = this.paddleRight
+			break;
+			case "setGameBoard":
+				this.isOnline = true
+				this.draw()
+			break;
+			case "startGame":
+				this.startGame()
+			break;
+			case "stopGame":
+				this.stopGame()
+		}
+	}
+
 	gameLoop()
 	{
 		if (!this.isGameRunning)
 			return
 		this.draw();
+		this.ball.updatePosition()
 		requestAnimationFrame(this.gameLoop);
 	}
 
@@ -82,37 +116,22 @@ export const HEIGHT = 640
 		this.context?.fillRect(0, 0, WIDTH, HEIGHT);
 	}
 
+	startGame() {
+		this.isGameRunning = true;
+		// this.oldTimeStamp = Date.now()
+		this.gameLoop();
+	}
+
+	stopGame()
+	{
+		this.isGameRunning = false;
+		this.drawBoard()
+		this.isOnline = false
+	}
+
 	disconnect()
 	{
 		this.player.sendRequest("disconnectingClient")
-		this.drawBoard()
-	}
-
-	handleOrder(order:string, payload:any)
-	{
-		switch(order){
-			case "ballPosition":
-				this.ball.x = payload.x
-				this.ball.y = payload.y
-				this.ball.angle = payload.angle
-			break;
-			case "paddlePosition":
-				if(!payload.side)
-					this.newPaddlePosition(this.paddleLeft, payload.x, payload.y)
-				else
-					this.newPaddlePosition(this.paddleRight, payload.x, payload.y)
-			break;
-			case "usersPaddle":
-				if (!payload.side)
-					this.userPaddle = this.paddleLeft
-				else
-					this.userPaddle = this.paddleRight
-			break;
-			case "setGameBoard":
-				this.draw()
-			break;
-
-		}
 	}
 
 	newPaddlePosition(paddle: Paddle, x: number, y: number)
