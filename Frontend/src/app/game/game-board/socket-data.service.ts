@@ -25,7 +25,7 @@ export class SocketDataService{
       console.log("Connected");
     });
     this.socket.on('onGameRequest', (payload: {order: string}) =>{
-      console.log(payload)
+      // console.log(payload)
       data.next(payload);
     });
     return dataObservable;

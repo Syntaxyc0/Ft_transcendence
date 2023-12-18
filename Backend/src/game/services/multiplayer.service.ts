@@ -4,8 +4,7 @@ import { Ball, Paddle } from "../models/game-elements.model";
 
 export class MultiplayerService{
 
-    lastFrameTime: number = 0;
-    deltaTime: number = 0;
+    previousBallState: {x: number, y : number, angle: number};
 
     constructor(private room: Room){}
 
@@ -17,7 +16,20 @@ export class MultiplayerService{
 
     ballData(ball: Ball)
     {
-        this.gameRequest({order: "ballPosition", x: ball.x, y: ball.y, angle: ball.angle})
+        const deltaX = ball.x - this.previousBallState.x
+        const deltaY = ball.y - this.previousBallState.y
+
+        this.gameRequest({order: "ballPosition", x: deltaX, y: deltaY, angle: ball.angle})
+        this.previousBallState.x = ball.x
+        this.previousBallState.y = ball.y
+        this.previousBallState.angle = ball.angle
+    }
+    
+    ballReset(ball: Ball)
+    {
+        this.previousBallState = {x: ball.x, y : ball.y, angle: ball.angle}
+		this.gameRequest({order: "ballReset", x: ball.x, y: ball.y, angle: ball.angle})
+
     }
 
     gameLoop()
@@ -25,8 +37,8 @@ export class MultiplayerService{
 		if (!this.room || !this.room.isGameRunning) {
             return;
         }
-        const currentTime = Date.now();
-        this.deltaTime = currentTime - this.lastFrameTime;
+        // const currentTime = Date.now();
+        // this.deltaTime = currentTime - this.lastFrameTime;
         this.room.ball.updatePosition(this.room.paddleLeft, this.room.paddleRight)
 		this.ballData(this.room.ball)
 
@@ -49,13 +61,14 @@ export class MultiplayerService{
         if (!this.room) {
             return;
         }
+        this.previousBallState = {x: this.room.ball.x, y: this.room.ball.y, angle: this.room.ball.angle}
         this.ballData(this.room.ball)
         this.setPaddle(this.room.paddleLeft)
         this.setPaddle(this.room.paddleRight)
         this.gameRequest({order: "setGameBoard"})
-        this.room.isGameRunning = true;
+        this.room.isGameRunning = true
         this.gameRequest({order: "startGame"})
-		this.gameLoop = this.gameLoop.bind(this);
+		this.gameLoop = this.gameLoop.bind(this)
         this.gameLoop()
     }
 

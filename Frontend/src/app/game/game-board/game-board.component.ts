@@ -34,6 +34,7 @@ export const HEIGHT = 640
 	paddleLeft: Paddle;
 	paddleRight: Paddle;
 
+	oldTimeStamp: number;
 	isGameRunning: boolean;
 	isOnline: boolean;
 
@@ -46,7 +47,7 @@ export const HEIGHT = 640
 		this.data.subscribe((payload: any) =>{
 			if (!payload.order)
 				return;
-			console.log(payload.order)
+			// console.log(payload.order)
 			this.handleOrder(payload.order, payload);
 		});
 		this.gameLoop = this.gameLoop.bind(this);
@@ -57,9 +58,10 @@ export const HEIGHT = 640
 	{
 		switch(order){
 			case "ballPosition":
-				this.ball.x = payload.x
-				this.ball.y = payload.y
-				this.ball.angle = payload.angle
+				this.ball.newPos(payload.angle, payload.x, payload.y)
+			break;
+			case "ballReset":
+				this.ball.reset(payload.angle, payload.x, payload.y)
 			break;
 			case "paddlePosition":
 				if(!payload.side)
@@ -82,6 +84,7 @@ export const HEIGHT = 640
 			break;
 			case "stopGame":
 				this.stopGame()
+			break;
 		}
 	}
 
@@ -89,13 +92,23 @@ export const HEIGHT = 640
 	{
 		if (!this.isGameRunning)
 			return
+		const timeStamp = Date.now();
+		const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
+		this.ball.x = this.lerp(this.ball.x, this.ball.targetX, this.ball.speed * secondsPassed)
+		this.ball.y = this.lerp(this.ball.y, this.ball.targetY, this.ball.speed * secondsPassed)
+		this.oldTimeStamp = timeStamp
 		this.draw();
-		this.ball.updatePosition()
 		requestAnimationFrame(this.gameLoop);
+
 	}
+
+	private lerp(start: number, end: number, t: number): number {
+		return start + t * (end - start);
+	  }
 
 	draw()
 	{
+		console.log("drawing")
 		this.context.fillStyle = 'black';
 		this.context.clearRect(0, 0, WIDTH, HEIGHT);
 		this.context?.fillRect(0, 0, WIDTH, HEIGHT);
@@ -111,6 +124,7 @@ export const HEIGHT = 640
 
 	drawBoard()
 	{
+		this.ball.draw()
 		this.context.fillStyle = 'black';
 		this.context.clearRect(0, 0, WIDTH, HEIGHT);
 		this.context?.fillRect(0, 0, WIDTH, HEIGHT);
@@ -118,7 +132,7 @@ export const HEIGHT = 640
 
 	startGame() {
 		this.isGameRunning = true;
-		// this.oldTimeStamp = Date.now()
+		this.oldTimeStamp = Date.now()
 		this.gameLoop();
 	}
 

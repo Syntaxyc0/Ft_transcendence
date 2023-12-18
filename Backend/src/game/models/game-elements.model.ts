@@ -45,11 +45,6 @@ export class Ball{
     speed: number;
     radius: number = 15;
 
-    targetX: number;
-    targetY: number;
-
-	
-
     constructor(private multiplayer: MultiplayerService){
         this.reset()
     }
@@ -62,8 +57,8 @@ export class Ball{
 		this.angle = Math.random() * 360;
 		while((this.angle >= 75 && this.angle <= 105) || (this.angle >= 255 && this.angle <= 285) )//|| (this.angle >= 0 && this.angle <= 15)
 			this.angle = Math.random() * 360;
-		this.targetX = this.x;
-		this.targetY = this.y;
+		// this.multiplayer.gameRequest({order: "ballReset", x: this.x, y: this.y, angle: this.angle})
+		this.multiplayer.ballReset(this)
 	}
 
 		calculateReflectionAngle(ballY: number, paddleHeight: number, minAngle: number, maxAngle: number){
@@ -82,19 +77,12 @@ export class Ball{
 		this.x = paddle.x + (-this.radius) * playerColliding + -playerColliding;
 		if (playerColliding == -1)
 			this.x += paddle.width;
-
-		// console.log(this.x)
-		// this.gameBoard.sendBall()
-		// console.log("allo3")
 		this.multiplayer.ballData(this)
 
 	}
 
 	xIsColliding(paddleRight: Paddle, paddleLeft: Paddle, x: number) : number
 	{
-		console.log("paddleLeft: " + paddleLeft.width + paddleLeft.x)
-		console.log("paddleRight: " + paddleRight.x)
-		console.log("x: " + x)
 
 		if(x - this.radius <= paddleLeft.width + paddleLeft.x)
 			return -1;
@@ -125,10 +113,8 @@ export class Ball{
 
 		const left = this.radius;
 		const right = WIDTH - this.radius;
-		console.log(hx + " " + hy)
 
 		let playerColliding = this.xIsColliding(paddleRight, paddleLeft, hx)
-		console.log(playerColliding)
 		if (playerColliding != 0){
 			if (playerColliding == 1 && this.yIsColliding(paddleRight, hy))
 				return this.updateCollide(paddleRight, hy, hx, playerColliding)
@@ -148,14 +134,11 @@ export class Ball{
 			else
 				paddleLeft.score++;
 			this.reset();
-			this.multiplayer.ballData(this)
 		}
 		if (hy <= bottom || hy >= top)
 		{
-
 			this.angle = (-this.angle);
 			this.multiplayer.ballData(this)
-
 		}
 	
 	}
