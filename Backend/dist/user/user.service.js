@@ -676,6 +676,26 @@ let UserService = class UserService {
             }
         });
     }
+    async updateSearches(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_2.NotFoundException('User not found');
+        }
+        await this.prisma.user.update({
+            where: {
+                id: uid
+            },
+            data: {
+                profiles_searched: {
+                    increment: 1
+                }
+            }
+        });
+    }
     async achievements(uid) {
         const res = [];
         const user = await this.prisma.user.findUnique({

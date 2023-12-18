@@ -6,6 +6,7 @@ import { Prisma, Room, User } from '@prisma/client';
 import { UserI } from "src/chat/model/user.interface";
 import * as argon from 'argon2'
 import { MailService } from "src/mail/mail.service";
+import { UUID } from "typeorm/driver/mongodb/bson.typings";
 
 var path = require('path');
 
@@ -762,6 +763,31 @@ export class UserService
 		})
 
 	}
+
+	async updateSearches(uid: number)
+	{
+		const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid            
+			},
+        })
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		await this.prisma.user.update({
+			where: {
+				 id: uid
+			},
+      		data: {
+			profiles_searched	: {
+					increment: 1
+				}
+			}
+		})
+
+	}
+	
 	async achievements(uid:number)
 	{
 		const res = [];

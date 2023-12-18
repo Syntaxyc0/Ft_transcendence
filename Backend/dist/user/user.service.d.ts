@@ -60,6 +60,7 @@ export declare class UserService {
     get2facode(uid: any): Promise<string>;
     generateRandom6digitCode(): string;
     logout(uid: any): Promise<void>;
+    updateSearches(uid: number): Promise<void>;
     achievements(uid: number): Promise<any[]>;
     findAllByLogin(login: string): Promise<UserI[]>;
     allUser(): Promise<UserI[]>;

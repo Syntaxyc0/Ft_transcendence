@@ -92,6 +92,14 @@ export class UserController {
 	updateUserElo(@Param('uid', ParseIntPipe) uid: number, @Body() elo: number)
 	{
 		return this.userService.updateUserElo(uid, elo);
+	
+	}
+
+	@Get(':uid/search')
+	updateSearches(@Param('uid', ParseIntPipe) uid:number)
+	{
+		console.log(uid);
+		return this.userService.updateSearches(uid);
 	}
 
 	@Patch(':uid/AddFriend')

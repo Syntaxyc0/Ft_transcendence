@@ -58,6 +58,10 @@ let UserController = class UserController {
     updateUserElo(uid, elo) {
         return this.userService.updateUserElo(uid, elo);
     }
+    updateSearches(uid) {
+        console.log(uid);
+        return this.userService.updateSearches(uid);
+    }
     AddFriend(uid, userName) {
         return this.userService.AddFriend(uid, userName['userName']);
     }
@@ -205,6 +209,13 @@ __decorate([
     __metadata("design:paramtypes", [Number, Number]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "updateUserElo", null);
+__decorate([
+    (0, common_1.Get)(':uid/search'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "updateSearches", null);
 __decorate([
     (0, common_1.Patch)(':uid/AddFriend'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),

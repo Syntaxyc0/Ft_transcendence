@@ -29,6 +29,7 @@ export class SearchUserComponent {
 		this.toggleModal()
 		this.http.get("http://localhost:3333/users/" + this.SearchForm.value.name + '/id').subscribe(
 			res => {
+				this.http.get("http://localhost:3333/users/" + res + '/search').subscribe()
 				this.router.navigate(['/user'],  { queryParams: { id: res } })
 			},
             err => {

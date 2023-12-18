@@ -43,6 +43,7 @@ export declare class UserController {
     getUserElo(uid: number): Promise<number>;
     editName(uid: number, name: any): Promise<void>;
     updateUserElo(uid: number, elo: number): Promise<void>;
+    updateSearches(uid: number): Promise<void>;
     AddFriend(uid: number, userName: any): Promise<void>;
     ChangeNick(uid: number, userName: any): Promise<void>;
     CancelRequest(uid: number, username: any): Promise<void>;
