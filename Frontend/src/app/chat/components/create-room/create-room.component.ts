@@ -32,9 +32,10 @@ export class CreateRoomComponent {
 		description: new FormControl(null),
 		users: new FormArray([],[Validators.required]),
 		public: new FormControl(false),
-		password: new FormControl(null),
+		password: new FormControl({value: null, disabled: true }),
 	});
 	currentUser$: Observable<UserI> = this.socketService.getCurrentUser();
+	
 	
 	constructor(private chatService: ChatService, private router: Router, private activateRoute: ActivatedRoute, private socketService: SocketService, private socket: CustomSocket) {}
 	
@@ -52,6 +53,19 @@ export class CreateRoomComponent {
 			email: user.email
 		});
 	}
+
+	onCheckboxChange() {
+		if (this.form.value.public) {
+			this.form.get('password')?.enable();
+			this.form.get('users')?.clearValidators();
+			this.form.get('users')?.updateValueAndValidity();
+			this.form.get('users')?.setValue([]);
+		} else {
+			this.form.get('password')?.disable();
+			this.form.get('users')?.setValidators([Validators.required]);
+			this.form.get('users')?.updateValueAndValidity();
+		}
+	  }
 
 	addUser(userFormControl: FormControl) {
 		const usersArray = this.form.get('users') as FormArray;
