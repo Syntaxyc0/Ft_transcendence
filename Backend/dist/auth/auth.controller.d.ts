@@ -33,6 +33,9 @@ export declare class AuthController {
         description: string;
         created_at: Date;
         updated_at: Date;
+        creatorId: number;
+        Public: boolean;
+        password: string;
     })[]>;
     getUsers(): Promise<{
         id: number;

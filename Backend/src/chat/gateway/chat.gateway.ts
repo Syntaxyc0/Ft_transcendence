@@ -93,10 +93,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const createdRoom = await this.prisma.room.create({
 			data: {
-			  ...roomInput,
-			  users: {
-			    connect: usersArray,
-			  },
+				...roomInput,
+				users: {
+					connect: usersArray,
+				},
+				creator: {
+					connect: {
+						id: user.id
+					},
+				},
 			},
 			include : { users: true }
 		});

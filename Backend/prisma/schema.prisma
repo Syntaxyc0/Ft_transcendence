@@ -35,6 +35,8 @@ model User {
   connectedUser  ConnectedUser[]
   joinedRoom     JoinedRoom[]
   Message        Message[]
+  Creators		 Room[] @relation("RoomCreator")
+  AdminRooms     Room[] @relation("AdminRooms")
 }
 
 model FriendRequest {
@@ -62,9 +64,10 @@ model Room {
   users			User[]       @relation("UserRooms")
   joinedRoom	JoinedRoom[]
   message		Message[]
-  creator		User
-  admin			admin[]
-  Public		Boolean
+  creator		User @relation(fields: [creatorId], references: [id], name: "RoomCreator")
+  creatorId		Int
+  admin			User[] @relation("AdminRooms")
+  public		Boolean
   password		String?
 }
 

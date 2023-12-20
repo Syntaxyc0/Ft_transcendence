@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, of, take } from 'rxjs';
-import { RoomI, RoomPaginateI } from '../../model/room.interface';
+import { RoomI } from '../../model/room.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatService } from '../../services/chat.service';
 import { MatSelectionListChange } from '@angular/material/list';

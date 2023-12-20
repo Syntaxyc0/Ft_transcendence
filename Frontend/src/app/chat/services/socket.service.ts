@@ -17,9 +17,4 @@ import { UserI } from "../model/user.interface";
 	getCurrentUser(): Observable<UserI> {
 		return this.socket.fromEvent('currentUser');
 	}
-
-	// getCurrentUserByJwt() {
-	// 	const decodedToken = this.jwtService.decodeToken();
-	// 	return decodedToken.user;
-	// }
   }

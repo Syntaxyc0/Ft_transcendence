@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CustomSocket } from '../sockets/custom-socket';
-import { RoomI, RoomPaginateI } from 'src/app/chat/model/room.interface';
+import { RoomI } from 'src/app/chat/model/room.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { MessageI } from '../model/message.interface';
