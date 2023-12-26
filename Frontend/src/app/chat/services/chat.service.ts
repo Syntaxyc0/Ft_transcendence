@@ -37,8 +37,8 @@ export class ChatService {
 		return this.socket.fromEvent('roomsI');
 	}  
 
-	emitPaginateRooms(limit: number, page: number) {
-		this.socket.emit('roomsArray', {limit, page});
+	emitPaginateRooms() {
+		this.socket.emit('roomsArray');
 	}
 
 	createRoom(room: RoomI) {

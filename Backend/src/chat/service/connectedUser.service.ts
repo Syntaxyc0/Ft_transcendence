@@ -40,6 +40,8 @@ export class ConnectedUserService{
 	}
 
 	async deleteAll() {
-		await this.prisma.connectedUser.deleteMany();
-	  }
+		await this.prisma.connectedUser.deleteMany({
+			where: {}
+		});
+	}
 }

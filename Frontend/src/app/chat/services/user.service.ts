@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, throwError } from 'rxjs';
 import { UserI } from 'src/app/chat/model/user.interface';
-import { catchError, tap } from 'rxjs/operators'
+import { JwtHelperService } from '@auth0/angular-jwt';
+
 
 
 @Injectable({
@@ -11,8 +12,9 @@ import { catchError, tap } from 'rxjs/operators'
 })
 export class UserService {
 
-	constructor(private http: HttpClient, private snackbar: MatSnackBar) { }
+	constructor(private http: HttpClient, private snackbar: MatSnackBar,) { }
 	users$: Observable<UserI[]>;
+	helper = new JwtHelperService();
 	
 	findByLogin(login: string): Observable<UserI[]> {
 		this.users$ = this.http.get<UserI[]>(`http://localhost:3333/users/find-by-login/${login}`)
@@ -24,4 +26,10 @@ export class UserService {
 
 		return this.users$;
 	}
+
+
+	getLoggedInUser() {
+		const decodedToken = this.helper.decodeToken(localStorage.getItem('access_token')!);
+		return decodedToken;
+	  }
 }
