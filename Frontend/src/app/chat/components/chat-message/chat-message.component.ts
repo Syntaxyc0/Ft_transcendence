@@ -20,8 +20,7 @@ export class ChatMessageComponent {
   constructor(private socketService: SocketService) {}
   
   ngOnInit(): void {
-	  this.socketService.emitGetCurrentUser();
-
+		this.socketService.emitGetCurrentUser();
 		this.socketService.getCurrentUser().pipe(take(1)).subscribe( value => {
 			this.user = value;
 		});

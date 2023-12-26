@@ -19,6 +19,20 @@ export declare class AuthController {
     check_token(token: string): boolean;
     get42redirect(request: any, res: any): Promise<void>;
     getRooms(): Promise<({
+        users: {
+            id: number;
+            email: string;
+            login: string;
+            hash: string;
+            is2faenabled: boolean;
+            is2favalidated: boolean;
+            twofacode: string;
+            avatar: string;
+            elo: number;
+            userStatus: string;
+            gameHistory: number[];
+            friendList: number[];
+        }[];
         creator: {
             id: number;
             email: string;
@@ -33,6 +47,20 @@ export declare class AuthController {
             gameHistory: number[];
             friendList: number[];
         };
+        admin: {
+            id: number;
+            email: string;
+            login: string;
+            hash: string;
+            is2faenabled: boolean;
+            is2favalidated: boolean;
+            twofacode: string;
+            avatar: string;
+            elo: number;
+            userStatus: string;
+            gameHistory: number[];
+            friendList: number[];
+        }[];
     } & {
         id: number;
         name: string;

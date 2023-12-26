@@ -88,8 +88,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			throw new UnauthorizedException();
 		}
 
-		const usersArray = (roomInput.users as Array<{ id: number }>).map(user => ({ id: user.id }));
-		usersArray.push({ id: socket.data.user.id });
+		let usersArray = [];
+
+		if (!roomInput.public) {
+			usersArray = (roomInput.users as Array<{ id: number }>).map(user => ({ id: user.id }));
+			usersArray.push({ id: socket.data.user.id });
+		}
+
+		console.log("USER ARRAY :",usersArray);
 
 		const createdRoom = await this.prisma.room.create({
 			data: {
@@ -102,24 +108,45 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 						id: user.id
 					},
 				},
+				admin: {
+					connect: {
+						id: user.id
+					},
+				},
 			},
 			include : { users: true }
 		});
 
-		// emit room if user is connected
-		for (const user of createdRoom.users) {
-			const connected_users: ConnectedUser[] = await this.connectedUserService.findByUser({id: user.id});
-			
-			const rooms = await this.prisma.room.findMany({
-				where: { users: { some: { id: user.id } } },
-				take: 10,
-				skip: 0,
-			});
-			for (const connection of connected_users) {
-				await this.server.to(connection.socketId).emit('roomsI', rooms);
-			}
-		  }
+		// if (roomInput.public) {
+		// 	const connectedUser = await this.prisma.connectedUser.findMany();
+		// 	for (const user of connectedUser) {
 
+		// 		const userRooms = await this.prisma.room.findMany({
+		// 			where: { users: { some: { id: user.id } } },
+		// 			take: 10,
+		// 			skip: 0,
+		// 		});
+				
+
+		// 		await this.server.to(user.socketId).emit('roomsI', rooms);
+		// 	}
+		// } else {
+
+			// emit room if user is connected
+			for (const user of createdRoom.users) {
+				const connected_users: ConnectedUser[] = await this.connectedUserService.findByUser({id: user.id});
+				
+				const rooms = await this.prisma.room.findMany({
+					where: { users: { some: { id: user.id } } },
+					take: 10,
+					skip: 0,
+				});
+
+				for (const connection of connected_users) {
+					await this.server.to(connection.socketId).emit('roomsI', rooms);
+				}
+			// }
+		}
 		return createdRoom;
 	}
 	
@@ -132,9 +159,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			},
 		});
 		
-		const room = user.rooms;
+		const userRooms = user.rooms;
+
+		const publicRooms = await this.prisma.room.findMany({
+			where: { public: true }	
+		})
+
+		console.log("user rooms: \n", userRooms);
+		const allRooms = [...userRooms, ...publicRooms];
 		
-		return this.server.to(socket.id).emit('roomsI', room);
+		return this.server.to(socket.id).emit('roomsI', allRooms);
 	}
 
 	@SubscribeMessage('getCurrentUser')

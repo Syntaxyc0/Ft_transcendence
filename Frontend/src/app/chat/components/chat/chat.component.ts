@@ -34,7 +34,7 @@ export class ChatComponent implements OnInit{
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
 	userList :object[] = []
-	user: UserI | undefined;
+	user: UserI;
 
 
 	constructor(private route:ActivatedRoute,
