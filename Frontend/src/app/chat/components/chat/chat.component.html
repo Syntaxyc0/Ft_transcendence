@@ -2,31 +2,30 @@
 
 	<mat-card>
 		<div style="display: flex; flex-direction: row;">
-
-
+			
 			<div>
-				<h1></h1>
-				<h2>My Chatrooms</h2>
-				<button mat-button [routerLink]="'/create-room'">Create new Room</button>
-				<mat-selection-list hideSingleSelectionIndicator [multiple]="false" (selectionChange)="onSelectRoom($event)">
-				  <mat-list-option *ngFor="let room of (room$ | async)" [value]="room">
-					Name: {{room.name}}, ID: {{room.id}}
-					<mat-divider></mat-divider>
-				  </mat-list-option>
-				</mat-selection-list>
-				<!-- <mat-paginator
-				[length]="(rooms$ | async)?.meta?.totalItems"
-				[pageIndex]="(rooms$ | async)?.meta?.currentPage"
-				[pageSize]="(rooms$ | async)?.meta?.itemCount"
-				(page)="onPaginateRooms($event)"
-				[pageSizeOptions]="[10,25,50]"
-				></mat-paginator> -->
-			  </div>
+				<div>
+					<span style="display: flex; flex-direction: row; align-items: baseline;">
+						<h2>My Chatrooms</h2>
+						<small style="margin-left:10px;">Logged in as {{ (user | async)?.login }}</small>
+					</span>					
+					<button mat-button [routerLink]="'/create-room'">Create new Room</button>
+				</div>
+
+				<div class="rooms">
+						<mat-selection-list hideSingleSelectionIndicator [multiple]="false" (selectionChange)="onSelectRoom($event)">
+							<mat-list-option *ngFor="let room of (room$ | async)" [value]="room">
+								Name: {{room.name}}, ID: {{room.id}}
+								<mat-divider></mat-divider>
+							</mat-list-option>
+						</mat-selection-list>
+				</div>
+
+			</div>
 		
-			  <div style="margin-left: 40px;">
-				<h2>My Room</h2>
-				{{(selectedRoom | json)}}
-			  </div>
+				<div class="chatroom">
+					<app-chat-room *ngIf="selectedRoom" [chatRoom]="selectedRoom"></app-chat-room>
+				</div>
 		
 			</div>
 		  </mat-card>
@@ -38,3 +37,4 @@
 	</div>
 
 </ng-template>
+

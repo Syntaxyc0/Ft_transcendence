@@ -1,8 +1,8 @@
-FROM node:latest
+FROM node:19
 
 RUN apt update -y && apt upgrade -y
 
-RUN npm install -g @angular/cli
+RUN npm install -g @angular/cli@16.2.9
 
 RUN npm install -g npm-check-updates
 

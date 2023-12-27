@@ -8,12 +8,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { RouterModule, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { CustomSocket } from '../chat/sockets/custom-socket';
+import { FooterBarComponent } from '../components/footer-bar/footer-bar.component';
 
 
 @Component({
   selector: 'app-signin',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatFormFieldModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatFormFieldModule, RouterModule, FooterBarComponent],
   templateUrl: './signin.component.html',
   styleUrls: ['./signin.component.scss']
 })
@@ -30,14 +31,16 @@ export class SigninComponent {
 				res => {
 					localStorage.setItem('access_token', res['access_token']);
 					localStorage.setItem('id', JSON.stringify(res['id']));
-					this.http.patch<any>('http://localhost:3333/users/' + res['id'] + '/status', {status: "ONLINE"}).subscribe()
+					// this.http.patch<any>('http://localhost:3333/users/' + res['id'] + '/status', {status: "ONLINE"}).subscribe()
 					this.http.get<any>('http://localhost:3333/users/' + res['id'] + '/2faenabled').subscribe( res => {
-						if (!res)
+						if (res === false)
+						{
+							localStorage.setItem('is_authenticated', 'true');
 							this.router.navigate(['/home'])
+						}
 						else
 						{
-							alert("2fa is activated")
-							this.router.navigate(['/home'])
+							this.router.navigate(['/twofa'])
 						}
 
 					})
@@ -46,6 +49,7 @@ export class SigninComponent {
 					alert("User not found")
 				})
 	}
+	
 
 	get	login(): FormControl
 	{

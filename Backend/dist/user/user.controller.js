@@ -14,22 +14,18 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
-const multer_1 = require("multer");
 const user_service_1 = require("./user.service");
 const platform_express_1 = require("@nestjs/platform-express");
+const multer_config_1 = require("./multer.config");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
+    getUserIdFromLogin(login) {
+        return this.userService.getUserIdFromLogin(login);
+    }
     getUserFromId(uid) {
         const user = this.userService.getUserFromId(uid);
-        if (!user) {
-            throw new common_1.NotFoundException('User not found');
-        }
-        return user;
-    }
-    getUserFromLogin(login) {
-        const user = this.userService.getUserFromLogin(login);
         if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
@@ -44,17 +40,38 @@ let UserController = class UserController {
     GetUserFriendlist(uid) {
         return this.userService.GetUserFriendlist(uid);
     }
+    GetUserFriendRequestsReceived(uid) {
+        return this.userService.GetUserFriendRequestsReceived(uid);
+    }
+    GetUserFriendRequestsSent(uid) {
+        return this.userService.GetUserFriendRequestsSent(uid);
+    }
     getUserLogin(uid) {
         return this.userService.getlogin(uid);
     }
     getUserElo(uid) {
         return this.userService.getelo(uid);
     }
+    editName(uid, name) {
+        return this.userService.ChangeNick(uid, name['userName']);
+    }
     updateUserElo(uid, elo) {
         return this.userService.updateUserElo(uid, elo);
     }
     AddFriend(uid, userName) {
         return this.userService.AddFriend(uid, userName['userName']);
+    }
+    ChangeNick(uid, userName) {
+        return this.userService.ChangeNick(uid, userName['name']);
+    }
+    CancelRequest(uid, username) {
+        return this.userService.CancelRequest(uid, username['username']);
+    }
+    AcceptRequest(uid, id) {
+        return this.userService.AcceptRequest(uid, id['id']);
+    }
+    RefuseRequest(uid, id) {
+        return this.userService.RefuseRequest(uid, id['id']);
     }
     RemoveFriend(uid, userId) {
         return this.userService.RemoveFriend(uid, userId['userId']);
@@ -82,6 +99,9 @@ let UserController = class UserController {
     switch2fa(uid, activate) {
         return this.userService.switch2fa(uid, activate);
     }
+    verify2facode(uid, code) {
+        return this.userService.verify2facode(uid, code['code']);
+    }
     get2faenabled(uid) {
         return this.userService.get2faenabled(uid);
     }
@@ -91,8 +111,24 @@ let UserController = class UserController {
     async getAllUsers() {
         return this.userService.allUser();
     }
+    get2facode(uid) {
+        return this.userService.get2facode(uid);
+    }
+    getelo(uid) {
+        return this.userService.getelo(uid);
+    }
+    logout(uid) {
+        return this.userService.logout(uid);
+    }
 };
 exports.UserController = UserController;
+__decorate([
+    (0, common_1.Get)(':login/id'),
+    __param(0, (0, common_1.Param)('login')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "getUserIdFromLogin", null);
 __decorate([
     (0, common_1.Get)(':uid'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
@@ -100,13 +136,6 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "getUserFromId", null);
-__decorate([
-    (0, common_1.Get)(':login'),
-    __param(0, (0, common_1.Param)('login')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], UserController.prototype, "getUserFromLogin", null);
 __decorate([
     (0, common_1.Patch)(':uid/status'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
@@ -130,6 +159,20 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "GetUserFriendlist", null);
 __decorate([
+    (0, common_1.Get)(':uid/friendrequestsreceived'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "GetUserFriendRequestsReceived", null);
+__decorate([
+    (0, common_1.Get)(':uid/friendrequestssent'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "GetUserFriendRequestsSent", null);
+__decorate([
     (0, common_1.Get)(":uid/login"),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -143,6 +186,14 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "getUserElo", null);
+__decorate([
+    (0, common_1.Patch)(':uid/editName'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "editName", null);
 __decorate([
     (0, common_1.Patch)(':uid/elo'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
@@ -160,6 +211,38 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "AddFriend", null);
 __decorate([
+    (0, common_1.Patch)(':uid/ChangeNick'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "ChangeNick", null);
+__decorate([
+    (0, common_1.Patch)(':uid/CancelRequest'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "CancelRequest", null);
+__decorate([
+    (0, common_1.Patch)(':uid/AcceptRequest'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "AcceptRequest", null);
+__decorate([
+    (0, common_1.Patch)(':uid/RefuseRequest'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "RefuseRequest", null);
+__decorate([
     (0, common_1.Patch)(':uid/RemoveFriend'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
@@ -169,14 +252,7 @@ __decorate([
 ], UserController.prototype, "RemoveFriend", null);
 __decorate([
     (0, common_1.Post)(':uid/upload'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './assets',
-            filename: (req, file, cb) => {
-                cb(null, file.originalname);
-            },
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', multer_config_1.multerOptions)),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
     __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
@@ -200,6 +276,14 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "switch2fa", null);
 __decorate([
+    (0, common_1.Post)('/:uid/verify2facode'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "verify2facode", null);
+__decorate([
     (0, common_1.Get)('/:uid/2faenabled'),
     __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -219,6 +303,27 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getAllUsers", null);
+__decorate([
+    (0, common_1.Get)('/:uid/2facode'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "get2facode", null);
+__decorate([
+    (0, common_1.Get)('/:uid/getelo'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "getelo", null);
+__decorate([
+    (0, common_1.Get)('/:uid/logout'),
+    __param(0, (0, common_1.Param)('uid', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "logout", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])

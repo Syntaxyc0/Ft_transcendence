@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormArray, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { UserI } from 'src/app/chat/model/user.interface';
 import { ChatService } from '../../services/chat.service';
@@ -12,6 +12,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 
 import { RouterModule } from '@angular/router';
+import { SocketService } from '../../services/socket.service';
+import { Observable, take } from 'rxjs';
+import { User } from 'src/app/helpers/types';
+import { CustomSocket } from '../../sockets/custom-socket';
 
 
 @Component({
@@ -28,11 +32,10 @@ export class CreateRoomComponent {
 		description: new FormControl(null),
 		users: new FormArray([],[Validators.required])
 	});
-
-	constructor(private chatService: ChatService, private router: Router, private activateRoute: ActivatedRoute) {
-
-	}
-
+	currentUser$: Observable<UserI> = this.socketService.user;
+	
+	constructor(private chatService: ChatService, private router: Router, private activateRoute: ActivatedRoute, private socketService: SocketService, private socket: CustomSocket) {}
+	
 	create() {
 		if (this.form.valid) {
 			this.chatService.createRoom(this.form.getRawValue());
@@ -48,17 +51,11 @@ export class CreateRoomComponent {
 		});
 	}
 
-	// addUser(userFormControl: FormControl) {
-	// 	this.users.push(userFormControl);
-	// }
 	addUser(userFormControl: FormControl) {
 		const usersArray = this.form.get('users') as FormArray;
 		usersArray.push(userFormControl);
 	  }
 
-	// removeUser(userId: number) {
-	// 	this.users.removeAt(this.users.value.findIndex((user: UserI) => user.id === userId));
-	// }
 	removeUser(userId: number | undefined) {
 		const usersArray = this.form.get('users') as FormArray;
 		const indexToRemove = usersArray.value.findIndex((user: UserI) => user.id === userId);

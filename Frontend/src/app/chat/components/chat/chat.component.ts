@@ -17,24 +17,32 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { CustomSocket } from '../../sockets/custom-socket';
+import { ChatRoomComponent } from '../chat-room/chat-room.component';
+import { UserI } from '../../model/user.interface';
+import { SocketService } from '../../services/socket.service';
 
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatListModule, MatDividerModule, MatPaginatorModule, MatFormFieldModule, MatIconModule, HttpClientModule, RouterModule],
+  imports: [CommonModule, MatCardModule, MatButtonModule, MatListModule, MatDividerModule, MatPaginatorModule, MatFormFieldModule, MatIconModule, HttpClientModule, RouterModule, ChatRoomComponent ],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit{
 	
-	rooms$: Observable<RoomPaginateI> = this.chatService.getMyRooms();
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
 	userList :object[] = []
+	user = this.socketService.user;
 
 
-	constructor(private route:ActivatedRoute, private router: Router, private chatService: ChatService, public http: HttpClient, private customSocket: CustomSocket) {}
+	constructor(private route:ActivatedRoute,
+		private router: Router,
+		private chatService: ChatService,
+		public http: HttpClient,
+		private customSocket: CustomSocket,
+		private socketService: SocketService) {}
 
 	ngOnInit() {
 		this.chatService.emitPaginateRooms(10, 0);
