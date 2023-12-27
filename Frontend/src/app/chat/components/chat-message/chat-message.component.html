@@ -1,6 +1,15 @@
 <span style="display: flex;" [class.ownContainer]="message.user?.id === user.id">
 	<p [ngClass]="{ownMessage: message.user?.id === user.id}">
-	  <strong>{{ message.user?.login }}</strong> <br /> {{ message.text }}
+	  <span [cdkMenuTriggerFor]="menu" class="example-standalone-trigger"><strong>{{ message.user?.login }}</strong></span> <br /> {{ message.text }}
 	</p>
 </span>
+
+<ng-template #menu>
+	<div class="example-menu" cdkMenu>
+	  <button class="example-menu-item" cdkMenuItem>Refresh</button>
+	  <button class="example-menu-item" cdkMenuItem>Settings</button>
+	  <button class="example-menu-item" cdkMenuItem>Help</button>
+	  <button class="example-menu-item" cdkMenuItem>Sign out</button>
+	</div>
+</ng-template>
 

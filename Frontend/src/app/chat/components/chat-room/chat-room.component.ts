@@ -37,10 +37,6 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
       if (message && message.room.id === this.chatRoom.id && !allMessages.some(m => m.id === message.id)) {
         allMessages.push(message);
       }
-
-	  console.log('allMessages:', allMessages);
-	  console.log('addedMessage:', message);
-
 	  const items = allMessages.sort((a, b) => {
 		const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
 		const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;

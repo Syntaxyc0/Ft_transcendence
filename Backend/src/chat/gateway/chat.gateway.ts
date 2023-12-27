@@ -46,11 +46,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				return this.disconnect(socket);
 			} else {
 				socket.data.user = user;
-				const rooms = await this.prisma.room.findMany({
+				const userRooms = await this.prisma.room.findMany({
 					where: { users: { some: { id: user.id } } },
-					take: 10,
-					skip: 0,
 				});
+
+				const publicRooms = await this.prisma.room.findMany({
+					where: { public: true }
+				});
+
+				const rooms = [...publicRooms, userRooms]
 
 				await this.connectedUserService.create({ socketId: socket.id, user });
 
