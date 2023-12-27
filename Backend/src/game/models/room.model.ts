@@ -1,20 +1,19 @@
 import { Player } from "./player.model";
 import { Ball, Paddle } from "./game-elements.model";
 import { MultiplayerService } from "../services/multiplayer.service";
+import { WIDTH } from "../game.service";
 
 export class Room{
 
     multiplayer: MultiplayerService;
     players: Player[] = [];
 
-    height: number = 640;
-    width: number = 1000;
-
     id: number;
 
     ball: Ball
-    paddleLeft: Paddle
-    paddleRight: Paddle
+    paddles: Paddle[] = [];
+    // paddleLeft: Paddle
+    // paddleRight: Paddle
 
     isGameRunning: boolean = false
 
@@ -28,8 +27,11 @@ export class Room{
 
         this.ball = new Ball(this.multiplayer)
 
-        this.paddleLeft = new Paddle(0)
-        this.paddleRight = new Paddle(1)
+        // this.paddleLeft = new Paddle(0, this.multiplayer)
+        // this.paddleRight = new Paddle(1, this.multiplayer)
+
+        this.paddles.push(new Paddle(0, this.multiplayer))
+        this.paddles.push(new Paddle(1, this.multiplayer))
 
         for (let i: number = 0; i < 2; i++)
         {
@@ -41,6 +43,20 @@ export class Room{
         this.multiplayer.gameBoardInit()
 
     }
+
+    // updatePaddle(paddle: {x: number, y: number, side: number})
+    // {
+    //     if (!paddle.side)
+    //     {
+    //         this.paddleLeft.y = paddle.y
+    //     }
+    //     else
+    //     {
+    //         this.paddleRight.y = paddle.y
+    //     }
+    //     this.multiplayer.gameRequest({order: "paddlePosition", side: paddle.side, x: paddle.x, y: paddle.y})
+        
+    // }
 
     destroyRoom()
     {

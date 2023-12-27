@@ -14,45 +14,36 @@ export class MultiplayerService{
             this.room.players[i].socket.emit('onGameRequest', payload)
     }
 
-    ballData(ball: Ball)
+ballData(ball: Ball)
     {
         const deltaX = ball.x - this.previousBallState.x
         const deltaY = ball.y - this.previousBallState.y
+        const deltaAngle = ball.angle - this.previousBallState.angle
 
-        this.gameRequest({order: "ballPosition", x: deltaX, y: deltaY, angle: ball.angle})
+        this.gameRequest({order: "ballPosition", x: deltaX, y: deltaY, angle: deltaAngle})
+
         this.previousBallState.x = ball.x
         this.previousBallState.y = ball.y
         this.previousBallState.angle = ball.angle
     }
-    
-    ballReset(ball: Ball)
-    {
-        this.previousBallState = {x: ball.x, y : ball.y, angle: ball.angle}
-		this.gameRequest({order: "ballReset", x: ball.x, y: ball.y, angle: ball.angle})
 
-    }
 
     gameLoop()
 	{
 		if (!this.room || !this.room.isGameRunning) {
             return;
         }
-        // const currentTime = Date.now();
-        // this.deltaTime = currentTime - this.lastFrameTime;
-        this.room.ball.updatePosition(this.room.paddleLeft, this.room.paddleRight)
+        this.room.ball.updatePosition(this.room.paddles[0], this.room.paddles[1])
 		this.ballData(this.room.ball)
 
         setTimeout(() => {
             this.gameLoop();
-        }, 1000 / 30);
+        }, 1000 / 60);
 	}
 
     setPaddle(paddle: Paddle)
     {
         this.gameRequest({order: "paddlePosition", side: paddle.side, x: paddle.x, y: paddle.y})
-        this.room.players[0].socket.emit('usersPaddle', {order: 'usersPaddle', side: 0})
-        this.room.players[1].socket.emit('usersPaddle', {order: 'usersPaddle', side: 1})
-
     }
 
 
@@ -61,11 +52,9 @@ export class MultiplayerService{
         if (!this.room) {
             return;
         }
-        this.previousBallState = {x: this.room.ball.x, y: this.room.ball.y, angle: this.room.ball.angle}
-        this.ballData(this.room.ball)
-        this.setPaddle(this.room.paddleLeft)
-        this.setPaddle(this.room.paddleRight)
-        this.gameRequest({order: "setGameBoard"})
+        this.room.players[0].socket.emit('onGameRequest', {order: 'usersPaddle', side: 0})
+        this.room.players[1].socket.emit('onGameRequest', {order: 'usersPaddle', side: 1})
+        this.gameRequest({order: "setGameBoard", speed: this.room.ball.speed, x: this.room.ball.x, y: this.room.ball.y, angle: this.room.ball.angle})
         this.room.isGameRunning = true
         this.gameRequest({order: "startGame"})
 		this.gameLoop = this.gameLoop.bind(this)

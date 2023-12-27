@@ -1,11 +1,13 @@
 import { GameBoardComponent, WIDTH } from "../game-board/game-board.component";
 
+export const PADDLE_HEIGHT = 150
+
 export class Paddle{
 
 	velocity!:number;
 	acceleration!:number;
 	deceleration!: number;
-	step!: number;
+	step: number = 20;
 
 	height: number = 150;
 	width: number = 25;
@@ -15,6 +17,7 @@ export class Paddle{
 	targetY: number;
 
 	score: number = 0;
+	side: number;
 
 	constructor( public context: CanvasRenderingContext2D, public gameBoard: GameBoardComponent)
 	{

@@ -4,6 +4,8 @@ import { Server, Socket} from "socket.io"
 import { Player } from './models/player.model'; 
 import { Room} from './models/room.model';
 import { MultiplayerService } from './services/multiplayer.service';
+import { connected } from 'process';
+import { Client } from 'socket.io/dist/client';
 
 @WebSocketGateway({
   cors: {
@@ -35,12 +37,12 @@ export class GameGateway implements OnModuleInit{
     });
   }
 
-  // @SubscribeMessage("socketInit")
-  // initPlayer(@ConnectedSocket() client: Socket)
-  // {
-  //   this.connectedPlayers.set(client.id, new Player(client, client.data.user.login))
-  //   client.emit("onGameRequest",{order: "initPlayer", username: client.data.user.login})
-  // }
+  getRoom(clientId: string) : Room{
+    if (!this.connectedPlayers.get(clientId))
+      return undefined;
+    const targetRoom = this.connectedPlayers.get(clientId).room;
+    return targetRoom;
+  }
 
   disconnectRoom(clientId: string){
     if (!this.connectedPlayers.get(clientId))
@@ -61,30 +63,31 @@ export class GameGateway implements OnModuleInit{
   @SubscribeMessage('disconnectingClient')
   warnOther(@ConnectedSocket() client: Socket)
   {
+    this.connectedPlayers.get(client.id).lookingForPlayer = false
     this.disconnectRoom(client.id)
   }
 
-  @SubscribeMessage('gameRequest')
-  gameRequest(@MessageBody() body: {order: string}, @ConnectedSocket() client: Socket)
+  @SubscribeMessage('newPaddlePosition')
+  setPaddle(@ConnectedSocket() client: Socket, @MessageBody() paddle: {x: number, y: number, side: number})
   {
-
-  }  
-
-  @SubscribeMessage('newScore')
-  newScore(@MessageBody() body: {leftScore: number, rightScore: number}, @ConnectedSocket() client:Socket)
-  {
-   
-  }
-
-  @SubscribeMessage('newPaddlePos')
-  newPaddlePos(@MessageBody() body: {x: number, y: number}, @ConnectedSocket() client: Socket)
-  {
-   
+    const targetRoom = this.getRoom(client.id)
+    if (!targetRoom)
+      return;
+    
+    targetRoom.paddles[paddle.side].y = paddle.y
+    if (paddle.side == 1)
+    {
+      targetRoom.players[0].socket.emit("onGameRequest", {order: "paddlePosition", side: paddle.side, x: paddle.x, y: paddle.y})
+    }
+    else
+      targetRoom.players[1].socket.emit("onGameRequest", {order: "paddlePosition", side: paddle.side, x: paddle.x, y: paddle.y})
   }
 
   @SubscribeMessage('multiplayerRequest')
   searchMultiplayer(@ConnectedSocket() client: Socket) {
-    console.log(client.data.login + " is looking for another player.")
+    if (this.connectedPlayers.get(client.id).room)
+      return;
+    // console.log(client.data.login + " is looking for another player.")
     for (const [socketId, player] of this.connectedPlayers) {
       if (player.socket.id != client.id && player.lookingForPlayer)
       {

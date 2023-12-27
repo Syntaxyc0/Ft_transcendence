@@ -1,35 +1,39 @@
 import { GameBoardComponent, HEIGHT, WIDTH } from "../game-board/game-board.component";
 import { Paddle } from "./paddle.model";
 export class Ball{
-	public speed: number = 30;
+	public speed: number;
 	public radius: number = 15;
-	public angle: number =  Math.random() * 360;
+	public angle: number;
 	public x: number = 0
 	public y: number = 0
+
+	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
 	public targetX!:number;
 	public targetY!:number;
 
-	constructor(public context: CanvasRenderingContext2D, public gameBoard: GameBoardComponent)
+	constructor(public context: CanvasRenderingContext2D)
 	{
-		// this.reset();
+
 	}
 	reset(angle: number, x: number, y: number)
 	{
-		this.x = x;
-		this.y = y;
-		this.targetX = x;
-		this.targetY = y;
-		this.angle = angle;
+		this.x = this.targetX + x;
+		this.y = this.targetY + y;
+		this.targetX = this.x;
+		this.targetY = this.y;
+		this.angle += angle;
 	}
 	
-	newPos(angle: number, x: number, y: number)
+	newPos(angle: number, deltaX: number, deltaY: number)
 	{
-		console.log("x: " + x + " y: " + y)
-		this.targetX += x;
-		this.targetY += y;
-		this.angle = angle;
+
+		// this.targetX += x;
+		// this.targetY += y;
+		// this.angle += angle;
+
 	}
+
 	
 	draw()
 	{

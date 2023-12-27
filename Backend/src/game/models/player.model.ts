@@ -1,5 +1,6 @@
 import { Socket } from "socket.io";
 import { Room } from "./room.model";
+import { Paddle } from "./game-elements.model";
 
 export class Player{
     socket: Socket;
