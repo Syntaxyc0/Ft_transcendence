@@ -1,8 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ConnectedUserI } from "../model/connectedUser.interface";
-import { UserI } from "../model/user.interface";
-import { User } from "@prisma/client";
 
 @Injectable()
 export class ConnectedUserService{
@@ -40,8 +38,6 @@ export class ConnectedUserService{
 	}
 
 	async deleteAll() {
-		await this.prisma.connectedUser.deleteMany({
-			where: {}
-		});
+		await this.prisma.connectedUser.deleteMany();
 	}
 }

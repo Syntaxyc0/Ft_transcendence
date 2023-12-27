@@ -130,9 +130,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 
 		} else {
+			const { users, ...roomDataWithoutUsers } = roomInput;
+
 			const createdRoom = await this.prisma.room.create({
 				data: {
-					...roomInput,
+					...roomDataWithoutUsers,
 					creator: {
 						connect: {
 							id: user.id
@@ -144,7 +146,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 						},
 					},
 				},
-				include : { users: true }
 			});
 
 			const connectedUser = await this.prisma.connectedUser.findMany();

@@ -61,7 +61,7 @@ model Room {
   description	String?
   created_at	DateTime     @default(now())
   updated_at	DateTime     @updatedAt
-  users			User[]       @relation("UserRooms")
+  users			User[]		 @relation("UserRooms")
   joinedRoom	JoinedRoom[]
   message		Message[]
   creator		User @relation(fields: [creatorId], references: [id], name: "RoomCreator")
