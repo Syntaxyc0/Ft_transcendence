@@ -43,6 +43,7 @@ export class ChatComponent implements AfterViewInit{
 	selectedRoom = null;
 	userList :object[] = []
 	user = this.userService.getLoggedInUser();
+	additionnalDiv = true;
 
 
 	constructor(private route:ActivatedRoute,
