@@ -54,7 +54,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					where: { public: true }
 				});
 
-				const rooms = [...publicRooms, userRooms]
+				const rooms = [...publicRooms, ...userRooms];
 
 				await this.connectedUserService.create({ socketId: socket.id, user });
 
@@ -122,10 +122,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			for (const user of createdRoom.users) {
 				const connected_users: ConnectedUser[] = await this.connectedUserService.findByUser({id: user.id});
 				
-				const rooms = await this.prisma.room.findMany({
+				const userRooms = await this.prisma.room.findMany({
 					where: { users: { some: { id: user.id } } },
 				});
 
+				const publicRooms = await this.prisma.room.findMany({
+					where: { public: true }
+				});
+
+				const rooms = [...publicRooms, ...userRooms];
+				
 				for (const connection of connected_users) {
 					await this.server.to(connection.socketId).emit('roomsI', rooms);
 				}
@@ -163,7 +169,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					where: { public: true }
 				});
 
-				const rooms = [...publicRooms, userRooms]
+				const rooms = [...publicRooms, ...userRooms]
 				
 
 				await this.server.to(user.socketId).emit('roomsI', rooms);
@@ -188,10 +194,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const publicRooms = await this.prisma.room.findMany({
 			where: { public: true }
 		})
-
-		const allRooms = [...userRooms, ...publicRooms];
-
-		return this.server.to(socket.id).emit('roomsI', allRooms);
+		
+		const rooms = [...publicRooms, ...userRooms];
+		
+		return this.server.to(socket.id).emit('roomsI', rooms);
 	}
 
 	@SubscribeMessage('getCurrentUser')

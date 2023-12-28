@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, of, take } from 'rxjs';
 import { RoomI } from '../../model/room.interface';
@@ -22,11 +22,22 @@ import { UserService } from '../../services/user.service';
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatListModule, MatDividerModule, MatPaginatorModule, MatFormFieldModule, MatIconModule, HttpClientModule, RouterModule, ChatRoomComponent ],
+  imports: [CommonModule,
+			MatCardModule,
+			MatButtonModule,
+			MatListModule,
+			MatDividerModule,
+			MatPaginatorModule,
+			MatFormFieldModule,
+			MatIconModule,
+			HttpClientModule,
+			RouterModule,
+			ChatRoomComponent,
+			],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit{
+export class ChatComponent implements AfterViewInit{
 	
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
@@ -40,8 +51,8 @@ export class ChatComponent implements OnInit{
 		public http: HttpClient,
 		private userService: UserService) {}
 
-	ngOnInit() {
-		this.chatService.emitPaginateRooms();
+	ngAfterViewInit() {
+		this.chatService.emitRooms();
 	}
 
 	onSelectRoom(event: MatSelectionListChange) {
