@@ -5,9 +5,9 @@
 <div *ngIf="chatRoom; else no_chatroom_selected">
 
 	<!-- Header -->
-	<div style="height: 40px;">
+	<div style="height: 20px;">
 	  <span style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
-		<h2 style="font-size: 1.5em; color: #6fb6e8;">{{chatRoom.name}}</h2>
+		<h2 style="margin-left: 10px; font-size: 1.5em; color: #6fb6e8;">{{chatRoom.name}}</h2>
 		<span style="display: flex; flex-direction: row; align-items: center;">
 		  <mat-icon>event</mat-icon>
 		  <p>{{chatRoom.updated_at | date}}</p>
