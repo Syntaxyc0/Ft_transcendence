@@ -12,8 +12,6 @@ export class Room{
 
     ball: Ball
     paddles: Paddle[] = [];
-    // paddleLeft: Paddle
-    // paddleRight: Paddle
 
     isGameRunning: boolean = false
 
@@ -26,9 +24,6 @@ export class Room{
         this.players.push(playerTwo)
 
         this.ball = new Ball(this.multiplayer)
-
-        // this.paddleLeft = new Paddle(0, this.multiplayer)
-        // this.paddleRight = new Paddle(1, this.multiplayer)
 
         this.paddles.push(new Paddle(0, this.multiplayer))
         this.paddles.push(new Paddle(1, this.multiplayer))
@@ -44,19 +39,18 @@ export class Room{
 
     }
 
-    // updatePaddle(paddle: {x: number, y: number, side: number})
-    // {
-    //     if (!paddle.side)
-    //     {
-    //         this.paddleLeft.y = paddle.y
-    //     }
-    //     else
-    //     {
-    //         this.paddleRight.y = paddle.y
-    //     }
-    //     this.multiplayer.gameRequest({order: "paddlePosition", side: paddle.side, x: paddle.x, y: paddle.y})
-        
-    // }
+    log()
+    {
+		console.log(" ************* ")
+        this.paddles.forEach((paddle) => {
+			console.log("paddle " + paddle.side)
+			console.log("x: " + paddle.x + " / y: " + paddle.y)
+            console.log(" -------------------------- ")
+		})
+		console.log("ball: x: " + this.ball.x + " / y: " + this.ball.y)
+		console.log(" ************* ")
+
+    }
 
     destroyRoom()
     {

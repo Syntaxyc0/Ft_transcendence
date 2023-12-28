@@ -14,7 +14,8 @@ export class MultiplayerService{
             this.room.players[i].socket.emit('onGameRequest', payload)
     }
 
-ballData(ball: Ball)
+
+    ballData(ball: Ball)
     {
         const deltaX = ball.x - this.previousBallState.x
         const deltaY = ball.y - this.previousBallState.y
@@ -27,6 +28,29 @@ ballData(ball: Ball)
         this.previousBallState.angle = ball.angle
     }
 
+    ballReset(ball: Ball)
+    {
+        this.gameRequest({order: "ballReset", x: ball.x, y: ball.y, angle: ball.angle})
+    }
+
+    paddleData(paddle: {y: number, side: number})
+    {
+        this.room.paddles[paddle.side].y += paddle.y
+        if (paddle.side == 1)
+          this.room.players[0].socket.emit("onGameRequest", {order: "paddlePosition", side: paddle.side, y: paddle.y})
+        else
+          this.room.players[1].socket.emit("onGameRequest", {order: "paddlePosition", side: paddle.side, y: paddle.y})
+    }
+
+    paddleReset(paddle: Paddle)
+    {
+        this.gameRequest({order: "resetPaddle", side: paddle.side, x: paddle.x, y: paddle.y})
+    }
+
+    sendScore(side: number)
+    {
+        this.gameRequest({order: "newScore", side: side})
+    }
 
     gameLoop()
 	{
@@ -40,12 +64,6 @@ ballData(ball: Ball)
             this.gameLoop();
         }, 1000 / 60);
 	}
-
-    setPaddle(paddle: Paddle)
-    {
-        this.gameRequest({order: "paddlePosition", side: paddle.side, x: paddle.x, y: paddle.y})
-    }
-
 
     gameBoardInit()
     {

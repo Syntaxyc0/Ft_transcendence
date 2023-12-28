@@ -6,6 +6,7 @@ import { Room} from './models/room.model';
 import { MultiplayerService } from './services/multiplayer.service';
 import { connected } from 'process';
 import { Client } from 'socket.io/dist/client';
+import { tsAnyKeyword } from '@babel/types';
 
 @WebSocketGateway({
   cors: {
@@ -68,26 +69,27 @@ export class GameGateway implements OnModuleInit{
   }
 
   @SubscribeMessage('newPaddlePosition')
-  setPaddle(@ConnectedSocket() client: Socket, @MessageBody() paddle: {x: number, y: number, side: number})
+  setPaddle(@ConnectedSocket() client: Socket, @MessageBody() paddle: {y: number, side: number})
   {
     const targetRoom = this.getRoom(client.id)
     if (!targetRoom)
       return;
-    
-    targetRoom.paddles[paddle.side].y = paddle.y
-    if (paddle.side == 1)
-    {
-      targetRoom.players[0].socket.emit("onGameRequest", {order: "paddlePosition", side: paddle.side, x: paddle.x, y: paddle.y})
-    }
-    else
-      targetRoom.players[1].socket.emit("onGameRequest", {order: "paddlePosition", side: paddle.side, x: paddle.x, y: paddle.y})
+    targetRoom.multiplayer.paddleData(paddle);
+  }
+
+  @SubscribeMessage('logRequest')
+  log(@ConnectedSocket() client: Socket)
+  {
+    const targetRoom = this.getRoom(client.id)
+    if (!targetRoom)
+      return;
+    targetRoom.log()
   }
 
   @SubscribeMessage('multiplayerRequest')
   searchMultiplayer(@ConnectedSocket() client: Socket) {
     if (this.connectedPlayers.get(client.id).room)
       return;
-    // console.log(client.data.login + " is looking for another player.")
     for (const [socketId, player] of this.connectedPlayers) {
       if (player.socket.id != client.id && player.lookingForPlayer)
       {
@@ -98,10 +100,3 @@ export class GameGateway implements OnModuleInit{
     this.connectedPlayers.get(client.id).lookingForPlayer = true
   }
 }
-
-
- // targetSocket.emit('onGameRequest', {
-    //   order: "scoreUp",
-    //   leftScore: body.leftScore,
-    //   rightScore: body.rightScore
-    // });

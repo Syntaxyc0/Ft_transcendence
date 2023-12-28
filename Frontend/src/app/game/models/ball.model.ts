@@ -7,33 +7,18 @@ export class Ball{
 	public x: number = 0
 	public y: number = 0
 
-	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
-
-	public targetX!:number;
-	public targetY!:number;
 
 	constructor(public context: CanvasRenderingContext2D)
 	{
 
 	}
+	
 	reset(angle: number, x: number, y: number)
 	{
-		this.x = this.targetX + x;
-		this.y = this.targetY + y;
-		this.targetX = this.x;
-		this.targetY = this.y;
-		this.angle += angle;
+		this.x = x
+		this.y = y
+		this.angle = angle;
 	}
-	
-	newPos(angle: number, deltaX: number, deltaY: number)
-	{
-
-		// this.targetX += x;
-		// this.targetY += y;
-		// this.angle += angle;
-
-	}
-
 	
 	draw()
 	{

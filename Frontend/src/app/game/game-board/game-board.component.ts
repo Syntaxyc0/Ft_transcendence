@@ -30,9 +30,7 @@ export const HEIGHT = 640
 	ball: Ball;
 
 	userPaddle: Paddle;
-
-	paddleLeft: Paddle;
-	paddleRight: Paddle;
+    paddles: Paddle[] = [];
 
 	oldTimeStamp: number;
 	isGameRunning: boolean;
@@ -41,14 +39,15 @@ export const HEIGHT = 640
 
 	ngOnInit(): void {
 		this.context = this.gameCanvas.nativeElement.getContext('2d');
-		this.paddleLeft = new Paddle(this.context, this);
-		this.paddleRight = new Paddle(this.context, this);
+
+        this.paddles.push(new Paddle(this.context))
+        this.paddles.push(new Paddle(this.context))
+
 		this.ball = new Ball(this.context);
 		this.data = this.player.getData();
 		this.data.subscribe((payload: any) =>{
 			if (!payload.order)
 				return;
-			// console.log(payload)
 			this.handleOrder(payload.order, payload);
 		});
 		this.gameLoop = this.gameLoop.bind(this);
@@ -58,37 +57,25 @@ export const HEIGHT = 640
 	handleOrder(order:string, payload:any)
 	{
 		switch(order){
-			case "ballCollide":
-				this.ball.reset(payload.angle, payload.x, payload.y)
-				this.draw()
-			break;
 			case "ballPosition":
 				this.newMovement(payload.angle, payload.x, payload.y)
 			break;
 			case "ballReset":
+				this.movementQueue = []
 				this.ball.reset(payload.angle, payload.x, payload.y)
-				this.draw()
+			break;
+			case "resetPaddle":
+				this.paddles[payload.side].reset(payload.x, payload.y)
 			break;
 			case "paddlePosition":
-				if(!payload.side)
-					this.newPaddlePosition(this.paddleLeft, payload.x, payload.y)
-				else
-					this.newPaddlePosition(this.paddleRight, payload.x, payload.y)
+				this.paddles[payload.side].newPosition(payload.y)
 			break;
 			case "usersPaddle":
-				if (!payload.side)
-					this.userPaddle = this.paddleLeft
-				else
-					this.userPaddle = this.paddleRight
+				this.userPaddle = this.paddles[payload.side]
 				this.userPaddle.side = payload.side;
 			break;
 			case "setGameBoard":
 				this.ball.speed = payload.speed
-				this.ball.x = payload.x
-				this.ball.y = payload.y
-				this.ball.angle = payload.angle
-				this.ball.targetX = this.ball.x
-				this.ball.targetY = this.ball.y
 				this.draw()
 			break;
 			case "startGame":
@@ -96,6 +83,9 @@ export const HEIGHT = 640
 			break;
 			case "stopGame":
 				this.stopGame()
+			break;
+			case "newScore":
+				this.paddles[payload.side].score++
 			break;
 		}
 	}
@@ -105,24 +95,42 @@ export const HEIGHT = 640
 		this.movementQueue.push({ deltaX: deltaX, deltaY: deltaY, angle: angle});
 	}
 
-	applyMovement(movement: { deltaX: number; deltaY: number, angle: number}, secondsPassed: number)
+	applyMovement(movement: { deltaX: number; deltaY: number, angle: number}/*, secondsPassed: number*/)
 	{
 		this.ball.x += movement.deltaX
 		this.ball.y += movement.deltaY
 		this.ball.angle += movement.angle
 	}
 
+	log()
+	{
+		console.log(" ************* ")
+		this.player.sendRequest("logRequest")
+		this.paddles.forEach((paddle) => {
+			console.log("paddle " + paddle.side)
+			console.log("x: " + paddle.x + " / y: " + paddle.y + " / targetY: " + paddle.targetY)
+			console.log(" -------------------------- ")
+		})
+		console.log("ball: x: " + this.ball.x + " / y: " + this.ball.y)
+		console.log(" ************* ")
+
+	}
+
 	gameLoop()
 	{
 		if (!this.isGameRunning)
 			return
-		const timeStamp = Date.now();
-		const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
+		// const timeStamp = Date.now();
+		// const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
+		let y = this.lerp(this.userPaddle.y, this.userPaddle.targetY, 0.3)
+		this.player.newPaddlePosition({y: y - this.userPaddle.y, side: this.userPaddle.side})
+		this.userPaddle.y = y;
 		this.movementQueue.forEach((movement) => {
-			this.applyMovement(movement, secondsPassed);
+			this.applyMovement(movement);
+
 		  });
 		this.movementQueue = [];
-		this.oldTimeStamp = timeStamp
+		// this.oldTimeStamp = timeStamp
 		this.draw();
 		requestAnimationFrame(this.gameLoop);
 
@@ -138,8 +146,8 @@ export const HEIGHT = 640
 		this.context.clearRect(0, 0, WIDTH, HEIGHT);
 		this.context?.fillRect(0, 0, WIDTH, HEIGHT);
 		this.ball.draw();
-		this.paddleLeft.draw();
-		this.paddleRight.draw();
+		this.paddles[0].draw();
+		this.paddles[1].draw();
 	}
 
 	multiplayerRequest()
@@ -164,6 +172,8 @@ export const HEIGHT = 640
 	stopGame()
 	{
 		this.isGameRunning = false;
+		this.paddles[0].score = 0;
+		this.paddles[1].score = 0;
 		this.drawBoard()
 	}
 
@@ -183,28 +193,37 @@ export const HEIGHT = 640
 
 	updatePaddlePosition(paddle: Paddle, event: string)
 	{
-		const top = HEIGHT - PADDLE_HEIGHT
-		const bottom = PADDLE_HEIGHT
+		const top = HEIGHT - (PADDLE_HEIGHT / 2)
+		const bottom = PADDLE_HEIGHT / 2
 
-		if(paddle && paddle.y < top && (event == 'ArrowDown' || event == 's'))
+		if (!paddle)
+			return;
+		if((event == 'ArrowDown' || event == 's'))
 		{
-			// paddle.targetY = paddle.y + paddle.step
-			paddle.y += paddle.step
-			this.player.newPaddlePosition({x: paddle.x, y: paddle.y, side: paddle.side})
+			if (paddle.y + paddle.step < top)
+				paddle.targetY = paddle.y + paddle.step
+			else
+				paddle.targetY = top
 
 		}
-		if(paddle && paddle.y > bottom && (event == 'ArrowUp' || event == 'w'))
+		if((event == 'ArrowUp' || event == 'w'))
 		{
-			// paddle.targetY = paddle.y - paddle.step
-			paddle.y -= paddle.step
-			this.player.newPaddlePosition({x: paddle.x, y: paddle.y, side: paddle.side})
+			if (paddle.y - paddle.step > bottom)
+				paddle.targetY = paddle.y - paddle.step
+			else
+				paddle.targetY = bottom
 		}
-	}
-
-	newPaddlePosition(paddle: Paddle, x: number, y: number)
-	{
-		paddle.x = x;
-		paddle.y = y;
 	}
 
   }
+
+  // this.paddles.forEach((paddle) => {
+		// 	let y = this.lerp(
+		// 		paddle.y,
+		// 		paddle.targetY,
+		// 		0.3
+		// 	);
+		// 	this.player.newPaddlePosition({y: y - paddle.y, side: paddle.side})
+		// 	paddle.y = y
+
+		// })

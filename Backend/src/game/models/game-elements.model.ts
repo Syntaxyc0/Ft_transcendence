@@ -2,15 +2,12 @@ import { WIDTH, HEIGHT } from "../game.service";
 import { MultiplayerService } from "../services/multiplayer.service";
 
 export class Paddle{
-    velocity!:number;
-	acceleration!:number;
-	deceleration!: number;
 	step!: number;
 
-	height: number = 150;
+	height: number = 200;
 	width: number = 25;
 
-	x: number = 0;
+	x!: number;
 	y!: number;
 
 	score: number = 0;
@@ -26,14 +23,9 @@ export class Paddle{
 
     reset()
 	{
-		// this.acceleration = 1000
-		// this.deceleration = 1000
-		// this.velocity = 10;
-		// this.step = 20;
 		this.y = HEIGHT / 2;
 		this.score = 0;
-		this.multiplayer.setPaddle(this)
-		// this.targetY = this.y
+		this.multiplayer.paddleReset(this)
 	}
 	updatePosition(y: number)
 	{
@@ -43,6 +35,7 @@ export class Paddle{
 }
 
 export class Ball{
+
     x: number
     y: number
     angle: number = Math.random() * 360;
@@ -51,17 +44,18 @@ export class Ball{
 
     constructor(private multiplayer: MultiplayerService){
 		this.reset()
-	    this.multiplayer.previousBallState = {x: this.x, y : this.y, angle: this.angle}
     }
 	
     reset()
 	{
-		this.speed = 20;
+		this.speed = 15;
 		this.x = WIDTH / 2;
 		this.y = HEIGHT / 2;
 		this.angle = Math.random() * 360;
 		while((this.angle >= 75 && this.angle <= 105) || (this.angle >= 255 && this.angle <= 285) )//|| (this.angle >= 0 && this.angle <= 15)
 			this.angle = Math.random() * 360;
+	    this.multiplayer.previousBallState = {x: this.x, y : this.y, angle: this.angle}
+		this.multiplayer.ballReset(this)
 
 	}
 
@@ -78,7 +72,6 @@ export class Ball{
 		else
 			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, -45, 45);
 		this.x = paddle.x + (-this.radius) * playerColliding;
-		console.log(this.x);
 		if (playerColliding == -1)
 			this.x += paddle.width;
 		this.multiplayer.ballData(this)
@@ -137,14 +130,15 @@ export class Ball{
 			{
 				this.x = left
 				paddleRight.score++;
+				this.multiplayer.sendScore(1)
 			}
 			else
 			{
 				this.x = right
 				paddleLeft.score++;
+				this.multiplayer.sendScore(0)
 			}
 			this.reset();
-			this.multiplayer.ballData(this)
 			return;
 		}
 		if (hy <= bottom || hy >= top)

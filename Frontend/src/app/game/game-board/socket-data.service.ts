@@ -36,7 +36,7 @@ export class SocketDataService{
     this.socket.emit(order)
   }
 
-  newPaddlePosition(paddle: {x: number, y: number, side: number})
+  newPaddlePosition(paddle: {y: number, side: number})
   {
     this.socket.emit("newPaddlePosition", paddle)
   }

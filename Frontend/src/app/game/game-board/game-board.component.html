@@ -3,11 +3,12 @@
 <div class = grid>
 	<button (click)="multiplayerRequest()"> Multiplayer </button>
 	<button (click)="disconnect()"> Disconnect </button>
+	<button (click)="log()"> Log </button>
 </div>
 <canvas #canvas width="1000" height="640" class="game-board">
 	Fallback
 </canvas>
 <p *ngIf = "!isGameRunning"> Game Paused</p>
-<p> Score: <br> 
-	</p>
+<p> Score: <br>
+	{{paddles[0].score}} || {{paddles[1].score}}</p>
 </div>
