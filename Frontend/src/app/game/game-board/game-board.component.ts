@@ -148,6 +148,9 @@ export const HEIGHT = 640
 		this.ball.draw();
 		this.paddles[0].draw();
 		this.paddles[1].draw();
+		this.context.font = '30px Arial';
+    	this.context.fillStyle = 'white';
+    	this.context.fillText(`${this.paddles[0].score} - ${this.paddles[1].score}`, WIDTH / 2 - 50, 50);
 	}
 
 	multiplayerRequest()
