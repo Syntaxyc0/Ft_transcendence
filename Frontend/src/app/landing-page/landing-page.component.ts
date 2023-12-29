@@ -10,6 +10,7 @@ import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http'
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.scss']
 })
+
 export class LandingPageComponent {
 
 	constructor(public http: HttpClient) {}

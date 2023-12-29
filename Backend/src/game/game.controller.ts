@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
-import { GameInfoDto } from './dto/GameInfor.dto';
+import { Body, Controller, Get, Param, ParseIntPipe, Post} from '@nestjs/common';
+import {GameInfoDto } from './dto/GameInfor.dto';
 import { GameService } from './game.service';
-
 @Controller('game')
 export class GameController {
 
