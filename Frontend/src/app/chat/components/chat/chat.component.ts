@@ -17,6 +17,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { ChatRoomComponent } from '../chat-room/chat-room.component';
 import { UserService } from '../../services/user.service';
+import { OptionUserComponent } from '../option-user/option-user.component';
 
 
 @Component({
@@ -33,6 +34,7 @@ import { UserService } from '../../services/user.service';
 			HttpClientModule,
 			RouterModule,
 			ChatRoomComponent,
+			OptionUserComponent,
 			],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
