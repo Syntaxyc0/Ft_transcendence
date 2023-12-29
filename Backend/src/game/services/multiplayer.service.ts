@@ -5,7 +5,7 @@ import { Injectable } from "@nestjs/common";
 
 export class MultiplayerService{
 
-   oldtimeStamp : number;
+    oldTimeStamp : number;
 
 
     previousBallState: {x: number, y : number, angle: number};
@@ -58,10 +58,13 @@ export class MultiplayerService{
 
     gameLoop()
 	{
+        const timeStamp = Date.now()
+        const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
 		if (!this.room || !this.room.isGameRunning) {
             return;
         }
         this.room.ball.updatePosition(this.room.paddles)
+        this.room.ball.speed *= 1 + secondsPassed / 20000
 		this.ballData(this.room.ball)
 
         setTimeout(() => {
@@ -79,6 +82,7 @@ export class MultiplayerService{
         this.gameRequest({order: "setGameBoard", speed: this.room.ball.speed, x: this.room.ball.x, y: this.room.ball.y, angle: this.room.ball.angle})
         this.room.isGameRunning = true
         this.gameRequest({order: "startGame"})
+        this.oldTimeStamp = Date.now()
 		this.gameLoop = this.gameLoop.bind(this)
         this.gameLoop()
     }
