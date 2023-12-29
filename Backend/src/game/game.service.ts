@@ -2,8 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { GameInfoDto } from './dto/GameInfor.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+export const WIDTH = 1000
+export const HEIGHT = 640
+
 @Injectable()
 export class GameService {
+
 
 	constructor(private prisma: PrismaService) {}
 

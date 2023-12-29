@@ -1,5 +1,7 @@
 import { GameInfoDto } from './dto/GameInfor.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+export declare const WIDTH = 1000;
+export declare const HEIGHT = 640;
 export declare class GameService {
     private prisma;
     constructor(prisma: PrismaService);

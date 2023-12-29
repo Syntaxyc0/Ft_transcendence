@@ -1,5 +1,5 @@
 {
-  "name": "nest_tutorial",
+  "name": "transcendence",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -48,6 +48,7 @@
     "fs": "^0.0.1-security",
     "nestjs-typeorm-paginate": "^4.0.4",
     "node-fetch": "^2.7.0",
+	"nodemailer": "^6.9.7",
     "passport": "^0.7.0",
     "passport-42": "^1.2.6",
     "passport-jwt": "^4.0.1",

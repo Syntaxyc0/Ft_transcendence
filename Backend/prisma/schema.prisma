@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
@@ -8,31 +5,28 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-enum Status {
-  ONLINE
-  OFFLINE
-  INGAME
+  url      = "postgresql://user:password@postgres:5432/db?schema=public"
 }
 
 model User {
-  id             Int             @id @default(autoincrement())
-  email          String          @unique
-  login          String          @unique
-  hash           String
-  is2faenabled   Boolean         @default(false)
-  is2favalidated Boolean         @default(false)
-  twofacode      String          @default("")
-  avatar         String          @default("")
-  elo            Int             @default(1000)
-  userStatus     String          @default("OFFLINE")
-  gameHistory    Int[]
-  friendList     Int[]           @default([])
-  FriendRequest  FriendRequest[]
-  rooms          Room[]          @relation("UserRooms")
-  connectedUser  ConnectedUser[]
+  id                     Int     @id @default(autoincrement())
+  email                  String  @unique
+  login                  String  @unique
+  login42                String  @unique
+  hash                   String
+  access_token           String  @default("")
+  is2faenabled           Boolean @default(false)
+  is2favalidated         Boolean @default(false)
+  twofacode              String  @default("")
+  avatar                 String  @default("")
+  elo                    Int     @default(1000)
+  userStatus             String  @default("OFFLINE")
+  gameHistory            Int[]
+  friendList             Int[]   @default([])
+  FriendRequestsEmitted  Int[]   @default([])
+  FriendRequestsReceived Int[]   @default([])
+  rooms				Room[]	@relation("UserRooms")
+  connectedUser		ConnectedUser[]
   joinedRoom     JoinedRoom[]
   Message        Message[]
   Creators		 Room[] @relation("RoomCreator")
@@ -53,6 +47,12 @@ model GameInfo {
   scoreUser1 Int
   scoreUser2 Int
   winnerId   Int
+}
+
+enum Status {
+  ONLINE
+  OFFLINE
+  INGAME
 }
 
 model Room {

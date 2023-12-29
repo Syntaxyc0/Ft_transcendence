@@ -1,6 +1,12 @@
 import { Body, OnModuleInit } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket} from "socket.io"
+import { Player } from './models/player.model'; 
+import { Room} from './models/room.model';
+import { MultiplayerService } from './services/multiplayer.service';
+import { connected } from 'process';
+import { Client } from 'socket.io/dist/client';
+import { tsAnyKeyword } from '@babel/types';
 
 @WebSocketGateway({
   cors: {
@@ -11,120 +17,86 @@ export class GameGateway implements OnModuleInit{
   @WebSocketServer()
   server: Server;
 
-  private connectedSockets: Map<string, Socket> = new Map();
-  private lookingForPlayerSockets: Map<string, Socket> = new Map();
-  private pairedSockets: Map<string, string> = new Map();
+
+  private connectedPlayers: Map<string, Player> = new Map()
+  private rooms: Room[] = []
 
   onModuleInit(){
     console.log("Server up")
     this.server.on('connection', (socket) => {
-      
-      this.connectedSockets.set(socket.id, socket);
+
       console.log(socket.id + ' has connected');
+      this.connectedPlayers.set(socket.id, new Player(socket))
 
       socket.on('disconnect', () => {
         console.log(socket.id + " has disconnected");
-        const targetId = this.pairedSockets.get(socket.id);
-        const targetSocket = this.connectedSockets.get(targetId);
 
-        this.disconnectClient(socket.id);
-        this.connectedSockets.delete(socket.id);
-        if (targetSocket)
-          targetSocket.emit('otherDisconnected', {order: 'otherDisconnected'})
+        this.disconnectRoom(socket.id);
+        this.connectedPlayers.delete(socket.id)
+
       });
     });
   }
 
+  getRoom(clientId: string) : Room{
+    if (!this.connectedPlayers.get(clientId))
+      return undefined;
+    const targetRoom = this.connectedPlayers.get(clientId).room;
+    return targetRoom;
+  }
+
+  disconnectRoom(clientId: string){
+    if (!this.connectedPlayers.get(clientId))
+      return;
+    const targetRoom = this.connectedPlayers.get(clientId).room;
+    if (targetRoom)
+    {
+      console.log("Destroying Room " + targetRoom.id)
+      targetRoom.destroyRoom()
+      this.rooms.splice(targetRoom.id, 1);
+    }
+  }
+
   disconnectClient(clientId: string) {
-    const targetId = this.pairedSockets.get(clientId);
-    this.pairedSockets.delete(clientId);
-    this.pairedSockets.delete(targetId); // Remove the target as well
-    this.lookingForPlayerSockets.delete(clientId);
-    this.lookingForPlayerSockets.delete(targetId); // Remove the target as well
-    console.log("erase happened")
+    this.disconnectRoom(clientId)
 }
 
   @SubscribeMessage('disconnectingClient')
   warnOther(@ConnectedSocket() client: Socket)
   {
-    const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
-    this.disconnectClient(client.id);
-    if (targetSocket)
-      targetSocket.emit('otherDisconnected', {order: 'otherDisconnected'});
+    this.connectedPlayers.get(client.id).lookingForPlayer = false
+    this.disconnectRoom(client.id)
   }
 
-  @SubscribeMessage('gameRequest')
-  gameRequest(@MessageBody() body: {order: string}, @ConnectedSocket() client: Socket)
+  @SubscribeMessage('newPaddlePosition')
+  setPaddle(@ConnectedSocket() client: Socket, @MessageBody() paddle: {y: number, side: number})
   {
-    const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
-    if (!targetSocket)
+    const targetRoom = this.getRoom(client.id)
+    if (!targetRoom)
       return;
-    targetSocket.emit('onGameRequest', {
-        order: body.order
-    });
-  }  
-
-  @SubscribeMessage('newScore')
-  newScore(@MessageBody() body: {leftScore: number, rightScore: number}, @ConnectedSocket() client:Socket)
-  {
-    const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
-    if (!targetSocket)
-      return;
-    targetSocket.emit('onGameRequest', {
-      order: "scoreUp",
-      leftScore: body.leftScore,
-      rightScore: body.rightScore
-    });
+    targetRoom.multiplayer.paddleData(paddle);
   }
 
-  @SubscribeMessage('newPaddlePos')
-  newPaddlePos(@MessageBody() body: {x: number, y: number}, @ConnectedSocket() client: Socket)
+  @SubscribeMessage('logRequest')
+  log(@ConnectedSocket() client: Socket)
   {
-    const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
-    if (!targetSocket)
+    const targetRoom = this.getRoom(client.id)
+    if (!targetRoom)
       return;
-    targetSocket.emit('onGameRequest', {
-      order:"paddleUp",
-      x: body.x,
-      y: body.y
-    });
-  }
-
-  @SubscribeMessage('newBallPos')
-  newBallPos(@MessageBody() body: {angle: number, x: number, y: number}, @ConnectedSocket() client: Socket)
-  {
-    const targetSocket = this.connectedSockets.get(this.pairedSockets.get(client.id));
-    if (!targetSocket)
-      return;
-    targetSocket.emit('onGameRequest', {
-      order:"ballUp",
-      angle: body.angle,
-      x: body.x,
-      y: body.y
-    });
+    targetRoom.log()
   }
 
   @SubscribeMessage('multiplayerRequest')
   searchMultiplayer(@ConnectedSocket() client: Socket) {
-    console.log("Client looking for player: " + client.id);
-    for (const [socketId, socket] of this.lookingForPlayerSockets) {
-      if (socket.id != client.id)
+    if (this.connectedPlayers.get(client.id).room)
+      return;
+    for (const [socketId, player] of this.connectedPlayers) {
+      if (player.socket.id != client.id && player.lookingForPlayer)
       {
-        console.log("Player found: " + socket.id);
-        client.emit('newPlayer', {
-          order: "newPlayer",
-          first: true,
-        });
-        socket.emit('newPlayer', {
-          order: "newPlayer",
-          first: false,
-        });
-        this.lookingForPlayerSockets.delete(socket.id);
-        this.pairedSockets.set(socket.id, client.id);
-        this.pairedSockets.set(client.id, socket.id);
+        this.rooms.push(new Room(this.rooms.length ,this.connectedPlayers.get(client.id), player))
         return;
       }
     }
-    this.lookingForPlayerSockets.set(client.id, client);
+    this.connectedPlayers.get(client.id).lookingForPlayer = true
   }
 }
