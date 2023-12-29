@@ -5,6 +5,7 @@ import { Socket, io } from 'socket.io-client';
 import { Ball } from '../models/ball.model';
 import { Paddle } from '../models/paddle.model';
 import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
+import { strings } from '@material/form-field';
 
 
 @Injectable({
@@ -14,8 +15,9 @@ export class SocketDataService{
 
 	constructor(private socket: CustomSocket) {}
 
-  private baseUrl = 'http://localhost:3333';
-  private isOnline: boolean = false;
+  // private baseUrl = 'http://localhost:3333';
+
+  private login!: string;
 
   getData(): Observable<any[]> {
     const data = new Subject<any>();
@@ -24,11 +26,18 @@ export class SocketDataService{
     this.socket.on('connect', () => {
       console.log("Connected");
     });
+    this.socket.on('login', (login: string) => {
+      this.login = login
+    });
     this.socket.on('onGameRequest', (payload: {order: string}) =>{
-      // console.log(payload)
       data.next(payload);
     });
     return dataObservable;
+  }
+
+  getLogin(): string
+  {
+    return this.login;
   }
 
   sendRequest(order: string)

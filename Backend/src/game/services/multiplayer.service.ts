@@ -1,8 +1,12 @@
 import { Player } from "../models/player.model";
 import { Room } from "../models/room.model";
 import { Ball, Paddle } from "../models/game-elements.model";
+import { Injectable } from "@nestjs/common";
 
 export class MultiplayerService{
+
+   oldtimeStamp : number;
+
 
     previousBallState: {x: number, y : number, angle: number};
 
@@ -57,7 +61,7 @@ export class MultiplayerService{
 		if (!this.room || !this.room.isGameRunning) {
             return;
         }
-        this.room.ball.updatePosition(this.room.paddles[0], this.room.paddles[1])
+        this.room.ball.updatePosition(this.room.paddles)
 		this.ballData(this.room.ball)
 
         setTimeout(() => {
@@ -70,8 +74,8 @@ export class MultiplayerService{
         if (!this.room) {
             return;
         }
-        this.room.players[0].socket.emit('onGameRequest', {order: 'usersPaddle', side: 0})
-        this.room.players[1].socket.emit('onGameRequest', {order: 'usersPaddle', side: 1})
+        this.room.players[0].socket.emit('onGameRequest', {order: 'usersPaddle', side: 0, login: this.room.players[1].login})
+        this.room.players[1].socket.emit('onGameRequest', {order: 'usersPaddle', side: 1, login: this.room.players[0].login})
         this.gameRequest({order: "setGameBoard", speed: this.room.ball.speed, x: this.room.ball.x, y: this.room.ball.y, angle: this.room.ball.angle})
         this.room.isGameRunning = true
         this.gameRequest({order: "startGame"})

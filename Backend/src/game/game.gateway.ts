@@ -4,9 +4,10 @@ import { Server, Socket} from "socket.io"
 import { Player } from './models/player.model'; 
 import { Room} from './models/room.model';
 import { MultiplayerService } from './services/multiplayer.service';
-import { connected } from 'process';
-import { Client } from 'socket.io/dist/client';
-import { tsAnyKeyword } from '@babel/types';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { AuthService } from 'src/auth/auth.service';
+import { UserI } from 'src/chat/model/user.interface';
+
 
 @WebSocketGateway({
   cors: {
@@ -21,12 +22,18 @@ export class GameGateway implements OnModuleInit{
   private connectedPlayers: Map<string, Player> = new Map()
   private rooms: Room[] = []
 
+  constructor(private prisma: PrismaService, private authService: AuthService) {}
+
   onModuleInit(){
     console.log("Server up")
-    this.server.on('connection', (socket) => {
+    this.server.on('connection', async (socket) => {
 
       console.log(socket.id + ' has connected');
-      this.connectedPlayers.set(socket.id, new Player(socket))
+      const decodedToken = await this.authService.verifyJwt(socket.handshake.headers.authorization);
+            const user: UserI = await this.prisma.user.findUnique({
+                where: { id: decodedToken.sub },
+            });
+      this.connectedPlayers.set(socket.id, new Player(socket, user.login))
 
       socket.on('disconnect', () => {
         console.log(socket.id + " has disconnected");

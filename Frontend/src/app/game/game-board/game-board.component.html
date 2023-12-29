@@ -8,5 +8,9 @@
 <canvas #canvas width="1000" height="640" class="game-board">
 	Fallback
 </canvas>
+<div id="playerNames" class="player-names">
+	<div class="player-name left">{{ paddles[0].login }}</div>
+	<div class="player-name right">{{ paddles[1].login }}</div>
+</div>
 <p *ngIf = "!isGameRunning"> Game Paused</p>
 </div>

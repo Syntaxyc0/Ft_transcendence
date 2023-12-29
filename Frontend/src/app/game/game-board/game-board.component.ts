@@ -72,10 +72,15 @@ export const HEIGHT = 640
 			break;
 			case "usersPaddle":
 				this.userPaddle = this.paddles[payload.side]
+				this.userPaddle.login = this.getLogin();
 				this.userPaddle.side = payload.side;
+				if (!this.userPaddle.side)
+					this.paddles[1].login = payload.login
+				else
+					this.paddles[0].login = payload.login
 			break;
 			case "setGameBoard":
-				this.ball.speed = payload.speed
+				// this.ball.speed = payload.speed
 				this.draw()
 			break;
 			case "startGame":
@@ -83,6 +88,9 @@ export const HEIGHT = 640
 			break;
 			case "stopGame":
 				this.stopGame()
+			break;
+			case "resetBoard":
+				this.reset()
 			break;
 			case "newScore":
 				this.paddles[payload.side].score++
@@ -114,6 +122,11 @@ export const HEIGHT = 640
 		console.log("ball: x: " + this.ball.x + " / y: " + this.ball.y)
 		console.log(" ************* ")
 
+	}
+
+	getLogin(): string
+	{
+		return (this.player.getLogin())
 	}
 
 	gameLoop()
@@ -175,9 +188,18 @@ export const HEIGHT = 640
 	stopGame()
 	{
 		this.isGameRunning = false;
+	}
+
+	reset()
+	{
+		this.isGameRunning = false;
 		this.paddles[0].score = 0;
 		this.paddles[1].score = 0;
+		this.paddles.forEach((paddle) => {
+			paddle.login = ""
+		})
 		this.drawBoard()
+
 	}
 
 	disconnect()

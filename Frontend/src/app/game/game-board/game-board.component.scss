@@ -47,60 +47,20 @@
 	justify-content: center;
   }
   
-  /* Other styles remain the same */
+  .player-names {
+	position: relative;
+  }
   
 
-/*.game-board {
-	position: relative;
-	width: 65vh;
-	height: 40vh;
-	background-color: black; 
-
-  }
-
-  .center-line {
-	width: 1vw;
-	height: 100%;
-	background-color: #fff;
+  .player-name {
 	position: absolute;
-	left: 50%;
-	transform: translateX(-50%);
-  }*/
-
-  /*.h-screen {
-	height: 100vh;
+	font-size: 18px;
   }
   
-  .grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 10px;
+  .left {
+	left: 75px; /* Adjust the left position as needed */
   }
   
-  .grid button {
-	padding: 10px;
-	font-size: 16px;
-	cursor: pointer;
-	background-color: #4caf50;
-	color: white;
-	border: none;
-	border-radius: 5px;
+  .right {
+	right: 75px; /* Adjust the right position as needed */
   }
-  
-  .grid button:hover {
-	background-color: #45a049;
-  }
-  
-  .grid p {
-	margin-top: 10px;
-  }
-  
-  .game-board {
-	position: relative;
-	border: 1px solid #ccc;
-	margin-top: 20px;
-	cursor: pointer;
-  }*/
-  
-  /* Add more styles based on your requirements */
-  

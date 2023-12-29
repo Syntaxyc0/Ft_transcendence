@@ -68,12 +68,17 @@ export class Ball{
 	updateCollide(paddle: Paddle, y: number, x: number, playerColliding: number)
 	{
 		if (playerColliding == 1)
+		{
 			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, 225, 135);
+			this.x = paddle.x + (-this.radius);
+
+		}
 		else
+		{
 			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, -45, 45);
-		this.x = paddle.x + (-this.radius) * playerColliding;
-		if (playerColliding == -1)
-			this.x += paddle.width;
+			this.x = paddle.x + this.radius + paddle.width;
+
+		}
 		this.multiplayer.ballData(this)
 
 	}
@@ -82,10 +87,10 @@ export class Ball{
 	{
 
 		if(x - this.radius <= paddleLeft.width + paddleLeft.x)
-			return -1;
+			return 0;
 		else if (x + this.radius >= paddleRight.x)
 			return 1;
-		return 0;
+		return -1;
 	}
 
 	yIsColliding(paddle: Paddle, y: number): boolean
@@ -100,7 +105,7 @@ export class Ball{
 		return false
 	}
 
-	updatePosition(paddleLeft: Paddle, paddleRight: Paddle)
+	updatePosition(paddles: Paddle[])
 	{
 		let hx: number = Math.cos((this.angle * Math.PI) / 180) * this.speed  + this.x;
 		let hy: number = Math.sin((this.angle * Math.PI) / 180) * this.speed  + this.y;
@@ -111,12 +116,10 @@ export class Ball{
 		const left = this.radius;
 		const right = WIDTH - this.radius;
 
-		let playerColliding = this.xIsColliding(paddleRight, paddleLeft, hx)
-		if (playerColliding != 0){
-			if (playerColliding == 1 && this.yIsColliding(paddleRight, hy))
-				return this.updateCollide(paddleRight, hy, hx, playerColliding)
-			else if (this.yIsColliding(paddleLeft, hy) && playerColliding == -1)
-				return this.updateCollide(paddleLeft, hy, hx, playerColliding)
+		let playerColliding = this.xIsColliding(paddles[1], paddles[0], hx)
+		if (playerColliding != -1){
+			if (this.yIsColliding(paddles[playerColliding], hy))
+				return this.updateCollide(paddles[playerColliding], hy, hx, playerColliding)
 		}
 		if (hx < right && hx > left && hy < top && hy > bottom)
 		{
@@ -128,14 +131,13 @@ export class Ball{
 		{
 			if (hx <= left)
 			{
-				this.x = left
-				paddleRight.score++;
+				paddles[1].score++;
 				this.multiplayer.sendScore(1)
+
 			}
 			else
 			{
-				this.x = right
-				paddleLeft.score++;
+				paddles[0].score++;
 				this.multiplayer.sendScore(0)
 			}
 			this.reset();

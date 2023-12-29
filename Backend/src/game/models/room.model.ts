@@ -2,6 +2,7 @@ import { Player } from "./player.model";
 import { Ball, Paddle } from "./game-elements.model";
 import { MultiplayerService } from "../services/multiplayer.service";
 import { WIDTH } from "../game.service";
+import { PrismaService } from "src/prisma/prisma.service";
 
 export class Room{
 
@@ -54,7 +55,7 @@ export class Room{
 
     destroyRoom()
     {
-        this.multiplayer.gameRequest({order: "stopGame"})
+        this.multiplayer.gameRequest({order: "resetBoard"})
         this.isGameRunning = false
         for (let i: number = 0; i < 2; i++)
         {

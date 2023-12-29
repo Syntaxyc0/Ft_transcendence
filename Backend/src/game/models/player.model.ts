@@ -1,20 +1,21 @@
 import { Socket } from "socket.io";
 import { Room } from "./room.model";
 import { Paddle } from "./game-elements.model";
+import { PrismaService } from "src/prisma/prisma.service";
 
 export class Player{
     socket: Socket;
-    // username: string;
     score: number;
     room: Room;
 
     lookingForPlayer = false;
 
-    constructor(socket: Socket){
+    constructor(socket: Socket, public login: string){
         
+
         this.socket = socket;
-        // this.username = username
         this.score = 0;
-        console.log(socket.id + " player created.")
+        this.socket.emit('login', login)
+        console.log(login + " player created.")
     }
 }
