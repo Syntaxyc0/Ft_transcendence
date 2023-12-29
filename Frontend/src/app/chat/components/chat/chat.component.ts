@@ -34,18 +34,18 @@ import { OptionUserComponent } from '../option-user/option-user.component';
 			HttpClientModule,
 			RouterModule,
 			ChatRoomComponent,
-			OptionUserComponent,
+			OptionUserComponent
 			],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements AfterViewInit{
+export class ChatComponent implements AfterViewInit, OnInit{
 	
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
 	userList :object[] = []
 	user = this.userService.getLoggedInUser();
-	additionnalDiv = true;
+	option: boolean;
 
 
 	constructor(private route:ActivatedRoute,
@@ -53,6 +53,12 @@ export class ChatComponent implements AfterViewInit{
 		private chatService: ChatService,
 		public http: HttpClient,
 		private userService: UserService) {}
+
+	ngOnInit(): void {
+		this.userService.option$.subscribe(value => {
+			this.option = value;
+		  });
+	}
 
 	ngAfterViewInit() {
 		this.chatService.emitRooms();

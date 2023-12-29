@@ -14,6 +14,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { ChatMessageComponent } from '../chat-message/chat-message.component';
 import { UserI } from '../../model/user.interface';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-chat-room',
@@ -52,9 +53,10 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 
   chatMessage: FormControl = new FormControl(null, [Validators.required]);
 
-  constructor(private chatService: ChatService) { }
+  constructor(private chatService: ChatService, private userService: UserService) { }
 
   ngOnInit(): void {
+	this.userService.changeRoom(this.chatRoom);
   }
 
   ngOnChanges(changes: SimpleChanges) {

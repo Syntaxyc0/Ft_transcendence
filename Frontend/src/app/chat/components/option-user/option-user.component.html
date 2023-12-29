@@ -1,1 +1,16 @@
-<p>option-user works!</p>
+<head>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<mat-card>
+	<mat-list>
+		<mat-list-item class="list"><strong>{{ user?.login }}</strong></mat-list-item>
+		<mat-list-item class="list"><strong>{{ room?.name }}</strong></mat-list-item>
+		<mat-list-item class="list"><button mat-raised-button extended color=primary><strong>PLAY</strong></button></mat-list-item>
+		<mat-list-item class="list"><button mat-raised-button extended color=primary><strong>profile</strong></button></mat-list-item>
+		<mat-list-item class="list"><button mat-stroked-button>Mute</button></mat-list-item>
+		<mat-list-item class="list"><button mat-stroked-button>Kick</button></mat-list-item>
+		<mat-list-item class="list"><button mat-stroked-button color=warn>Ban</button></mat-list-item>
+		<mat-icon (click)="closeOption()">cancel</mat-icon>
+	</mat-list>
+</mat-card>

@@ -1,12 +1,50 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { SocketService } from '../../services/socket.service';
+import { take } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { UserService } from '../../services/user.service';
+import { MatCardModule } from '@angular/material/card';
+import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { UserI } from '../../model/user.interface';
+import { RoomI } from '../../model/room.interface';
+import { CustomSocket } from '../../sockets/custom-socket';
+
 
 @Component({
   selector: 'app-option-user',
   standalone: true,
-  imports: [],
   templateUrl: './option-user.component.html',
-  styleUrl: './option-user.component.scss'
+  imports: [ CommonModule,
+			MatCardModule,
+			MatListModule,
+			MatIconModule,
+			MatButtonModule,
+			],
+  styleUrls: ['./option-user.component.scss']
 })
 export class OptionUserComponent {
 
+	user: UserI | undefined;
+	room: RoomI | undefined;
+	current_user = this.userService.getLoggedInUser();
+  
+  constructor(private userService: UserService, private socket: CustomSocket) {}
+  
+  	ngOnInit(): void {
+		// import user on click
+		this.userService.user$.subscribe(value => {
+			this.user = value;
+		});
+
+		// import current room
+		this.userService.room$.subscribe(value => {
+			this.room = value;
+		});
+	}
+
+	closeOption() {
+		this.userService.changeOption(false, undefined);
+	}
 }
