@@ -40,6 +40,9 @@ export declare class AuthController {
         description: string;
         created_at: Date;
         updated_at: Date;
+        creatorId: number;
+        public: boolean;
+        password: string;
     })[]>;
     getUsers(): Promise<{
         id: number;
