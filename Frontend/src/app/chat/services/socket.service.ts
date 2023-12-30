@@ -20,7 +20,5 @@ import { UserI } from "../model/user.interface";
 		this.socket.emit('getCurrentUser');
 	}
 
-	getCurrentUser(): Observable<UserI> {
-		return this.socket.fromEvent('currentUser');
-	}
+
   }
