@@ -28,11 +28,18 @@ export class OptionUserComponent {
 
 	user: UserI | undefined;
 	room: RoomI | undefined;
-	current_user;
+	current_user = this.userService.getLoggedInUser();
+	isadmin;
   
-  constructor(private userService: UserService, private socket: CustomSocket) {}
+  constructor(private userService: UserService, private socket: CustomSocket, private socketService: SocketService) {}
   
   	ngOnInit(): void {
+		// import current user 
+		this.socketService.emitGetCurrentUser();
+		this.socketService.getCurrentUser().pipe(take(1)).subscribe( value => {
+			this.current_user = value;
+		});
+
 		// import user on click
 		this.userService.user$.subscribe(value => {
 			this.user = value;
@@ -42,12 +49,15 @@ export class OptionUserComponent {
 		this.userService.room$.subscribe(value => {
 			this.room = value;
 		});
+
+		this.isAdmin().subscribe(value =>{
+			this.isadmin = value;
+		})	
 	}
 
 	isAdmin(): Observable<boolean> {
 		this.socket.emit("getIsAdmin", this.room);
-		console.log(this.socket.fromEvent("isAdmin"));
-		return of(true);
+		return this.socket.fromEvent("isAdmin");
 	}
 
 	closeOption() {

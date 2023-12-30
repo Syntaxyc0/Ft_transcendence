@@ -4,15 +4,14 @@
 
 <mat-card *ngIf="user?.login !== current_user.login">
 	<mat-list>
-		<mat-list-item class="list"><strong>{{ current_user?.login }}</strong></mat-list-item>
 		<mat-list-item class="list"><strong>{{ user?.login }}</strong></mat-list-item>
 		<mat-list-item class="list"><strong>{{ room?.name }}</strong></mat-list-item>
 		<mat-list-item class="list"><button mat-raised-button extended color=primary><strong>PLAY</strong></button></mat-list-item>
 		<mat-list-item class="list"><button mat-raised-button extended color=primary><strong>profile</strong></button></mat-list-item>
 		<mat-list-item class="list"><button mat-stroked-button>Block</button></mat-list-item>
-		<mat-list-item class="list"><button mat-stroked-button color=warn>Mute</button></mat-list-item>
-		<mat-list-item *ngIf="!room?.public" class="list"><button mat-stroked-button color=warn>Kick</button></mat-list-item>
-		<mat-list-item *ngIf="!room?.public" class="list"><button mat-stroked-button color=warn>Ban</button></mat-list-item>
+		<mat-list-item *ngIf="isadmin" class="list"><button mat-stroked-button color=warn>Mute</button></mat-list-item>
+		<mat-list-item *ngIf="!room?.public && isadmin" class="list"><button mat-stroked-button color=warn>Kick</button></mat-list-item>
+		<mat-list-item *ngIf="!room?.public && isadmin" class="list"><button mat-stroked-button color=warn>Ban</button></mat-list-item>
 		<mat-icon (click)="closeOption()">cancel</mat-icon>
 	</mat-list>
 </mat-card>

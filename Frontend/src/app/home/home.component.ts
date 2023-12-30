@@ -8,6 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CustomSocket } from '../chat/sockets/custom-socket';
 import { PictureComponent } from '../components/picture/picture.component';
 import { FooterBarComponent } from '../components/footer-bar/footer-bar.component';
+import { UserService } from '../chat/services/user.service';
 
 @Component({
   selector: 'app-home',
@@ -18,14 +19,14 @@ import { FooterBarComponent } from '../components/footer-bar/footer-bar.componen
 })
 export class HomeComponent {
 
-	constructor(public http: HttpClient, private route:ActivatedRoute, private router: Router, private customSocket: CustomSocket) {}
+	constructor(public http: HttpClient, private route:ActivatedRoute, private router: Router, private customSocket: CustomSocket, private userService: UserService) {}
 
 
 	id:number = 0;
 
 	code: string 
 	ngOnInit() {
-	this.id = JSON.parse(localStorage.getItem('id')!)
+		this.id = JSON.parse(localStorage.getItem('id')!);
 	}
 
 	LaunchGame()
