@@ -11,21 +11,39 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard implements CanActivate {
+export class AuthGuard {
   constructor( private readonly router: Router, private http: HttpClient) {}
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    if (!localStorage.getItem('access_token'))
+    if (!localStorage.getItem('access_token') || !localStorage.getItem('id') || !localStorage.getItem('is_authenticated'))
 	{
       localStorage.clear();
       this.router.navigateByUrl('/landing');
       return false;
     }
     try {
-      this.check_token(localStorage.getItem('access_token')).subscribe({
+      this.check_token(localStorage.getItem('access_token'), parseInt(localStorage.getItem('id') || '{}')).subscribe({
         next: (val) => {
           if (!val) {
+		      	localStorage.clear();
             this.router.navigateByUrl('/landing');
             return false;
+
+          }
+          return true;
+        },
+        error: (e) => {
+          localStorage.clear();
+          this.router.navigateByUrl('/landing');
+          return false;
+        },
+      });
+      this.check_2fastatus(localStorage.getItem('id')).subscribe({
+        next: (val) => {
+          if (!val) {
+		      	localStorage.clear();
+            this.router.navigateByUrl('/landing');
+            return false;
+
           }
           return true;
         },
@@ -45,7 +63,12 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  check_token(token) {
-    return this.http.post("http://localhost:3333/auth/check", {token})
+  check_token(token, id) {
+    return this.http.post("http://localhost:3333/auth/check", {token: token, id: id})
 	}
+
+  check_2fastatus(id)
+  {
+    return this.http.get("http://localhost:3333/auth/" + id + "/check2fa")
+  }
 }

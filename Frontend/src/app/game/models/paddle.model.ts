@@ -1,38 +1,40 @@
-import { GameBoardComponent } from "../game-board/game-board.component";
+import { GameBoardComponent, HEIGHT, WIDTH } from "../game-board/game-board.component";
+
+export const PADDLE_HEIGHT = 200
+export const PADDLE_WIDTH = 25
 
 export class Paddle{
-	speed!: number;
-	height: number = 150;
-	width: number = 25;
+	step: number = 175;
+
 	x!: number;
 	y!: number;
-	targetY: number = 0;
+	targetY: number;
+
 	score: number = 0;
-	constructor(public currentUser: boolean, public context: CanvasRenderingContext2D, public gameBoard: GameBoardComponent)
+	side: number;
+	
+
+	constructor( public context: CanvasRenderingContext2D)
 	{
-		if (!currentUser)
-			this.x = this.gameBoard.width - this.width;
-		else
-			this.x = 0;
 	}
+	  
 
 	draw(){
 		this.context.fillStyle = 'red';
-		if(!this.currentUser)
-			this.context.fillRect(this.x, this.y - this.height/2, this.width, this.height);
-		this.context.fillRect(this.x, this.y - this.height/2, this.width, this.height);
+		this.context.fillRect(this.x, this.y - PADDLE_HEIGHT/2, PADDLE_WIDTH, PADDLE_HEIGHT);
+		this.context.fillRect(this.x, this.y - PADDLE_HEIGHT/2, PADDLE_WIDTH, PADDLE_HEIGHT);
 	}
 
-	newMultiPos(x: number, y: number)
+
+	reset(x: number, y: number)
 	{
 		this.x = x;
 		this.y = y;
+		this.targetY = y;
 	}
 
-	reset()
+	newPosition(y: number)
 	{
-		this.speed = 100;
-		this.y = this.gameBoard.height / 2;
-		this.score = 0;
+		this.y += y;
 	}
 }

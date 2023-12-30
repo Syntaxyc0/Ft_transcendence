@@ -1,14 +1,18 @@
 /// <reference types="multer" />
 import { PrismaService } from "src/prisma/prisma.service";
 import { UserI } from "src/chat/model/user.interface";
+import { MailService } from "src/mail/mail.service";
 export declare class UserService {
     private prisma;
-    constructor(prisma: PrismaService);
+    private mail;
+    constructor(prisma: PrismaService, mail: MailService);
     getUserFromId(id: number): Promise<{
         id: number;
         email: string;
         login: string;
+        login42: string;
         hash: string;
+        access_token: string;
         is2faenabled: boolean;
         is2favalidated: boolean;
         twofacode: string;
@@ -17,24 +21,19 @@ export declare class UserService {
         userStatus: string;
         gameHistory: number[];
         friendList: number[];
+        FriendRequestsEmitted: number[];
+        FriendRequestsReceived: number[];
     }>;
-    getUserFromLogin(login: string): Promise<{
-        id: number;
-        email: string;
-        login: string;
-        hash: string;
-        is2faenabled: boolean;
-        is2favalidated: boolean;
-        twofacode: string;
-        avatar: string;
-        elo: number;
-        userStatus: string;
-        gameHistory: number[];
-        friendList: number[];
-    }>;
+    getUserIdFromLogin(login: string): Promise<number>;
     updateUserStatus(id: number, status: any): Promise<void>;
+    ChangeNick(uid: number, name: string): Promise<void>;
     GetUserStatus(id: number): Promise<string>;
     GetUserFriendlist(uid: number): Promise<number[]>;
+    GetUserFriendRequestsReceived(uid: number): Promise<number[]>;
+    GetUserFriendRequestsSent(uid: number): Promise<number[]>;
+    CancelRequest(uid: number, name: string): Promise<void>;
+    RefuseRequest(uid: number, id: number): Promise<void>;
+    AcceptRequest(uid: number, id: number): Promise<void>;
     AddFriend(uid: number, userName: string): Promise<void>;
     RemoveFriend(uid: number, userId: number): Promise<void>;
     uploadFile(uid: number, file: Express.Multer.File): Promise<void>;
@@ -46,6 +45,10 @@ export declare class UserService {
     get2favalidated(uid: number): Promise<boolean>;
     validate2FA(uid: number): Promise<void>;
     switch2fa(uid: any, activate: any): Promise<void>;
+    verify2facode(uid: any, code: any): Promise<boolean>;
+    get2facode(uid: any): Promise<string>;
+    generateRandom6digitCode(): string;
+    logout(uid: any): Promise<void>;
     findAllByLogin(login: string): Promise<UserI[]>;
     allUser(): Promise<UserI[]>;
 }

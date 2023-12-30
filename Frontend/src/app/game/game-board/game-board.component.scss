@@ -1,9 +1,61 @@
-.game-board {
+/* Add these styles to your global styles or component-specific styles */
+
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh; /* Full height of the viewport */
+  }
+  
+  .grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 10px;
+	margin-bottom: 20px; /* Add margin to the grid */
+  }
+  
+  .grid button {
+	padding: 10px;
+	font-size: 16px;
+	cursor: pointer;
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	border-radius: 5px;
+  }
+  
+  .game-board {
+	position: relative;
+	border: 1px solid #ccc;
+	cursor: pointer;
+	width: 65vh;
+	height: 40vh;
+	background-color: black;
+	margin: 0 auto; /* Center the game board horizontally */
+  }
+  
+  .center-line {
+	/* Your center line styles remain the same */
+  }
+  
+  .h-screen {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+  }
+  
+  /* Other styles remain the same */
+  
+
+/*.game-board {
 	position: relative;
 	width: 65vh;
-	height: 40vh; /* Adjust as needed */
-	background-color: black; /* Set the background color */
-	// border: 0.5vh solid black; /* Add border styles */
+	height: 40vh;
+	background-color: black; 
+
   }
 
   .center-line {
@@ -13,9 +65,9 @@
 	position: absolute;
 	left: 50%;
 	transform: translateX(-50%);
-  }
+  }*/
 
-  .h-screen {
+  /*.h-screen {
 	height: 100vh;
   }
   
@@ -48,7 +100,7 @@
 	border: 1px solid #ccc;
 	margin-top: 20px;
 	cursor: pointer;
-  }
+  }*/
   
   /* Add more styles based on your requirements */
   

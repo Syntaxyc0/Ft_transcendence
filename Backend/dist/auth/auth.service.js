@@ -17,12 +17,14 @@ const argon = require("argon2");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 const axios_1 = require("@nestjs/axios");
+const mail_service_1 = require("../mail/mail.service");
 let AuthService = class AuthService {
-    constructor(prisma, jwt, config, httpService) {
+    constructor(prisma, jwt, config, httpService, mailService) {
         this.prisma = prisma;
         this.jwt = jwt;
         this.config = config;
         this.httpService = httpService;
+        this.mailService = mailService;
     }
     async signin(dto) {
         const user = await this.prisma.user.findUnique({
@@ -43,7 +45,8 @@ let AuthService = class AuthService {
             const user = await this.prisma.user.create({
                 data: {
                     email: dto.email,
-                    login: dto.login,
+                    login: this.generateRandomLogin(),
+                    login42: this.generateRandomLogin(),
                     hash,
                 },
                 select: {
@@ -71,6 +74,14 @@ let AuthService = class AuthService {
             expiresIn: '180m',
             secret: secret
         });
+        await this.prisma.user.update({
+            data: {
+                access_token: token
+            },
+            where: {
+                id: userId,
+            }
+        });
         return { access_token: token, id: userId };
     }
     async create42user(login, email) {
@@ -79,15 +90,16 @@ let AuthService = class AuthService {
             const hash = await argon.hash(pass);
             const alreadyregistered = await this.prisma.user.findUnique({
                 where: {
-                    login: login,
+                    login42: login,
                 },
             });
             if (alreadyregistered)
-                return this.signToken(alreadyregistered.id, alreadyregistered.login);
+                return { token: await this.signToken(alreadyregistered.id, alreadyregistered.login), isalreadyregistered: true };
             const user = await this.prisma.user.create({
                 data: {
                     email: email,
-                    login: login,
+                    login: this.generateRandomLogin(),
+                    login42: login,
                     avatar: "",
                     hash,
                 },
@@ -96,7 +108,7 @@ let AuthService = class AuthService {
                     login: true,
                 }
             });
-            return this.signToken(user.id, user.login);
+            return { token: await this.signToken(user.id, user.login), isalreadyregistered: false };
         }
         catch (error) {
             if (error instanceof client_1.Prisma.PrismaClientKnownRequestError) {
@@ -110,11 +122,24 @@ let AuthService = class AuthService {
         const password = Math.random().toString(36);
         return password;
     }
-    check_token(token) {
-        if (!token)
+    generateRandomLogin() {
+        const login = Math.random().toString(36);
+        return login;
+    }
+    async check_token(token, id) {
+        if (!token || !id)
+            return false;
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: id
+            },
+        });
+        if (!user)
+            return false;
+        if (user.access_token != token)
             return false;
         try {
-            const payload = this.jwt.verify(token.token, { secret: process.env.JWT_SECRET });
+            const payload = this.jwt.verify(user.access_token, { secret: process.env.JWT_SECRET });
             if (!payload)
                 return false;
         }
@@ -127,10 +152,50 @@ let AuthService = class AuthService {
     verifyJwt(jwt) {
         return this.jwt.verifyAsync(jwt, { secret: process.env.JWT_SECRET });
     }
+    async SendMail(uid) {
+        const twofacode = this.generateRandom6digitCode();
+        const hash = await argon.hash(twofacode);
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        await this.mailService.sendEmail(user.email, 'transcendance 2FA code', twofacode);
+        await this.prisma.user.update({
+            where: {
+                id: uid,
+            },
+            data: {
+                twofacode: hash
+            }
+        });
+    }
+    async check2fa(uid) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        if (user.is2faenabled && !user.is2favalidated)
+            return false;
+        return true;
+    }
+    generateRandom6digitCode() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+    geturl() {
+        return { url: process.env.REDIRECT_URL };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService, axios_1.HttpService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService, axios_1.HttpService, mail_service_1.MailService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

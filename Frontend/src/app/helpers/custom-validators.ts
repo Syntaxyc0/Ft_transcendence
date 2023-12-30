@@ -36,4 +36,23 @@ export class CustomValidators
 
 
 	}
+
+	static	nicktoolong(control: AbstractControl): ValidationErrors | null
+	{
+		const nick = control.get('Nickname')?.value;
+		if (nick)
+		{
+			if (nick.length < 10)
+			{
+				return null;
+			}
+			else
+			{
+				return {nickTooLong: true};
+			}
+		}
+		else return null
+
+
+	}
 }

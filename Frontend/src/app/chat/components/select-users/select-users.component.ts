@@ -40,7 +40,7 @@ export class SelectUsersComponent implements OnInit, OnChanges{
 	searchLogin = new FormControl();
 	filteredUsers: UserI[] = [];
 	selectedUser: UserI | null = null;
-	currentUser$: Observable<UserI> = this.socketService.getCurrentUser();
+	currentUser$: Observable<UserI> = this.socketService.user;
 	
 	constructor( private userService: UserService, private socketService: SocketService ) {}
 
