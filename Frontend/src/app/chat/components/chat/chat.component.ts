@@ -18,6 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ChatRoomComponent } from '../chat-room/chat-room.component';
 import { UserService } from '../../services/user.service';
 import { OptionUserComponent } from '../option-user/option-user.component';
+import { SocketService } from '../../services/socket.service';
 
 
 @Component({
@@ -51,10 +52,16 @@ export class ChatComponent implements AfterViewInit, OnInit{
 	constructor(private route:ActivatedRoute,
 		private router: Router,
 		private chatService: ChatService,
+		private socketService: SocketService,
 		public http: HttpClient,
 		private userService: UserService) {}
 
 	ngOnInit(): void {
+		this.socketService.emitGetCurrentUser();
+		this.socketService.getCurrentUser().pipe(take(1)).subscribe( value => {
+			this.user = value;
+		});
+
 		this.userService.option$.subscribe(value => {
 			this.option = value;
 		  });
