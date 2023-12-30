@@ -29,7 +29,7 @@
 	<!-- Add Message -->
 	<div style="display: flex; flex-shrink: 0; width: 98%;">
 	  <mat-form-field style="width: 100%; margin-left: 10px;">
-		<input matInput [formControl]="chatMessage" type="text">
+		<input matInput [formControl]="chatMessage" type="text" (keydown.enter)="sendMessage()">
 	  </mat-form-field>
 	  <button mat-button [disabled]="!chatMessage.valid" (click)="sendMessage()" style="margin-top: 10px; margin-left: 10px;">
 		<span style="display: flex; flex-direction: row; align-items: center;">

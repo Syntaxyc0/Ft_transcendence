@@ -5,6 +5,7 @@ h3 {
   }
   
   .message {
+	overflow-y: auto;
 	background-color: rgb(100, 100, 100); 
 	height: 400px; 
 	scrollbar-color: lightgrey darkgrey;

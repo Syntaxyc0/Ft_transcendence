@@ -29,9 +29,6 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   @Input() chatRoom: RoomI;
   @ViewChild('messages') private messagesScroller: ElementRef;
 
-//   messages$: Observable<MessageI[]> = this.chatService.getMessage();
-
-
   messages$: Observable<MessageI[]> = combineLatest([
 	this.chatService.getMessage(), 
 	this.chatService.getAddedMessage().pipe(startWith(null))
