@@ -35,19 +35,21 @@ export class Room{
             this.players[i].room = this
         }
 
-        console.log(playerOne.socket.data.login + " and " + playerTwo.socket.data.login + " entered room " + roomId)
+        console.log(playerOne.login + " and " + playerTwo.login + " entered room " + roomId)
         this.multiplayer.gameBoardInit()
-
     }
 
     log()
     {
 		console.log(" ************* ")
-        this.paddles.forEach((paddle) => {
-			console.log("paddle " + paddle.side)
-			console.log("x: " + paddle.x + " / y: " + paddle.y)
+        for (let i = 0; i < 2; i++)
+        {
+            console.log("player: " + this.players[i].login)
+            console.log("paddle " + this.paddles[i].side)
+			console.log("x: " + this.paddles[i].x + " / y: " + this.paddles[i].y)
             console.log(" -------------------------- ")
-		})
+            
+        }
 		console.log("ball: x: " + this.ball.x + " / y: " + this.ball.y)
 		console.log(" ************* ")
 

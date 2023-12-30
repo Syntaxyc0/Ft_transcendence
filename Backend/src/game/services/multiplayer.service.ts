@@ -58,19 +58,25 @@ export class MultiplayerService{
 
     gameLoop()
 	{
-        const timeStamp = Date.now()
-        const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
-		if (!this.room || !this.room.isGameRunning) {
+        if (!this.room || !this.room.isGameRunning) {
             return;
         }
+        const timeStamp = Date.now()
+        const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
         this.room.ball.updatePosition(this.room.paddles)
-        this.room.ball.speed *= 1 + secondsPassed / 20000
+        this.room.ball.speed *= 1 + secondsPassed / 40000
 		this.ballData(this.room.ball)
 
         setTimeout(() => {
             this.gameLoop();
         }, 1000 / 60);
 	}
+
+    stopGame()
+    {
+        this.room.isGameRunning = false;
+        this.gameRequest({order: "stopGame"})
+    }
 
     gameBoardInit()
     {

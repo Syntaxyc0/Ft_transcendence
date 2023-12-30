@@ -1,12 +1,12 @@
 /* Add these styles to your global styles or component-specific styles */
 
-.container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	height: 100vh; /* Full height of the viewport */
-  }
+// .container {
+// 	display: flex;
+// 	flex-direction: column;
+// 	align-items: center;
+// 	justify-content: center;
+// 	height: 100vh; /* Full height of the viewport */
+//   }
   
   .grid {
 	display: grid;
@@ -35,16 +35,13 @@
 	margin: 0 auto; /* Center the game board horizontally */
   }
   
-  .center-line {
-	/* Your center line styles remain the same */
-  }
   
   .h-screen {
 	height: 100vh;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	justify-content: center;
+	margin-top: 10vh;
   }
   
   .player-names {

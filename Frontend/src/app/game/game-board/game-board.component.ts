@@ -5,6 +5,7 @@ import { Socket } from 'socket.io-client';
 import { SocketDataService } from 'src/app/game/game-board/socket-data.service';
 import { Observable, first } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.component';
 
 export const WIDTH = 1000
 export const HEIGHT = 640 
@@ -15,7 +16,7 @@ export const HEIGHT = 640
 	templateUrl: './game-board.component.html',
 	styleUrls: ['./game-board.component.scss'],
 	providers:[],
-	imports: [CommonModule]
+	imports: [CommonModule, HeaderbarComponent]
   })
 
   export class GameBoardComponent implements OnInit{
@@ -74,13 +75,9 @@ export const HEIGHT = 640
 				this.userPaddle = this.paddles[payload.side]
 				this.userPaddle.login = this.getLogin();
 				this.userPaddle.side = payload.side;
-				if (!this.userPaddle.side)
-					this.paddles[1].login = payload.login
-				else
-					this.paddles[0].login = payload.login
+				this.paddles[payload.side * -1 + 1].login = payload.login
 			break;
 			case "setGameBoard":
-				// this.ball.speed = payload.speed
 				this.draw()
 			break;
 			case "startGame":
@@ -94,6 +91,10 @@ export const HEIGHT = 640
 			break;
 			case "newScore":
 				this.paddles[payload.side].score++
+			break;
+			case "gameWon":
+				this.draw()
+
 			break;
 		}
 	}
@@ -112,13 +113,16 @@ export const HEIGHT = 640
 
 	log()
 	{
-		console.log(" ************* ")
 		this.player.sendRequest("logRequest")
-		this.paddles.forEach((paddle) => {
-			console.log("paddle " + paddle.side)
-			console.log("x: " + paddle.x + " / y: " + paddle.y + " / targetY: " + paddle.targetY)
-			console.log(" -------------------------- ")
-		})
+		console.log(" ************* ")
+        for (let i = 0; i < 2; i++)
+        {
+            console.log("player: " + this.paddles[i].login)
+            console.log("paddle " + this.paddles[i].side)
+			console.log("x: " + this.paddles[i].x + " / y: " + this.paddles[i].y)
+            console.log(" -------------------------- ")
+            
+        }
 		console.log("ball: x: " + this.ball.x + " / y: " + this.ball.y)
 		console.log(" ************* ")
 
@@ -135,7 +139,7 @@ export const HEIGHT = 640
 			return
 		// const timeStamp = Date.now();
 		// const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
-		let y = this.lerp(this.userPaddle.y, this.userPaddle.targetY, 0.3)
+		let y = this.lerp(this.userPaddle.y, this.userPaddle.targetY, 0.2)
 		this.player.newPaddlePosition({y: y - this.userPaddle.y, side: this.userPaddle.side})
 		this.userPaddle.y = y;
 		this.movementQueue.forEach((movement) => {
@@ -152,6 +156,11 @@ export const HEIGHT = 640
 	private lerp(start: number, end: number, t: number): number {
 		return start + t * (end - start);
 	  }
+
+	// gameWon()
+	// {
+	// 	if (this.paddles[])
+	// }
 
 	draw()
 	{

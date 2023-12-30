@@ -1,5 +1,6 @@
-<div class="h-screen grid place-items-center ">
 
+<app-headerbar></app-headerbar>
+<div class="h-screen grid place-items-center ">
 <div class = grid>
 	<button (click)="multiplayerRequest()"> Multiplayer </button>
 	<button (click)="disconnect()"> Disconnect </button>
@@ -9,8 +10,6 @@
 	Fallback
 </canvas>
 <div id="playerNames" class="player-names">
-	<div class="player-name left">{{ paddles[0].login }}</div>
-	<div class="player-name right">{{ paddles[1].login }}</div>
-</div>
-<p *ngIf = "!isGameRunning"> Game Paused</p>
+	<div *ngIf = "paddles[0].login" class="player-name left">{{ paddles[0].login }}</div>
+	<div *ngIf = "paddles[1].login" class="player-name right">{{ paddles[1].login }}</div>
 </div>

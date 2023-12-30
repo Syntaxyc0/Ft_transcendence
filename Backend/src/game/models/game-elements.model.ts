@@ -105,10 +105,24 @@ export class Ball{
 		return false
 	}
 
+	pointMarked(paddles: Paddle[] ,winner: number)
+	{
+		paddles[winner].score++;
+		this.multiplayer.sendScore(winner * -1 + 1)
+		if (paddles[winner].score >= 10)
+		{
+			this.multiplayer.stopGame()
+			this.multiplayer.gameRequest({order: "gameWon", side: winner})
+		}
+		this.reset();
+		return;
+	}
+
 	updatePosition(paddles: Paddle[])
 	{
 		let hx: number = Math.cos((this.angle * Math.PI) / 180) * this.speed  + this.x;
 		let hy: number = Math.sin((this.angle * Math.PI) / 180) * this.speed  + this.y;
+		let winner: number = -1
 
 		const bottom = this.radius;
 		const top = HEIGHT - this.radius;
@@ -127,22 +141,12 @@ export class Ball{
 			this.y = hy;
 			return;
 		}
-		if (hx <= left || hx >= right)
-		{
-			if (hx <= left)
-			{
-				paddles[1].score++;
-				this.multiplayer.sendScore(1)
 
-			}
-			else
-			{
-				paddles[0].score++;
-				this.multiplayer.sendScore(0)
-			}
-			this.reset();
-			return;
-		}
+		if (hx <= left)
+			this.pointMarked(paddles, 0)
+		else if(hx >= right)
+			this.pointMarked(paddles, 1)
+
 		if (hy <= bottom || hy >= top)
 		{
 			this.angle = (-this.angle);
