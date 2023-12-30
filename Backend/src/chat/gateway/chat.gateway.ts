@@ -93,7 +93,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 
 		let usersArray = [];
-
+		
+// La room est privé
 		if (!roomInput.public) {
 
 			usersArray = (roomInput.users as Array<{ id: number }>).map(user => ({ id: user.id }));
@@ -135,10 +136,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				for (const connection of connected_users) {
 					await this.server.to(connection.socketId).emit('roomsI', rooms);
 				}
-
-				return createdRoom;
 			}
-
+			return createdRoom;
+			
+// La room est public
 		} else {
 			const { users, ...roomDataWithoutUsers } = roomInput;
 
@@ -175,8 +176,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				await this.server.to(user.socketId).emit('roomsI', rooms);
 			}
 		}
-
-		console.log("USER ARRAY :",usersArray);
 	}
 	
 	@SubscribeMessage('roomsArray')
@@ -197,12 +196,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		
 		const rooms = [...publicRooms, ...userRooms];
 		
-		return this.server.to(socket.id).emit('roomsI', rooms);
+		return await this.server.to(socket.id).emit('roomsI', rooms);
 	}
 
 	@SubscribeMessage('getCurrentUser')
-	currentUser (socket: Socket) {
-		return socket.emit('currentUser', socket.data.user)
+	async currentUser (socket: Socket) {
+		return await socket.emit('currentUser', socket.data.user)
 	}
 
 	@SubscribeMessage('joinRoom')
@@ -254,5 +253,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	    for(const user of joinedUsers) {
       		await this.server.to(user.socketId).emit('messageAdded', { ...createdMessage, user: socket.data.user });
     	}
+	}
+
+	@SubscribeMessage('getIsAdmin')
+	async isAdmin(socket: Socket, current_room: RoomI) {
+
+		const user = await this.prisma.user.findUnique({
+			where: { id: socket.data.user.id },
+			include: { AdminRooms: true },
+		});
+
+		for(const room of user.AdminRooms)
+			if (room.name === current_room.name)
+      			return await socket.emit('isAdmin', true);
+      	return await socket.emit('isAdmin', false);
 	}
 }

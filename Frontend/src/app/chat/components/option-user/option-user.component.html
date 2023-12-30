@@ -4,6 +4,7 @@
 
 <mat-card *ngIf="user?.login !== current_user.login">
 	<mat-list>
+		<mat-list-item class="list"><strong>{{ current_user?.login }}</strong></mat-list-item>
 		<mat-list-item class="list"><strong>{{ user?.login }}</strong></mat-list-item>
 		<mat-list-item class="list"><strong>{{ room?.name }}</strong></mat-list-item>
 		<mat-list-item class="list"><button mat-raised-button extended color=primary><strong>PLAY</strong></button></mat-list-item>

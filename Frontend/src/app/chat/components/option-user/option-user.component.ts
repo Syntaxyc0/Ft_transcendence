@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { SocketService } from '../../services/socket.service';
-import { take } from 'rxjs';
+import { Observable, of, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { MatCardModule } from '@angular/material/card';
@@ -28,7 +28,7 @@ export class OptionUserComponent {
 
 	user: UserI | undefined;
 	room: RoomI | undefined;
-	current_user = this.userService.getLoggedInUser();
+	current_user;
   
   constructor(private userService: UserService, private socket: CustomSocket) {}
   
@@ -42,6 +42,12 @@ export class OptionUserComponent {
 		this.userService.room$.subscribe(value => {
 			this.room = value;
 		});
+	}
+
+	isAdmin(): Observable<boolean> {
+		this.socket.emit("getIsAdmin", this.room);
+		console.log(this.socket.fromEvent("isAdmin"));
+		return of(true);
 	}
 
 	closeOption() {
