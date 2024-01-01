@@ -12,15 +12,17 @@ import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MailService } from 'src/mail/mail.service';
 import { multerOptions } from './multer.config';
+import { PrismaService } from 'src/prisma/prisma.service';
 
-
+const fs = require("fs");
+const path = require("path");
 
 // @UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
-	constructor(private userService: UserService) {}
+	constructor(private prisma: PrismaService, private userService: UserService) {}
 
-	@Get(':login/id')
+		@Get(':login/id')
 	getUserIdFromLogin(@Param('login') login)
 	{
 		return this.userService.getUserIdFromLogin(login)
@@ -98,7 +100,6 @@ export class UserController {
 	@Get(':uid/search')
 	updateSearches(@Param('uid', ParseIntPipe) uid:number)
 	{
-		console.log(uid);
 		return this.userService.updateSearches(uid);
 	}
 
@@ -153,12 +154,25 @@ export class UserController {
 				const fileName = user.avatar
 				const result = res.sendFile(fileName, { root: "./assets" });
 				return result
-			}
-			else if (user.avatar === "")
+			} 
+			let file = "";
+			if (user.default_avatar === "")
 			{
-				const result = res.sendFile("stitch.png", { root: "./public" });
+				file = this.userService.getRandomFilename()
+				
+				await this.prisma.user.update({
+					data: {
+						default_avatar: file ,
+					},
+					where: {
+						id: uid,
+					}
+				})
+				const result = res.sendFile(file, { root: "./public" });
 				return result
 			}
+			const result = res.sendFile(user.default_avatar, { root: "./public" });
+			return result
 		} catch {
 			throw new NotFoundException('Image not Found');
 		}

@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import {Router, RouterModule } from '@angular/router';
+import { ErrorModalComponent } from '../error-modal/error-modal.component';
 
 @Component({
   selector: 'app-search-user',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, RouterModule, ErrorModalComponent],
   templateUrl: './search-user.component.html',
   styleUrls: ['./search-user.component.scss']
 })
@@ -20,6 +21,8 @@ export class SearchUserComponent {
 	});
 
 	showModal = false;
+	showError:boolean = false;
+	errorMessage:string =""
 
 	toggleModal(){
 	  this.showModal = !this.showModal;
@@ -29,11 +32,12 @@ export class SearchUserComponent {
 		this.toggleModal()
 		this.http.get("http://localhost:3333/users/" + this.SearchForm.value.name + '/id').subscribe(
 			res => {
-				this.http.get("http://localhost:3333/users/" + res + '/search').subscribe()
+				this.http.get("http://localhost:3333/users/" + localStorage.getItem('id') + '/search').subscribe()
 				this.router.navigate(['/user'],  { queryParams: { id: res } })
 			},
             err => {
-				alert(err.error.message);
+				this.errorMessage = err.error.message
+				this.openErrorModal();
 			}
 			);
 		this.SearchForm.reset();
@@ -48,4 +52,11 @@ export class SearchUserComponent {
 		this.searchUser()
 	  }
 
+	openErrorModal(): void {
+	this.showError = true;
+	}
+		
+	closeErrorModal(): void {
+		this.showError = false;
+	}
 }

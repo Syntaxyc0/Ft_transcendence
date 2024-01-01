@@ -1,5 +1,5 @@
 <div class="grid place-items-center">
-	
+	<app-error-modal *ngIf="showError" [message]="errorMessage" (onClose)="closeErrorModal()"></app-error-modal>
 	<input style="display: none" type="file" (change)="onFileChanged($event)" #fileInput>
 	<img (click)="fileInput.click()" class="mx-auto object-cover rounded-full h-28 w-28 hover:cursor-pointer" alt="avatar" src={{avatar}}/>
 	<div class="flex items-center justify-center space-x-2 mt-4">

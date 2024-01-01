@@ -4,12 +4,13 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { ErrorModalComponent } from '../components/error-modal/error-modal.component';
 
 
 @Component({
   selector: 'app-twofa',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, RouterModule, MatFormFieldModule, ReactiveFormsModule],
+  imports: [CommonModule, HttpClientModule, RouterModule, MatFormFieldModule, ReactiveFormsModule, ErrorModalComponent],
   templateUrl: './twofa.component.html',
   styleUrls: ['./twofa.component.scss']
 })
@@ -20,6 +21,8 @@ export class TwofaComponent {
 });
 
 id: number = 0;
+showError:boolean = false;
+errorMessage:string =""
 
 ngOnInit() {
 	this.id = JSON.parse(localStorage.getItem('id')!);
@@ -39,11 +42,20 @@ validate()
 				this.router.navigate(['/home'])
 		},
 		err => {
-		 	alert('Wrong code')
+			this.errorMessage = "Wrong code"
+			this.openErrorModal()
 			this.twofaForm.reset()
 		}
 	)
 
+}
+
+openErrorModal(): void {
+	this.showError = true;
+}
+		
+closeErrorModal(): void {
+	this.showError = false;
 }
 
 }

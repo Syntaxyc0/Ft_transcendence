@@ -9,6 +9,7 @@ import { MailService } from "src/mail/mail.service";
 import { UUID } from "typeorm/driver/mongodb/bson.typings";
 
 var path = require('path');
+const fs = require("fs");
 
 
 @Injectable()
@@ -785,6 +786,7 @@ export class UserService
 				}
 			}
 		})
+		console.log(user.profiles_searched	)
 
 	}
 	
@@ -840,6 +842,12 @@ export class UserService
 		return await this.prisma.user.findMany();
 	}
 	
+	getRandomFilename()
+	{
+		const filenames = ["Wtf.gif","awkward_2.gif", "homer_gif.gif", "minion.png", "snoop.gif", "awkward.gif", "homer.png", "mindblown.gif", "pikachu.png", "stitch.png"]
+		let index = Math.round(Math.random() * 10);
+		return filenames[index];
+	}
 
 }
 
