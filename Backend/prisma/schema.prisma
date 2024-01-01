@@ -19,6 +19,7 @@ model User {
   is2favalidated         Boolean @default(false)
   twofacode              String  @default("")
   avatar                 String  @default("")
+  default_avatar         String  @default("")
   elo                    Int     @default(1000)
   userStatus             String  @default("OFFLINE")
   gameHistory            Int[]
