@@ -255,20 +255,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     	}
 	}
 
-	// @SubscribeMessage('getIsAdmin')
-	// async isAdmin(socket: Socket, current_room: RoomI) {
-
-	// 	const user = await this.prisma.user.findUnique({
-	// 		where: { id: socket.data.user.id },
-	// 		include: { AdminRooms: true },
-	// 	});
-
-	// 	for(const room of user.AdminRooms)
-	// 		if (room.name === current_room.name)
-    //   			return await socket.emit('isAdmin', true);
-    //   	return await socket.emit('isAdmin', false);
-	// }
-
 	@SubscribeMessage('getIsAdmin')
 	async isAdmin(socket: Socket, current_room: RoomI) {
 
@@ -277,5 +263,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			include: { admin: true },
 		});
       	return await socket.emit('isAdmin', room.admin);
+	}
+
+	@SubscribeMessage('setAsAdmin')
+	async setAsAdmin(socket: Socket, data: { user: UserI, room: RoomI }) {
+
+		const { user, room } = data;
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id}
+		});
+
+		await this.prisma.room.update({
+			where: { id: room_.id },
+			data: {
+			  admin: { connect: { id: user_.id } },
+			},
+		  });
+		return await socket.emit("adminList", room_)
 	}
 }

@@ -61,6 +61,8 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   ngOnChanges(changes: SimpleChanges) {
     if(this.chatRoom) {
     	this.chatService.joinRoom(this.chatRoom);
+		this.userService.changeRoom(this.chatRoom);
+		this.userService.changeOption(false, undefined);
     }
   }
 
