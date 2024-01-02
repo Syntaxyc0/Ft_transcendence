@@ -58,7 +58,7 @@ export class ChatComponent implements AfterViewInit, OnInit{
 
 	ngOnInit(): void {
 		this.socketService.emitGetCurrentUser();
-		this.socketService.getCurrentUser().pipe(take(1)).subscribe( value => {
+		this.socketService.getCurrentUser().subscribe( value => {
 			this.user = value;
 		});
 

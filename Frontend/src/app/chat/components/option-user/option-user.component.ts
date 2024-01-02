@@ -29,7 +29,7 @@ export class OptionUserComponent {
 	user: UserI | undefined;
 	room: RoomI | undefined;
 	current_user = this.userService.getLoggedInUser();
-	isadmin;
+	adminArray: UserI[];
   
   constructor(private userService: UserService, private socket: CustomSocket, private socketService: SocketService) {}
   
@@ -50,17 +50,25 @@ export class OptionUserComponent {
 			this.room = value;
 		});
 
-		this.isAdmin().subscribe(value =>{
-			this.isadmin = value;
-		})	
+		this.getAdminArray().subscribe(value =>{
+			this.adminArray = value;
+			console.log(this.adminArray)
+		})
 	}
 
-	isAdmin(): Observable<boolean> {
+	getAdminArray(): Observable<UserI[]> {
 		this.socket.emit("getIsAdmin", this.room);
 		return this.socket.fromEvent("isAdmin");
 	}
 
 	closeOption() {
 		this.userService.changeOption(false, undefined);
+	}
+
+	isAdmin(user: UserI): boolean {
+		for(const admin of this.adminArray)
+			if (admin.id === user.id)
+				return true;
+		return false;
 	}
 }

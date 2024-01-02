@@ -255,17 +255,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     	}
 	}
 
+	// @SubscribeMessage('getIsAdmin')
+	// async isAdmin(socket: Socket, current_room: RoomI) {
+
+	// 	const user = await this.prisma.user.findUnique({
+	// 		where: { id: socket.data.user.id },
+	// 		include: { AdminRooms: true },
+	// 	});
+
+	// 	for(const room of user.AdminRooms)
+	// 		if (room.name === current_room.name)
+    //   			return await socket.emit('isAdmin', true);
+    //   	return await socket.emit('isAdmin', false);
+	// }
+
 	@SubscribeMessage('getIsAdmin')
 	async isAdmin(socket: Socket, current_room: RoomI) {
 
-		const user = await this.prisma.user.findUnique({
-			where: { id: socket.data.user.id },
-			include: { AdminRooms: true },
+		const room = await this.prisma.room.findUnique({
+			where: { id: current_room.id },
+			include: { admin: true },
 		});
-
-		for(const room of user.AdminRooms)
-			if (room.name === current_room.name)
-      			return await socket.emit('isAdmin', true);
-      	return await socket.emit('isAdmin', false);
+      	return await socket.emit('isAdmin', room.admin);
 	}
 }
