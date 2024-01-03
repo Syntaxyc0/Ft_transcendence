@@ -74,7 +74,14 @@ export class OptionUserComponent {
 		return false;
 	}
 
+	isCreator(user: UserI | undefined): boolean {
+		if(this.user?.id === this.room?.creator.id)
+			return true;
+		return false;
+	}
+
 	setAsAdmin() {
 		this.socket.emit("setAsAdmin", { user: this.user, room: this.room });
+		this.closeOption();
 	}
 }
