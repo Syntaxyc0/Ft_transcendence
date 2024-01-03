@@ -28,7 +28,9 @@ model User {
   rooms				Room[]	@relation("UserRooms")
   connectedUser		ConnectedUser[]
   joinedRoom     JoinedRoom[]
-  Message        Message[] 
+  Message        Message[]
+  Creators		 Room[] @relation("RoomCreator")
+  AdminRooms     Room[] @relation("AdminRooms")
 }
 
 model GameInfo {
@@ -47,14 +49,19 @@ enum Status {
 }
 
 model Room {
-  id          Int          @id @default(autoincrement())
-  name        String
-  description String?
-  created_at  DateTime     @default(now())
-  updated_at  DateTime     @updatedAt
-  users       User[]       @relation("UserRooms")
-  joinedRoom  JoinedRoom[]
-  message     Message[]
+  id			Int          @id @default(autoincrement())
+  name			String		 @unique
+  description	String?
+  created_at	DateTime     @default(now())
+  updated_at	DateTime     @updatedAt
+  users			User[]		 @relation("UserRooms")
+  joinedRoom	JoinedRoom[]
+  message		Message[]
+  creator		User @relation(fields: [creatorId], references: [id], name: "RoomCreator")
+  creatorId		Int
+  admin			User[] @relation("AdminRooms")
+  public		Boolean
+  password		String?
 }
 
 model ConnectedUser {

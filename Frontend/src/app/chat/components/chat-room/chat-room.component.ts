@@ -13,6 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { ChatMessageComponent } from '../chat-message/chat-message.component';
+import { UserI } from '../../model/user.interface';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-chat-room',
@@ -27,9 +29,6 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   @Input() chatRoom: RoomI;
   @ViewChild('messages') private messagesScroller: ElementRef;
 
-//   messages$: Observable<MessageI[]> = this.chatService.getMessage();
-
-
   messages$: Observable<MessageI[]> = combineLatest([
 	this.chatService.getMessage(), 
 	this.chatService.getAddedMessage().pipe(startWith(null))
@@ -38,10 +37,6 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
       if (message && message.room.id === this.chatRoom.id && !allMessages.some(m => m.id === message.id)) {
         allMessages.push(message);
       }
-
-	  console.log('allMessages:', allMessages);
-	  console.log('addedMessage:', message);
-
 	  const items = allMessages.sort((a, b) => {
 		const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
 		const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
@@ -57,9 +52,10 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 
   chatMessage: FormControl = new FormControl(null, [Validators.required]);
 
-  constructor(private chatService: ChatService) { }
+  constructor(private chatService: ChatService, private userService: UserService) { }
 
   ngOnInit(): void {
+	this.userService.changeRoom(this.chatRoom);
   }
 
   ngOnChanges(changes: SimpleChanges) {

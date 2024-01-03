@@ -11,7 +11,6 @@ export class JoinedRoomService {
 	constructor(private readonly prisma: PrismaService) {}
 	
 	async create(joinedRoomData: JoinedRoomI): Promise<JoinedRoom> {
-		console.log('joinedRoom');
 		const { socketId, user, room } = joinedRoomData;
 		return this.prisma.joinedRoom.create({
 		  data: {

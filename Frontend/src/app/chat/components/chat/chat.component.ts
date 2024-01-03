@@ -1,11 +1,10 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, of, take } from 'rxjs';
-import { RoomI, RoomPaginateI } from '../../model/room.interface';
+import { RoomI } from '../../model/room.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatService } from '../../services/chat.service';
 import { MatSelectionListChange } from '@angular/material/list';
-import { PageEvent } from '@angular/material/paginator';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
@@ -16,44 +15,64 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { CustomSocket } from '../../sockets/custom-socket';
 import { ChatRoomComponent } from '../chat-room/chat-room.component';
-import { UserI } from '../../model/user.interface';
+import { UserService } from '../../services/user.service';
+import { OptionUserComponent } from '../option-user/option-user.component';
 import { SocketService } from '../../services/socket.service';
 
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatListModule, MatDividerModule, MatPaginatorModule, MatFormFieldModule, MatIconModule, HttpClientModule, RouterModule, ChatRoomComponent ],
+  imports: [CommonModule,
+			MatCardModule,
+			MatButtonModule,
+			MatListModule,
+			MatDividerModule,
+			MatPaginatorModule,
+			MatFormFieldModule,
+			MatIconModule,
+			HttpClientModule,
+			RouterModule,
+			ChatRoomComponent,
+			OptionUserComponent
+			],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit{
+export class ChatComponent implements AfterViewInit, OnInit{
 	
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
 	userList :object[] = []
-	user = this.socketService.user;
+	user = this.userService.getLoggedInUser();
+	option: boolean;
 
 
 	constructor(private route:ActivatedRoute,
 		private router: Router,
 		private chatService: ChatService,
+		private socketService: SocketService,
 		public http: HttpClient,
-		private customSocket: CustomSocket,
-		private socketService: SocketService) {}
+		private userService: UserService) {}
 
-	ngOnInit() {
-		this.chatService.emitPaginateRooms(10, 0);
+	ngOnInit(): void {
+		this.socketService.emitGetCurrentUser();
+		this.socketService.getCurrentUser().pipe(take(1)).subscribe( value => {
+			this.user = value;
+		});
+
+		this.userService.option$.subscribe(value => {
+			this.option = value;
+		  });
+	}
+
+	ngAfterViewInit() {
+		this.chatService.emitRooms();
 	}
 
 	onSelectRoom(event: MatSelectionListChange) {
 		this.selectedRoom = event.source.selectedOptions.selected[0].value;
-	  }
-
-	onPaginateRooms(pageEvent: PageEvent) {
-		this.chatService.emitPaginateRooms(pageEvent.pageSize, pageEvent.pageIndex);
 	  }
 
 	  LaunchCreateRoom()

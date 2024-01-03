@@ -1,6 +1,8 @@
-<span style="display: flex;" [class.ownContainer]="message.user?.id === (user | async)?.id">
-	<p [ngClass]="{ownMessage: message.user?.id === (user | async)?.id}">
-	  <strong>{{ message.user?.login }}</strong> <br /> {{ message.text }}
+<span style="display: flex;" [class.ownContainer]="message.user?.id === user.id">
+	<p [ngClass]="{ownMessage: message.user?.id === user.id}">
+	  <strong (click)="openOption(message.user)">{{ message.user?.login }}</strong> <br /> {{ message.text }}
 	</p>
 </span>
+
+
 

@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { SocketService } from '../../services/socket.service';
-import { Observable } from 'rxjs';
+import { take } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { UserI } from '../../model/user.interface';
 import { MessageI } from '../../model/message.interface';
+import { UserService } from '../../services/user.service';
+import { UserI } from '../../model/user.interface';
 
 @Component({
   selector: 'app-chat-message',
@@ -14,9 +15,19 @@ import { MessageI } from '../../model/message.interface';
 })
 export class ChatMessageComponent {
 
-  @Input() message: MessageI;
-  user = this.socketService.user;
-  
-  constructor(private socketService: SocketService) {}
-  
+	@Input() message: MessageI;
+	user = this.userService.getLoggedInUser();
+
+	constructor(private socketService: SocketService, private userService: UserService) {}
+
+	ngOnInit(): void {
+		this.socketService.emitGetCurrentUser();
+		this.socketService.getCurrentUser().pipe(take(1)).subscribe( value => {
+			this.user = value;
+		});
+	}
+
+	openOption(user_: UserI | undefined) {
+		this.userService.changeOption(true, user_);
+	}
 }

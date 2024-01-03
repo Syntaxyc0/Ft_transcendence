@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { UserI } from 'src/app/chat/model/user.interface';
-import { catchError, tap } from 'rxjs/operators'
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { RoomI } from '../model/room.interface';
+
 
 
 @Injectable({
@@ -11,17 +13,40 @@ import { catchError, tap } from 'rxjs/operators'
 })
 export class UserService {
 
-	constructor(private http: HttpClient, private snackbar: MatSnackBar) { }
+	constructor(private http: HttpClient, private snackbar: MatSnackBar,) { }
 	users$: Observable<UserI[]>;
-	
+	helper = new JwtHelperService();
+
+	private option = new BehaviorSubject<boolean>(false);
+	option$ = this.option.asObservable();
+
+	private user = new BehaviorSubject<UserI | undefined>(undefined);
+	user$ = this.user.asObservable();
+
+	private room = new BehaviorSubject<RoomI | undefined>(undefined);
+	room$ = this.room.asObservable();
+
 	findByLogin(login: string): Observable<UserI[]> {
-		this.users$ = this.http.get<UserI[]>(`http://localhost:3333/users/find-by-login/${login}`)
-		
-
-		// exemple de suscribe:
-		// this.users$.subscribe((users) => {
-		// 	console.log('dans le userService du Front :', users);});
-
+		this.users$ = this.http.get<UserI[]>(`http://localhost:3333/users/find-by-login/${login}`)		
 		return this.users$;
 	}
+	
+	getLoggedInUser() {
+		const decodedToken = this.helper.decodeToken(localStorage.getItem('access_token')!);
+		return decodedToken;
+	}
+
+	changeOption(value: boolean, user: UserI | undefined) {
+		this.option.next(value);
+		if (value)
+			this.user.next(user);
+	}
+
+	changeRoom(room: RoomI) {
+		this.room.next(room)
+	}
 }
+
+// exemple de suscribe:
+// this.users$.subscribe((users) => {
+// 	console.log('dans le userService du Front :', users);});

@@ -1,7 +1,6 @@
 import { Injectable, OnInit } from "@angular/core";
 import { CustomSocket } from "../sockets/custom-socket";
 import { Observable } from "rxjs";
-import { User } from "src/app/helpers/types";
 import { UserI } from "../model/user.interface";
 
 @Injectable({
@@ -20,9 +19,7 @@ import { UserI } from "../model/user.interface";
 	emitGetCurrentUser() {
 		this.socket.emit('getCurrentUser');
 	}
-
-	// getCurrentUserByJwt() {
-	// 	const decodedToken = this.jwtService.decodeToken();
-	// 	return decodedToken.user;
-	// }
+	getCurrentUser(): Observable<UserI> {
+		return this.socket.fromEvent('currentUser');
+	}
   }

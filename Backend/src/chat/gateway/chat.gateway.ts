@@ -46,11 +46,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				return this.disconnect(socket);
 			} else {
 				socket.data.user = user;
-				const rooms = await this.prisma.room.findMany({
+				const userRooms = await this.prisma.room.findMany({
 					where: { users: { some: { id: user.id } } },
-					take: 10,
-					skip: 0,
 				});
+
+				const publicRooms = await this.prisma.room.findMany({
+					where: { public: true }
+				});
+
+				const rooms = [...publicRooms, ...userRooms];
 
 				await this.connectedUserService.create({ socketId: socket.id, user });
 
@@ -88,53 +92,116 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			throw new UnauthorizedException();
 		}
 
-		const usersArray = (roomInput.users as Array<{ id: number }>).map(user => ({ id: user.id }));
-		usersArray.push({ id: socket.data.user.id });
+		let usersArray = [];
+		
+// La room est privé
+		if (!roomInput.public) {
 
-		const createdRoom = await this.prisma.room.create({
-			data: {
-			  ...roomInput,
-			  users: {
-			    connect: usersArray,
-			  },
-			},
-			include : { users: true }
-		});
+			usersArray = (roomInput.users as Array<{ id: number }>).map(user => ({ id: user.id }));
+			usersArray.push({ id: socket.data.user.id });
 
-		// emit room if user is connected
-		for (const user of createdRoom.users) {
-			const connected_users: ConnectedUser[] = await this.connectedUserService.findByUser({id: user.id});
-			
-			const rooms = await this.prisma.room.findMany({
-				where: { users: { some: { id: user.id } } },
-				take: 10,
-				skip: 0,
+			const createdRoom = await this.prisma.room.create({
+				data: {
+					...roomInput,
+					users: {
+						connect: usersArray,
+					},
+					creator: {
+						connect: {
+							id: user.id
+						},
+					},
+					admin: {
+						connect: {
+							id: user.id
+						},
+					},
+				},
+				include : { users: true }
 			});
-			for (const connection of connected_users) {
-				await this.server.to(connection.socketId).emit('roomsI', rooms);
-			}
-		  }
 
-		return createdRoom;
+			for (const user of createdRoom.users) {
+				const connected_users: ConnectedUser[] = await this.connectedUserService.findByUser({id: user.id});
+				
+				const userRooms = await this.prisma.room.findMany({
+					where: { users: { some: { id: user.id } } },
+				});
+
+				const publicRooms = await this.prisma.room.findMany({
+					where: { public: true }
+				});
+
+				const rooms = [...publicRooms, ...userRooms];
+				
+				for (const connection of connected_users) {
+					await this.server.to(connection.socketId).emit('roomsI', rooms);
+				}
+			}
+			return createdRoom;
+			
+// La room est public
+		} else {
+			const { users, ...roomDataWithoutUsers } = roomInput;
+
+			const createdRoom = await this.prisma.room.create({
+				data: {
+					...roomDataWithoutUsers,
+					creator: {
+						connect: {
+							id: user.id
+						},
+					},
+					admin: {
+						connect: {
+							id: user.id
+						},
+					},
+				},
+			});
+
+			const connectedUser = await this.prisma.connectedUser.findMany();
+			for (const user of connectedUser) {
+
+				const userRooms = await this.prisma.room.findMany({
+					where: { users: { some: { id: user.id } } },
+				});
+
+				const publicRooms = await this.prisma.room.findMany({
+					where: { public: true }
+				});
+
+				const rooms = [...publicRooms, ...userRooms]
+				
+
+				await this.server.to(user.socketId).emit('roomsI', rooms);
+			}
+		}
 	}
 	
 	@SubscribeMessage('roomsArray')
-	async getRooms(socket: Socket, page: PageI) {
+	async getRooms(socket: Socket) {
+
 		const user = await this.prisma.user.findUnique({
 			where: { id: socket.data.user.id },
 			include: {
 				rooms: true,
 			},
 		});
+
+		const userRooms = user.rooms;
+
+		const publicRooms = await this.prisma.room.findMany({
+			where: { public: true }
+		})
 		
-		const room = user.rooms;
+		const rooms = [...publicRooms, ...userRooms];
 		
-		return this.server.to(socket.id).emit('roomsI', room);
+		return await this.server.to(socket.id).emit('roomsI', rooms);
 	}
 
 	@SubscribeMessage('getCurrentUser')
-	currentUser (socket: Socket) {
-		return socket.emit('currentUser', socket.data.user)
+	async currentUser (socket: Socket) {
+		return await socket.emit('currentUser', socket.data.user)
 	}
 
 	@SubscribeMessage('joinRoom')
@@ -186,5 +253,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	    for(const user of joinedUsers) {
       		await this.server.to(user.socketId).emit('messageAdded', { ...createdMessage, user: socket.data.user });
     	}
+	}
+
+	@SubscribeMessage('getIsAdmin')
+	async isAdmin(socket: Socket, current_room: RoomI) {
+
+		const user = await this.prisma.user.findUnique({
+			where: { id: socket.data.user.id },
+			include: { AdminRooms: true },
+		});
+
+		for(const room of user.AdminRooms)
+			if (room.name === current_room.name)
+      			return await socket.emit('isAdmin', true);
+      	return await socket.emit('isAdmin', false);
 	}
 }

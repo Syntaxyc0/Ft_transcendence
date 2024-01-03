@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { UserI } from 'src/app/chat/model/user.interface';
 import { FormControl } from '@angular/forms';
 import { Observable, debounceTime, distinctUntilChanged, of, switchMap, take, tap } from 'rxjs';
@@ -13,7 +13,6 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { SocketService } from '../../services/socket.service';
-import { User } from 'src/app/helpers/types';
 
 @Component({
   selector: 'app-select-users',
@@ -31,9 +30,10 @@ import { User } from 'src/app/helpers/types';
   templateUrl: './select-users.component.html',
   styleUrls: ['./select-users.component.scss'],
 })
-export class SelectUsersComponent implements OnInit{
+export class SelectUsersComponent implements OnInit, OnChanges{
 
 	@Input() users: UserI[] | null = null;
+	@Input() public: boolean;
 	@Output() addUser: EventEmitter<UserI> = new EventEmitter<UserI>();
 	@Output() removeuser: EventEmitter<UserI> = new EventEmitter<UserI>();
 
@@ -45,7 +45,20 @@ export class SelectUsersComponent implements OnInit{
 	constructor( private userService: UserService, private socketService: SocketService ) {}
 
 	
+	ngOnChanges(changes: SimpleChanges): void {
+		if (changes['public']) {
+		  if (changes['public'].currentValue) {
+			this.searchLogin.disable();
+		  } else {
+			this.searchLogin.enable();
+		  }
+		}
+	  }
+
 	ngOnInit() : void {
+		if (this.public)
+			this.searchLogin.disable();
+
 		this.socketService.emitGetCurrentUser();
 
 		let currentUser: UserI;

@@ -1,4 +1,3 @@
-import { Meta } from "./meta.interface";
 import { UserI } from "./user.interface";
 
 export interface RoomI {
@@ -8,9 +7,5 @@ export interface RoomI {
 	users?: UserI[];
 	created_at?: Date;
 	updated_at?: Date;
-}
-
-export interface RoomPaginateI {
-	items: RoomI[];
-	meta: Meta;
+	public: boolean;
 }
