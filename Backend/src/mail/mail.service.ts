@@ -10,8 +10,8 @@ export class MailService {
         host: 'mail.mailo.com',
     port: 465,
     auth: {
-        user: 'transcendencemail@mailo.com',
-        pass: 'Test.1234'
+        user: process.env.MAIL_ACCOUNT,
+        pass: process.env.MAIL_PASSWORD
     }
     });
   }
