@@ -30,6 +30,7 @@ export class OptionUserComponent {
 	room: RoomI | undefined;
 	current_user: UserI | undefined = this.userService.getLoggedInUser();
 	adminArray: UserI[] | undefined;
+	creatorId;
   
   constructor(private userService: UserService, private socket: CustomSocket, private socketService: SocketService) {}
   
@@ -53,6 +54,10 @@ export class OptionUserComponent {
 		this.getAdminArray().subscribe(value =>{
 			this.adminArray = value;
 		});
+
+		this.socket.emit("getCreatorId", this.room);  
+		this.socket.fromEvent("creatorId").subscribe(value => {
+		  this.creatorId = value;})
 	}
 
 	getAdminArray(): Observable<UserI[]> {
@@ -74,11 +79,14 @@ export class OptionUserComponent {
 		return false;
 	}
 
-	isCreator(user: UserI | undefined): boolean {
-		if(this.user?.id === this.room?.creator.id)
-			return true;
+	isCreator(): boolean {
+		if (this.creatorId === this.current_user?.id) {
+		  console.log(this.current_user?.login, "is creator of this room");
+		  return true;
+		}
 		return false;
 	}
+	  
 
 	setAsAdmin() {
 		this.socket.emit("setAsAdmin", { user: this.user, room: this.room });

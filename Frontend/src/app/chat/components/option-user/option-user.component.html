@@ -11,7 +11,7 @@
 		<mat-list-item class="list"><button mat-raised-button extended color=primary><strong>profile</strong></button></mat-list-item>
 		<mat-list-item class="list"><button mat-stroked-button>Block</button></mat-list-item>
 
-		<mat-list-item *ngIf="isCreator(current_user) && isAdmin(user)" class="list"><button mat-stroked-button color=warn>Unset as admin</button></mat-list-item>
+		<!-- <mat-list-item *ngIf="(isCreator() | async) && isAdmin(user)" class="list"><button mat-stroked-button color=warn>Unset as admin</button></mat-list-item> -->
 		<mat-list-item *ngIf="isAdmin(current_user) && !isAdmin(user)" class="list"><button mat-stroked-button color=warn (click)="setAsAdmin()">Set as admin</button></mat-list-item>
 		<mat-list-item *ngIf="isAdmin(current_user)" class="list"><button mat-stroked-button color=warn>Mute</button></mat-list-item>
 		<mat-list-item *ngIf="!room?.public && isAdmin(current_user)" class="list"><button mat-stroked-button color=warn>Kick</button></mat-list-item>

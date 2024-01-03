@@ -284,6 +284,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			  admin: { connect: { id: user_.id } },
 			},
 		  });
-		return await socket.emit("adminList", room_)
+		return await socket.emit("adminList", room_);
+	}
+
+	@SubscribeMessage("getCreatorId")
+	async getCreatorId(socket: Socket, room: RoomI) {
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+			include: {
+				creator: true
+			}
+		});
+
+		return await socket.emit("CreatorId", room_.creatorId);
 	}
 }
