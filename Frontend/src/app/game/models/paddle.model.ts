@@ -12,7 +12,7 @@ export class Paddle{
 
 	score: number = 0;
 	side: number;
-	login: string;
+	login: string | undefined;
 	
 
 	constructor( public context: CanvasRenderingContext2D)

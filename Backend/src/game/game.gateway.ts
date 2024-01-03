@@ -33,6 +33,7 @@ export class GameGateway implements OnModuleInit{
             const user: UserI = await this.prisma.user.findUnique({
                 where: { id: decodedToken.sub },
             });
+
       this.connectedPlayers.set(socket.id, new Player(socket, user.login))
 
       socket.on('disconnect', () => {
@@ -64,14 +65,22 @@ export class GameGateway implements OnModuleInit{
     }
   }
 
-  disconnectClient(clientId: string) {
-    this.disconnectRoom(clientId)
-}
+  @SubscribeMessage('loginRequest')
+  loginRequest(@ConnectedSocket() client:Socket)
+  {
+    client.emit('login', this.connectedPlayers.get(client.id).login)
+  }
 
   @SubscribeMessage('disconnectingClient')
-  warnOther(@ConnectedSocket() client: Socket)
+  warnOther(@ConnectedSocket() client: Socket, @MessageBody() side: number)
   {
+    console.log(this.connectedPlayers.get(client.id).login + " is disconnecting")
     this.connectedPlayers.get(client.id).lookingForPlayer = false
+    const targetRoom = this.getRoom(client.id)
+    if (!targetRoom)
+      return;
+    targetRoom.players[side * -1 + 1].socket.emit('onGameRequest', {order: "otherDisconnected"})
+    // this.getRoom(client.id).players[side * -1 + 1].socket.emit("otherDisconnected")
     this.disconnectRoom(client.id)
   }
 

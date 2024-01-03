@@ -29,6 +29,7 @@ export class Room{
         this.paddles.push(new Paddle(0, this.multiplayer))
         this.paddles.push(new Paddle(1, this.multiplayer))
 
+
         for (let i: number = 0; i < 2; i++)
         {
             this.players[i].lookingForPlayer = false
@@ -57,7 +58,8 @@ export class Room{
 
     destroyRoom()
     {
-        this.multiplayer.gameRequest({order: "resetBoard"})
+        // this.multiplayer.gameRequest({order: "resetBoard"})
+        this.multiplayer.stopGame()
         this.isGameRunning = false
         for (let i: number = 0; i < 2; i++)
         {

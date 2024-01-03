@@ -64,7 +64,7 @@ export class MultiplayerService{
         const timeStamp = Date.now()
         const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
         this.room.ball.updatePosition(this.room.paddles)
-        this.room.ball.speed *= 1 + secondsPassed / 40000
+        this.room.ball.speed *= 1 + secondsPassed / 30000
 		this.ballData(this.room.ball)
 
         setTimeout(() => {
@@ -78,6 +78,7 @@ export class MultiplayerService{
         this.gameRequest({order: "stopGame"})
     }
 
+
     gameBoardInit()
     {
         if (!this.room) {
@@ -86,11 +87,13 @@ export class MultiplayerService{
         this.room.players[0].socket.emit('onGameRequest', {order: 'usersPaddle', side: 0, login: this.room.players[1].login})
         this.room.players[1].socket.emit('onGameRequest', {order: 'usersPaddle', side: 1, login: this.room.players[0].login})
         this.gameRequest({order: "setGameBoard", speed: this.room.ball.speed, x: this.room.ball.x, y: this.room.ball.y, angle: this.room.ball.angle})
-        this.room.isGameRunning = true
-        this.gameRequest({order: "startGame"})
-        this.oldTimeStamp = Date.now()
 		this.gameLoop = this.gameLoop.bind(this)
-        this.gameLoop()
+        setTimeout(() => {
+            this.room.isGameRunning = true
+            this.gameRequest({order: "startGame"})
+            this.oldTimeStamp = Date.now()
+            this.gameLoop();
+        }, 3000);
     }
 
 }

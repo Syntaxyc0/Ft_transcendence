@@ -15,7 +15,6 @@ export class Player{
 
         this.socket = socket;
         this.score = 0;
-        this.socket.emit('login', login)
         console.log(login + " player created.")
     }
 }

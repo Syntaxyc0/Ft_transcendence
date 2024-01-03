@@ -19,9 +19,11 @@ export class SocketDataService{
 
   private login!: string;
 
-  getData(): Observable<any[]> {
+getData(): Observable<any[]> {
     const data = new Subject<any>();
     const dataObservable = from(data);
+
+    this.sendRequest("loginRequest")
 
     this.socket.on('connect', () => {
       console.log("Connected");
@@ -29,6 +31,7 @@ export class SocketDataService{
     this.socket.on('login', (login: string) => {
       this.login = login
     });
+   
     this.socket.on('onGameRequest', (payload: {order: string}) =>{
       data.next(payload);
     });
@@ -38,6 +41,11 @@ export class SocketDataService{
   getLogin(): string
   {
     return this.login;
+  }
+
+  disconnect(side: number)
+  {
+    this.socket.emit("disconnectingClient", side)
   }
 
   sendRequest(order: string)

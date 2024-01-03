@@ -1,6 +1,7 @@
 import { WIDTH, HEIGHT } from "../game.service";
 import { MultiplayerService } from "../services/multiplayer.service";
 
+
 export class Paddle{
 	step!: number;
 
@@ -41,6 +42,11 @@ export class Ball{
     angle: number = Math.random() * 360;
     speed: number;
     radius: number = 15;
+	bottom = this.radius;
+	top = HEIGHT - this.radius;
+	left = this.radius;
+	right = WIDTH - this.radius;
+
 
     constructor(private multiplayer: MultiplayerService){
 		this.reset()
@@ -48,7 +54,7 @@ export class Ball{
 	
     reset()
 	{
-		this.speed = 15;
+		this.speed = 20;
 		this.x = WIDTH / 2;
 		this.y = HEIGHT / 2;
 		this.angle = Math.random() * 360;
@@ -108,13 +114,13 @@ export class Ball{
 	pointMarked(paddles: Paddle[] ,winner: number)
 	{
 		paddles[winner].score++;
-		this.multiplayer.sendScore(winner * -1 + 1)
+        this.multiplayer.gameRequest({order: "newScore", side: winner})
+		this.reset();
 		if (paddles[winner].score >= 10)
 		{
 			this.multiplayer.stopGame()
 			this.multiplayer.gameRequest({order: "gameWon", side: winner})
 		}
-		this.reset();
 		return;
 	}
 
@@ -122,38 +128,31 @@ export class Ball{
 	{
 		let hx: number = Math.cos((this.angle * Math.PI) / 180) * this.speed  + this.x;
 		let hy: number = Math.sin((this.angle * Math.PI) / 180) * this.speed  + this.y;
-		let winner: number = -1
-
-		const bottom = this.radius;
-		const top = HEIGHT - this.radius;
-
-		const left = this.radius;
-		const right = WIDTH - this.radius;
 
 		let playerColliding = this.xIsColliding(paddles[1], paddles[0], hx)
 		if (playerColliding != -1){
 			if (this.yIsColliding(paddles[playerColliding], hy))
 				return this.updateCollide(paddles[playerColliding], hy, hx, playerColliding)
 		}
-		if (hx < right && hx > left && hy < top && hy > bottom)
+		if (hx < this.right && hx > this.left && hy < this.top && hy > this.bottom)
 		{
 			this.x = hx;
 			this.y = hy;
 			return;
 		}
 
-		if (hx <= left)
-			this.pointMarked(paddles, 0)
-		else if(hx >= right)
+		if (hx <= this.left)
 			this.pointMarked(paddles, 1)
+		else if(hx >= this.right)
+			this.pointMarked(paddles, 0)
 
-		if (hy <= bottom || hy >= top)
+		if (hy <= this.bottom || hy >= this.top)
 		{
 			this.angle = (-this.angle);
-			if (hy <= bottom)
-				this.y = bottom
+			if (hy <= this.bottom)
+				this.y = this.bottom
 			else
-				this.y = top
+				this.y = this.top
 
 			this.multiplayer.ballData(this)
 		}

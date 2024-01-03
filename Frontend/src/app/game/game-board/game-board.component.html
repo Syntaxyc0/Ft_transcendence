@@ -9,7 +9,8 @@
 <canvas #canvas width="1000" height="640" class="game-board">
 	Fallback
 </canvas>
+<p *ngIf = "matchmaking"> Looking for players... </p>
 <div id="playerNames" class="player-names">
-	<div *ngIf = "paddles[0].login" class="player-name left">{{ paddles[0].login }}</div>
-	<div *ngIf = "paddles[1].login" class="player-name right">{{ paddles[1].login }}</div>
+	<div *ngIf = "paddles[0].login" class="player-name right">{{ paddles[0].login }}</div>
+	<div *ngIf = "paddles[1].login" class="player-name left">{{ paddles[1].login }}</div>
 </div>
