@@ -39,7 +39,11 @@ export class GameGateway implements OnModuleInit{
       socket.on('disconnect', () => {
         console.log(socket.id + " has disconnected");
 
+        const targetRoom = this.getRoom(socket.id)
+        if (targetRoom)
+        targetRoom.multiplayer.gameRequest({order: "otherDisconnected"})
         this.disconnectRoom(socket.id);
+
         this.connectedPlayers.delete(socket.id)
 
       });

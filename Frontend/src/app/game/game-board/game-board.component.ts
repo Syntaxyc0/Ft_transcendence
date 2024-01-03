@@ -195,6 +195,8 @@ export const HEIGHT = 640
 
 	multiplayerRequest()
 	{
+		if(this.isOnline)
+			return;
 		this.player.sendRequest("multiplayerRequest")
 		this.matchmaking = true
 	}
