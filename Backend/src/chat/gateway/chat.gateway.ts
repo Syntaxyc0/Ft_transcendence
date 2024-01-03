@@ -255,7 +255,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     	}
 	}
 
-	@SubscribeMessage('getIsAdmin')
+	@SubscribeMessage('getAdminList')
 	async isAdmin(socket: Socket, current_room: RoomI) {
 
 		const room = await this.prisma.room.findUnique({

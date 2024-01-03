@@ -16,15 +16,12 @@ import { UserI } from '../../model/user.interface';
 export class ChatMessageComponent {
 
 	@Input() message: MessageI;
-	user = this.userService.getLoggedInUser();
+	id;
 
 	constructor(private socketService: SocketService, private userService: UserService) {}
 
 	ngOnInit(): void {
-		this.socketService.emitGetCurrentUser();
-		this.socketService.getCurrentUser().pipe(take(1)).subscribe( value => {
-			this.user = value;
-		});
+		this.id = JSON.parse(localStorage.getItem('id')!);
 	}
 
 	openOption(user_: UserI | undefined) {

@@ -56,7 +56,7 @@ export class OptionUserComponent {
 	}
 
 	getAdminArray(): Observable<UserI[]> {
-		this.socket.emit("getIsAdmin", this.room);
+		this.socket.emit("getAdminList", this.room);
 		return this.socket.fromEvent("isAdmin");
 	}
 

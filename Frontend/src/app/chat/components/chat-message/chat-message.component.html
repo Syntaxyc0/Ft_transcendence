@@ -1,5 +1,5 @@
-<span style="display: flex;" [class.ownContainer]="message.user?.id === user.id">
-	<p [ngClass]="{ownMessage: message.user?.id === user.id}">
+<span style="display: flex;" [class.ownContainer]="message.user?.id === id">
+	<p [ngClass]="{ownMessage: message.user?.id === id}">
 	  <strong (click)="openOption(message.user)">{{ message.user?.login }}</strong> <br /> {{ message.text }}
 	</p>
 </span>
