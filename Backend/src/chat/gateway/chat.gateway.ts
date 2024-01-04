@@ -284,7 +284,29 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			  admin: { connect: { id: user_.id } },
 			},
 		  });
-		return await socket.emit("adminList", room_);
+		await socket.emit("adminList", room_);
+	}
+
+	@SubscribeMessage('unsetAsAdmin')
+	async unsetAsAdmin(socket: Socket, data: { user: UserI, room: RoomI }) {
+
+		const { user, room } = data;
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id}
+		});
+
+		await this.prisma.room.update({
+			where: { id: room_.id },
+			data: {
+			  admin: { disconnect: { id: user_.id } },
+			},
+		  });
+		await socket.emit("adminList", room_);
 	}
 
 	@SubscribeMessage("getCreatorId")
@@ -296,7 +318,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				creator: true
 			}
 		});
-
-		return await socket.emit("CreatorId", room_.creatorId);
+		console.log(room_.creatorId);
+		return await socket.emit("creatorId", room_.creatorId);
 	}
 }

@@ -20,6 +20,7 @@ import { UserService } from '../../services/user.service';
 import { OptionUserComponent } from '../option-user/option-user.component';
 import { SocketService } from '../../services/socket.service';
 import { CustomSocket } from '../../sockets/custom-socket';
+import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.component';
 
 
 @Component({
@@ -36,7 +37,8 @@ import { CustomSocket } from '../../sockets/custom-socket';
 			HttpClientModule,
 			RouterModule,
 			ChatRoomComponent,
-			OptionUserComponent
+			OptionUserComponent,
+			HeaderbarComponent,
 			],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
