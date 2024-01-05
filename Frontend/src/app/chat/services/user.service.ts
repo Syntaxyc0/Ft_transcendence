@@ -17,7 +17,7 @@ export class UserService {
 	users$: Observable<UserI[]>;
 	helper = new JwtHelperService();
 
-	// Pour option-user
+	// Pour option-user //
 	private option = new BehaviorSubject<boolean>(false);
 	option$ = this.option.asObservable();
 
@@ -27,6 +27,10 @@ export class UserService {
 	private room = new BehaviorSubject<RoomI | undefined>(undefined);
 	room$ = this.room.asObservable();
 	//
+
+	// Pour Chat-message //
+
+	// 
 
 	findByLogin(login: string): Observable<UserI[]> {
 		this.users$ = this.http.get<UserI[]>(`http://localhost:3333/users/find-by-login/${login}`)		

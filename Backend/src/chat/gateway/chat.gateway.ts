@@ -321,4 +321,59 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log(room_.creatorId);
 		return await socket.emit("creatorId", room_.creatorId);
 	}
+
+	@SubscribeMessage('blockedUsers')
+	async blockedUserList(socket: Socket) {
+
+		const user = await this.prisma.user.findUnique({
+			where: { id: socket.data.user.id },
+			include: { blockedUsers: true },
+		});
+
+      	return await socket.emit('blockedUsersList', user.blockedUsers);
+	}
+
+	@SubscribeMessage('blockUser')
+	async blockUser(socket: Socket, user: UserI) {
+
+		const current = await this.prisma.user.findUnique({
+			where: { id: socket.data.user.id },
+			include: { blockedUsers: true}
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id}
+		});
+
+		await this.prisma.user.update({
+			where: { id: current.id },
+			data: {
+			  blockedUsers: { connect: { id: user_.id } },
+			},
+		});
+
+		await socket.emit("blockedUsersList", current.blockedUsers);
+	}
+
+	@SubscribeMessage('unblockUser')
+	async unblockUser(socket: Socket, user: UserI) {
+
+		const current = await this.prisma.user.findUnique({
+			where: { id: socket.data.user.id },
+			include: { blockedUsers: true}
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id}
+		});
+
+		await this.prisma.user.update({
+			where: { id: current.id },
+			data: {
+			  blockedUsers: { disconnect: { id: user_.id } },
+			},
+		});
+
+		await socket.emit("blockedUsersList", current.blockedUsers);
+	}
 }

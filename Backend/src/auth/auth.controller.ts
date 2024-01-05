@@ -97,7 +97,9 @@ export class AuthController
 
 	@Get('users')
 	async getUsers() {
-		return await this.prismaService.user.findMany();
+		return await this.prismaService.user.findMany({
+			include: {blockedUsers: true}
+		});
 	}
 
 	@Get('coUsers')

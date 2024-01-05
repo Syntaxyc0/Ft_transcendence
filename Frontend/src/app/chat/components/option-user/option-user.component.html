@@ -15,8 +15,12 @@
 			<button mat-raised-button extended color=primary><strong>profile</strong></button>
 		</mat-list-item>
 
-		<mat-list-item>
-			<button mat-stroked-button>Block</button>
+		<mat-list-item *ngIf="!isUserBlocked">
+			<button mat-stroked-button (click)="blockUser()">Block</button>
+		</mat-list-item>
+
+		<mat-list-item *ngIf="isUserBlocked">
+			<button mat-stroked-button (click)="unblockUser()">Unblock</button>
 		</mat-list-item>
 
 		<mat-list-item *ngIf="isCurrentCreator && adminUser">

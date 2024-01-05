@@ -29,7 +29,9 @@ export class OptionUserComponent implements OnInit{
 	user: UserI | undefined;
 	room: RoomI | undefined;
 	current_user: UserI | undefined = this.userService.getLoggedInUser();
+	
 	adminArray: UserI[] | undefined;
+	blockedUserList: UserI[] | undefined;
 
 	adminUser: boolean;
 	adminCurrent: boolean;
@@ -37,34 +39,36 @@ export class OptionUserComponent implements OnInit{
 	isUserCreator: boolean;
 	isCurrentCreator: boolean;
 
+	isUserBlocked: boolean;
 
   constructor(	private userService: UserService,
 				private socket: CustomSocket,
 				private socketService: SocketService) {}
   
   	ngOnInit(): void {
-		// import current user 
+		// Current user ?
 		this.socketService.emitGetCurrentUser();
 		this.socketService.getCurrentUser().pipe(take(1)).subscribe( value => {
 			this.current_user = value;
 		});
 
-		// import user on click
+		// User on click ? 
 		this.userService.user$.subscribe(value => {
 			this.user = value;
 
-			// import current room
+			// Current room ?
 			this.userService.room$.subscribe(value => {
 				this.room = value;
 			});
 
-			// import admin list
+			// Admin ?
 			this.getAdminArray().subscribe(value => {
 				this.adminArray = value;
 				this.adminUser = this.isAdmin(this.user);
 				this.adminCurrent = this.isAdmin(this.current_user) 
 			});
 
+			// Creator ?
 			this.socket.emit("getCreatorId", this.room);  
 			this.socket.fromEvent("creatorId").subscribe(value => {
 				if(this.user?.id === value) {
@@ -77,7 +81,14 @@ export class OptionUserComponent implements OnInit{
 				} else {
 					this.isCurrentCreator = false;
 				}
+			});
+			// BlockedUser ?
+			this.socket.emit("blockedUsers");
+			this.socket.fromEvent<UserI[] | undefined>("blockedUsersList").subscribe(value =>{
+				this.blockedUserList = value;
+				this.isUserBlocked = this.isBlocked();
 			})
+
 		});
 
 	}
@@ -100,6 +111,16 @@ export class OptionUserComponent implements OnInit{
 				return true;
 		return false;
 	}
+
+	isBlocked(): boolean {
+		if (!this.blockedUserList)
+			return false;
+
+		for(const user of this.blockedUserList)
+			if (user.id === this.user?.id)
+				return true;
+		return false;
+	}
 	  
 	setAsAdmin() {
 		this.socket.emit("setAsAdmin", { user: this.user, room: this.room });
@@ -108,6 +129,16 @@ export class OptionUserComponent implements OnInit{
 
 	unsetAsAdmin() {
 		this.socket.emit("unsetAsAdmin", { user: this.user, room: this.room });
+		this.closeOption();
+	}
+
+	blockUser() {
+		this.socket.emit("blockUser", this.user);
+		this.closeOption();
+	}
+
+	unblockUser() {
+		this.socket.emit("unblockUser", this.user);
 		this.closeOption();
 	}
 }

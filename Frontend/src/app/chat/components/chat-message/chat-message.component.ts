@@ -18,6 +18,8 @@ export class ChatMessageComponent {
 	@Input() message: MessageI;
 	id;
 
+
+
 	constructor(private socketService: SocketService, private userService: UserService) {}
 
 	ngOnInit(): void {
