@@ -10,10 +10,11 @@ import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { MailModule } from 'src/mail/mail.module';
 import { MailService } from 'src/mail/mail.service';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   controllers: [GameController],
-  providers: [GameService, GameGateway, PrismaService, AuthService, MailService],
+  providers: [GameService, GameGateway, PrismaService, AuthService, MailService, UserService],
   imports: [JwtModule, HttpModule, UserModule, AuthModule]
 })
 export class GameModule {}

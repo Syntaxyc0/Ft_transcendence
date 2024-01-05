@@ -33,9 +33,10 @@ export const HEIGHT = 640
 	userPaddle: Paddle;
     paddles: Paddle[] = [];
 
-	isGameRunning: boolean;
-	isOnline: boolean;
-	matchmaking: boolean;
+	isGameRunning: boolean = false;
+	isOnline: boolean = false;
+	matchmaking: boolean = false;
+	showRules: boolean = false;
 
 	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
@@ -53,8 +54,7 @@ export const HEIGHT = 640
 			this.handleOrder(payload.order, payload);
 		});
 
-		this.isOnline = false
-		this.matchmaking = false
+		this.player.sendRequest("gameExists")
 		this.gameLoop = this.gameLoop.bind(this);
 		requestAnimationFrame(this.gameLoop);
 	}
@@ -70,7 +70,7 @@ export const HEIGHT = 640
 				this.ball.reset(payload.angle, payload.x, payload.y)
 			break;
 			case "resetPaddle":
-				this.paddles[payload.side].reset(payload.x, payload.y)
+				this.paddles[payload.side].reset(payload.x, payload.y, payload.score)
 			break;
 			case "paddlePosition":
 				this.paddles[payload.side].newPosition(payload.y)
@@ -80,6 +80,12 @@ export const HEIGHT = 640
 				this.userPaddle.login = this.player.getLogin();
 				this.userPaddle.side = payload.side;
 				this.paddles[payload.side * -1 + 1].login = payload.login
+			break;
+			// case "paddleReload":
+			// 	console.log("paddleReload: " + payload)
+			// 	this.paddles[payload.side].x = payload.x
+			// 	this.paddles[payload.side].y = payload.y
+				
 			break;
 			case "setGameBoard":
 				this.matchmaking = false
@@ -103,10 +109,12 @@ export const HEIGHT = 640
 				this.paddles[payload.side].score++
 			break;
 			case "gameWon":
+				this.stopGame()
 				this.draw()
 				this.context.fillText(`${this.paddles[payload.side].login} WINS`, WIDTH / 2 * payload.side + WIDTH / 6, HEIGHT / 2);
 				this.context.fillText(`${this.paddles[payload.side * -1 + 1].login} LOSES`, WIDTH / 2 * (payload.side * -1 + 1) + WIDTH / 6, HEIGHT / 2)
-
+				this.player.sendRequest("gameOver")
+				this.disconnect()
 
 			break;
 		}
@@ -197,6 +205,8 @@ export const HEIGHT = 640
 	{
 		if(this.isOnline)
 			return;
+		this.player.sendRequest("gameExists")
+
 		this.player.sendRequest("multiplayerRequest")
 		this.matchmaking = true
 	}
@@ -211,7 +221,6 @@ export const HEIGHT = 640
 
 	startGame() {
 		this.isGameRunning = true;
-		// this.oldTimeStamp = Date.now()
 		this.gameLoop();
 	}
 
@@ -263,7 +272,17 @@ export const HEIGHT = 640
 		}
 	}
 
+	showPongRules() {
+		console.log(this.showRules)
+		this.showRules = true;
+	  }
+	  
+	  closePongRules() {
+		this.showRules = false;
+	  }
   }
+
+  
 
   // this.paddles.forEach((paddle) => {
 		// 	let y = this.lerp(

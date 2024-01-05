@@ -8,7 +8,9 @@ export class Player{
     score: number;
     room: Room;
 
+
     lookingForPlayer = false;
+    status: boolean = false;
 
     constructor(socket: Socket, public login: string){
         

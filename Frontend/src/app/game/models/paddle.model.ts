@@ -27,11 +27,12 @@ export class Paddle{
 	}
 
 
-	reset(x: number, y: number)
+	reset(x: number, y: number, score: number)
 	{
 		this.x = x;
 		this.y = y;
 		this.targetY = y;
+		this.score = score
 	}
 
 	newPosition(y: number)

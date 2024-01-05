@@ -120,6 +120,7 @@ export class Ball{
 		{
 			this.multiplayer.stopGame()
 			this.multiplayer.gameRequest({order: "gameWon", side: winner})
+			// this.multiplayer.gameWon(winner)
 		}
 		return;
 	}

@@ -18,13 +18,14 @@ const axios_1 = require("@nestjs/axios");
 const user_module_1 = require("../user/user.module");
 const auth_module_1 = require("../auth/auth.module");
 const mail_service_1 = require("../mail/mail.service");
+const user_service_1 = require("../user/user.service");
 let GameModule = class GameModule {
 };
 exports.GameModule = GameModule;
 exports.GameModule = GameModule = __decorate([
     (0, common_1.Module)({
         controllers: [game_controller_1.GameController],
-        providers: [game_service_1.GameService, game_gateway_1.GameGateway, prisma_service_1.PrismaService, auth_service_1.AuthService, mail_service_1.MailService],
+        providers: [game_service_1.GameService, game_gateway_1.GameGateway, prisma_service_1.PrismaService, auth_service_1.AuthService, mail_service_1.MailService, user_service_1.UserService],
         imports: [jwt_1.JwtModule, axios_1.HttpModule, user_module_1.UserModule, auth_module_1.AuthModule]
     })
 ], GameModule);
