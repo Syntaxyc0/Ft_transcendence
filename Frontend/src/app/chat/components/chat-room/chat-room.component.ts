@@ -16,6 +16,7 @@ import { ChatMessageComponent } from '../chat-message/chat-message.component';
 import { UserI } from '../../model/user.interface';
 import { UserService } from '../../services/user.service';
 import { HttpClient } from '@angular/common/http';
+import { CustomSocket } from '../../sockets/custom-socket';
 
 @Component({
   selector: 'app-chat-room',
@@ -60,11 +61,17 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 
   constructor(private chatService: ChatService, 
 			  private userService: UserService,
-			  public http: HttpClient,) {}
+			  public http: HttpClient,
+			  private socket: CustomSocket) {}
 
   ngOnInit(): void {
 	this.userService.changeRoom(this.chatRoom);
 	this.currentId = JSON.parse(localStorage.getItem('id')!);
+	this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
+		this.mutedUserList = value;
+		this.isCurrentMuted = this.isMuted();
+		console.log(this.isCurrentMuted);
+	});
   }
 
   ngOnChanges(changes: SimpleChanges) {
