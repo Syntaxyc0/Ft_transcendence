@@ -318,7 +318,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				creator: true
 			}
 		});
-		console.log(room_.creatorId);
 		return await socket.emit("creatorId", room_.creatorId);
 	}
 
@@ -395,6 +394,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const room_ = await this.prisma.room.findUnique({
 			where: { id: room.id },
+			include: { mutedUsers: true },
 		});
 
 		const user_ = await this.prisma.user.findUnique({
@@ -407,6 +407,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			  mutedUsers: { connect: { id: user_.id } },
 			},
 		  });
+
 		await socket.emit('mutedUsersList', room_.mutedUsers);
 
 		setTimeout( async () =>{
@@ -417,9 +418,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				  mutedUsers: { disconnect: { id: user_.id } },
 				},
 			  });
-			await socket.emit('mutedUsersList', room_.mutedUsers);
-			
-		}, 10000);
 
+			await socket.emit('mutedUsersList', room_.mutedUsers);
+		}, 10000);
 	}
 }

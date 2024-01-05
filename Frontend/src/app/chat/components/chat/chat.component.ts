@@ -77,7 +77,7 @@ export class ChatComponent implements AfterViewInit, OnInit{
 		   err => {
 			   alert("user doesn't exist");
 		   })
-	   }
+	}
 
 	ngAfterViewInit() {
 		this.chatService.emitRooms();

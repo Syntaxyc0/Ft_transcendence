@@ -15,6 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ChatMessageComponent } from '../chat-message/chat-message.component';
 import { UserI } from '../../model/user.interface';
 import { UserService } from '../../services/user.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-chat-room',
@@ -29,6 +30,11 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   @Input() chatRoom: RoomI;
   @ViewChild('messages') private messagesScroller: ElementRef;
 
+	
+  currentId: UserI;
+  mutedUserList: UserI[] | undefined;
+  isCurrentMuted: boolean = this.isMuted();
+  
   messages$: Observable<MessageI[]> = combineLatest([
 	this.chatService.getMessage(), 
 	this.chatService.getAddedMessage().pipe(startWith(null))
@@ -52,10 +58,13 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 
   chatMessage: FormControl = new FormControl(null, [Validators.required]);
 
-  constructor(private chatService: ChatService, private userService: UserService) { }
+  constructor(private chatService: ChatService, 
+			  private userService: UserService,
+			  public http: HttpClient,) {}
 
   ngOnInit(): void {
 	this.userService.changeRoom(this.chatRoom);
+	this.currentId = JSON.parse(localStorage.getItem('id')!);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -82,4 +91,15 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   scrollToBottom(): void {
     setTimeout(() => {this.messagesScroller.nativeElement.scrollTop = this.messagesScroller.nativeElement.scrollHeight}, 1);
   }
+
+  	isMuted(): boolean {
+		if (!this.mutedUserList)
+			return false;
+
+		for(const user of this.mutedUserList)
+			if (user.id === this.currentId)
+				return true;
+		return false;
+	}
+
 }

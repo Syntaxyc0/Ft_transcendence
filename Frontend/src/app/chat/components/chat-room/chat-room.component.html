@@ -27,7 +27,7 @@
 	</div>
   
 	<!-- Add Message -->
-	<div style="display: flex; flex-shrink: 0; width: 98%;">
+	<div style="display: flex; flex-shrink: 0; width: 98%;" *ngIf="!isCurrentMuted">
 	  <mat-form-field style="width: 100%; margin-left: 10px;">
 		<input matInput [formControl]="chatMessage" type="text" (keydown.enter)="sendMessage()">
 	  </mat-form-field>

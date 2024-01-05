@@ -123,9 +123,8 @@ export class OptionUserComponent implements OnInit{
 	}
 
 	isBlocked(): boolean {
-		if (!this.blockedUserList)
+		if (!this.blockedUserList )
 			return false;
-
 		for(const user of this.blockedUserList)
 			if (user.id === this.user?.id)
 				return true;
