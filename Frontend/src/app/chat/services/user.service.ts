@@ -26,11 +26,7 @@ export class UserService {
 
 	private room = new BehaviorSubject<RoomI | undefined>(undefined);
 	room$ = this.room.asObservable();
-	//
-
-	// Pour Chat-message //
-
-	// 
+	//    *********   //
 
 	findByLogin(login: string): Observable<UserI[]> {
 		this.users$ = this.http.get<UserI[]>(`http://localhost:3333/users/find-by-login/${login}`)		
@@ -51,8 +47,5 @@ export class UserService {
 	changeRoom(room: RoomI) {
 		this.room.next(room)
 	}
-}
 
-// exemple de suscribe:
-// this.users$.subscribe((users) => {
-// 	console.log('dans le userService du Front :', users);});
+}

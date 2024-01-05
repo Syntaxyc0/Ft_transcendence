@@ -87,7 +87,7 @@ export class OptionUserComponent implements OnInit{
 			this.socket.fromEvent<UserI[] | undefined>("blockedUsersList").subscribe(value =>{
 				this.blockedUserList = value;
 				this.isUserBlocked = this.isBlocked();
-			})
+			});
 
 		});
 
