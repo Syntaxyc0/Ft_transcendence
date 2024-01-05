@@ -12,7 +12,7 @@ export class MultiplayerService{
 
     previousBallState: {x: number, y : number, angle: number};
 
-    constructor(public room: Room, private gameService: GameService){}
+    constructor(private room: Room, private gameService: GameService){}
 
     gameRequest(payload: any)
     {
