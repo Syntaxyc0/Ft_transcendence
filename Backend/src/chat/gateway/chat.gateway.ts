@@ -376,4 +376,50 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		await socket.emit("blockedUsersList", current.blockedUsers);
 	}
+
+	@SubscribeMessage('MutedUsers')
+	async MutedUserList(socket: Socket, room: RoomI) {
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+			include: { mutedUsers: true },
+		});
+
+      	return await socket.emit('mutedUsersList', room_.mutedUsers);
+	}
+
+	@SubscribeMessage('muteUser')
+	async muteUser(socket: Socket, data: { user: UserI, room: RoomI }) {
+
+		const { user, room } = data;
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id}
+		});
+
+		await this.prisma.room.update({
+			where: { id: room_.id },
+			data: {
+			  mutedUsers: { connect: { id: user_.id } },
+			},
+		  });
+		await socket.emit('mutedUsersList', room_.mutedUsers);
+
+		setTimeout( async () =>{
+
+			await this.prisma.room.update({
+				where: { id: room_.id },
+				data: {
+				  mutedUsers: { disconnect: { id: user_.id } },
+				},
+			  });
+			await socket.emit('mutedUsersList', room_.mutedUsers);
+			
+		}, 10000);
+
+	}
 }

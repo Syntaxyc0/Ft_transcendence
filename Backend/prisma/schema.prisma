@@ -33,6 +33,7 @@ model User {
   AdminRooms             Room[]          @relation("AdminRooms")
   blockedUsers           User[]          @relation("BlockedUser")
   blockedByUsers         User[]          @relation("BlockedUser")
+  muteInRoom             Room[]          @relation("Muted")
 }
 
 model GameInfo {
@@ -64,6 +65,7 @@ model Room {
   admin       User[]       @relation("AdminRooms")
   public      Boolean
   password    String?
+  mutedUsers  User[]       @relation("Muted")
 }
 
 model ConnectedUser {

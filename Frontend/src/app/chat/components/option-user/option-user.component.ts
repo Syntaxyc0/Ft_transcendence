@@ -32,6 +32,7 @@ export class OptionUserComponent implements OnInit{
 	
 	adminArray: UserI[] | undefined;
 	blockedUserList: UserI[] | undefined;
+	mutedUserList: UserI[] | undefined;
 
 	adminUser: boolean;
 	adminCurrent: boolean;
@@ -40,6 +41,8 @@ export class OptionUserComponent implements OnInit{
 	isCurrentCreator: boolean;
 
 	isUserBlocked: boolean;
+
+	isUserMuted: boolean;
 
   constructor(	private userService: UserService,
 				private socket: CustomSocket,
@@ -82,11 +85,18 @@ export class OptionUserComponent implements OnInit{
 					this.isCurrentCreator = false;
 				}
 			});
+
 			// BlockedUser ?
 			this.socket.emit("blockedUsers");
 			this.socket.fromEvent<UserI[] | undefined>("blockedUsersList").subscribe(value =>{
 				this.blockedUserList = value;
 				this.isUserBlocked = this.isBlocked();
+			});
+			// Muted ?
+			this.socket.emit("MutedUsers", this.room);
+			this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
+				this.mutedUserList = value;
+				this.isUserMuted = this.isMuted();
 			});
 
 		});
@@ -121,6 +131,16 @@ export class OptionUserComponent implements OnInit{
 				return true;
 		return false;
 	}
+
+	isMuted(): boolean {
+		if (!this.mutedUserList)
+			return false;
+
+		for(const user of this.mutedUserList)
+			if (user.id === this.user?.id)
+				return true;
+		return false;
+	}
 	  
 	setAsAdmin() {
 		this.socket.emit("setAsAdmin", { user: this.user, room: this.room });
@@ -139,6 +159,11 @@ export class OptionUserComponent implements OnInit{
 
 	unblockUser() {
 		this.socket.emit("unblockUser", this.user);
+		this.closeOption();
+	}
+
+	muteUser() {
+		this.socket.emit("muteUser", { user: this.user, room: this.room });
 		this.closeOption();
 	}
 }
