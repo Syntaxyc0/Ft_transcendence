@@ -172,9 +172,7 @@ export class GameGateway implements OnModuleInit{
     if (this.connectedPlayers.get(client.id).room != undefined)
       return;
     for (const [socketId, player] of this.connectedPlayers) {
-      if(!player.lookingForPlayer)
-        return;
-      if (player.socket.id != client.id)
+      if (player.socket.id != client.id && player.lookingForPlayer)
       {
         this.rooms.push(new Room(this.rooms.length ,this.connectedPlayers.get(client.id), player, this.gameService))
         return;
