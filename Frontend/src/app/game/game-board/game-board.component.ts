@@ -57,7 +57,6 @@ export const HEIGHT = 640
 		});
 
 		this.player.sendRequest("gameExists")
-    	this.player.sendRequest("loginRequest")
 		console.log("onInit")
 		this.gameLoop = this.gameLoop.bind(this);
 		requestAnimationFrame(this.gameLoop);
