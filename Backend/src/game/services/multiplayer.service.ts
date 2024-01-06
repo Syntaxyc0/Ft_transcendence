@@ -70,7 +70,6 @@ export class MultiplayerService{
         gameInfoDto.scoreUser2 = this.room.paddles[1].score
         gameInfoDto.winnerId = this.room.players[sideWinner].socket.data.user.id
         this.gameService.newgame(gameInfoDto)
-        // this.room.destroyRoom()
     }
 
     gameLoop()
