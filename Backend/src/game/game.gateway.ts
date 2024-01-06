@@ -111,7 +111,7 @@ export class GameGateway implements OnModuleInit{
   loginRequest(@ConnectedSocket() client:Socket)
   {
     if (this.connectedPlayers.get(client.id))
-      client.emit('login', this.connectedPlayers.get(client.id).login)
+    client.emit('login', this.connectedPlayers.get(client.id).login)
   }
 
   @SubscribeMessage('gameExists')
