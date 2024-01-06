@@ -37,6 +37,8 @@ export const HEIGHT = 640
 	isOnline: boolean = false;
 	matchmaking: boolean = false;
 	showRules: boolean = false;
+	multiWindow: boolean = false;
+	// requestOver: boolean = true;
 
 	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
@@ -55,12 +57,16 @@ export const HEIGHT = 640
 		});
 
 		this.player.sendRequest("gameExists")
+    	this.player.sendRequest("loginRequest")
+		console.log("onInit")
 		this.gameLoop = this.gameLoop.bind(this);
 		requestAnimationFrame(this.gameLoop);
 	}
 
 	handleOrder(order:string, payload:any)
 	{
+		if (this.multiWindow == true)
+			return;
 		switch(order){
 			case "ballPosition":
 				this.newMovement(payload.angle, payload.x, payload.y)
@@ -85,7 +91,13 @@ export const HEIGHT = 640
 			// 	console.log("paddleReload: " + payload)
 			// 	this.paddles[payload.side].x = payload.x
 			// 	this.paddles[payload.side].y = payload.y
-				
+			case "multiWindow":
+				console.log("Many windows are open!")
+				this.multiWindow = true;
+				this.drawBoard()
+				this.context.font = '30px Arial';
+    			this.context.fillStyle = 'white';
+				this.context.fillText(`There is another game instance on this profile, you can close this window.`, 10, HEIGHT/2);
 			break;
 			case "setGameBoard":
 				this.matchmaking = false
@@ -203,7 +215,7 @@ export const HEIGHT = 640
 
 	multiplayerRequest()
 	{
-		if(this.isOnline)
+		if(this.isOnline || this.multiWindow)
 			return;
 		this.player.sendRequest("gameExists")
 
@@ -232,7 +244,7 @@ export const HEIGHT = 640
 	disconnect()
 	{
 		// this.player.sendRequest("disconnectingClient")
-		if (this.isOnline)
+		if (this.isOnline || this.multiWindow)
 			this.player.disconnect(this.userPaddle.side)
 		this.resetOnline()
 		this.matchmaking = false

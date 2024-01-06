@@ -23,7 +23,7 @@ getData(): Observable<any[]> {
     const data = new Subject<any>();
     const dataObservable = from(data);
 
-    this.sendRequest("loginRequest")
+    // this.sendRequest("loginRequest")
 
     this.socket.on('connect', () => {
       console.log("Connected");
