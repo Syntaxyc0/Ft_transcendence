@@ -243,7 +243,7 @@ export const HEIGHT = 640
 	disconnect()
 	{
 		// this.player.sendRequest("disconnectingClient")
-		if (this.isOnline || this.multiWindow)
+		if (!this.multiWindow)
 			this.player.disconnect(this.userPaddle.side)
 		this.resetOnline()
 		this.matchmaking = false
