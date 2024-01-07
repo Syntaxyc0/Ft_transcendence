@@ -18,7 +18,7 @@ export class ChatMessageComponent {
 
 	@Input() message: MessageI;
 	id;
-	blockedUserList;
+	blockedUserList: UserI[] | undefined;
 
 	constructor(private socketService: SocketService, 
 				private socket: CustomSocket,
@@ -39,7 +39,7 @@ export class ChatMessageComponent {
 	}
 
 	isBlocked(id: number | undefined) {
-		if(!id)
+		if(!id || !this.blockedUserList)
 			return false;
 
 		for(const user of this.blockedUserList)

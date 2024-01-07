@@ -31,11 +31,10 @@
 	  <mat-form-field style="width: 100%; margin-left: 10px;">
 		<input matInput [formControl]="chatMessage" type="text" (keydown.enter)="sendMessage()">
 	  </mat-form-field>
-	  <button mat-button [disabled]="!chatMessage.valid || isCurrentMuted" (click)="sendMessage()" style="margin-top: 10px; margin-left: 10px;">
+	  <button mat-button [disabled]="!chatMessage.valid" (click)="sendMessage()" style="margin-top: 10px; margin-left: 10px;">
 		<span style="display: flex; flex-direction: row; align-items: center;">
 		  <mat-icon>send</mat-icon>
-		  <p *ngIf="!isCurrentMuted">Send</p>
-		  <p *ngIf="isCurrentMuted">Mute</p>
+		  <p>Send</p>
 		</span>
 	  </button>
 	</div>

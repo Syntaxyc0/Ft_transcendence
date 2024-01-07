@@ -420,6 +420,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			  });
 
 			await socket.emit('mutedUsersList', room_.mutedUsers);
-		}, 10000);
+		}, 15000);
 	}
 }

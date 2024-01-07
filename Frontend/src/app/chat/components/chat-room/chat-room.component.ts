@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Observable, combineLatest, map, mergeMap, of, startWith, tap } from 'rxjs';
 import { RoomI } from 'src/app/chat/model/room.interface';
@@ -17,6 +17,7 @@ import { UserI } from '../../model/user.interface';
 import { UserService } from '../../services/user.service';
 import { HttpClient } from '@angular/common/http';
 import { CustomSocket } from '../../sockets/custom-socket';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-chat-room',
@@ -34,7 +35,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 	
   currentId: UserI;
   mutedUserList: UserI[] | undefined;
-  isCurrentMuted: boolean = this.isMuted();
+  isCurrentMuted: boolean;
   
   messages$: Observable<MessageI[]> = combineLatest([
 	this.chatService.getMessage(), 
@@ -62,15 +63,21 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   constructor(private chatService: ChatService, 
 			  private userService: UserService,
 			  public http: HttpClient,
-			  private socket: CustomSocket) {}
+			  private socket: CustomSocket,
+			  private snackbar: MatSnackBar,
+			  private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
 	this.userService.changeRoom(this.chatRoom);
 	this.currentId = JSON.parse(localStorage.getItem('id')!);
+
+	// muted?
 	this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
 		this.mutedUserList = value;
 		this.isCurrentMuted = this.isMuted();
-		console.log(this.isCurrentMuted);
+		console.log('is current Muted? =>', this.isCurrentMuted);
+
+		this.cdr.detectChanges();
 	});
   }
 
@@ -91,6 +98,13 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   }
 
   sendMessage() {
+	if (this.isCurrentMuted) {
+		this.snackbar.open(`You are muted`, 'Close' ,{
+			duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
+		} );
+		return;
+	}
+
     this.chatService.sendMessage({text: this.chatMessage.value, room: this.chatRoom});
     this.chatMessage.reset();
   }
