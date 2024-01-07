@@ -167,4 +167,9 @@ export class OptionUserComponent implements OnInit{
 		this.socket.emit("muteUser", { user: this.user, room: this.room });
 		this.closeOption();
 	}
+
+	kickUser() {
+		this.socket.emit("kickUser", { user: this.user, room: this.room });
+		this.closeOption();
+	}
 }

@@ -107,6 +107,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 
   ngOnDestroy() {
     this.chatService.leaveRoom(this.chatRoom);
+	this.userService.changeOption(false, undefined);
   }
 
   sendMessage() {

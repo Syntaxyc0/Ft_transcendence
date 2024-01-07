@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, of, take } from 'rxjs';
 import { RoomI } from '../../model/room.interface';
@@ -43,7 +43,7 @@ import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.compo
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements AfterViewInit, OnInit{
+export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
@@ -65,6 +65,12 @@ export class ChatComponent implements AfterViewInit, OnInit{
 		this.userService.option$.subscribe(value => {
 			this.option = value;
 		  });
+		this.socket.fromEvent("kicked").subscribe(() => {
+			location.reload();
+		})
+	}
+
+	ngOnDestroy(): void {	
 	}
 
 	retrieveUser() {
