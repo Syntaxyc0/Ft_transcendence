@@ -3,3 +3,4 @@ assets
 dist
 .env
 prisma/migrations
+dist/tsconfig.build.tsbuildinfo
