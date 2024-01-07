@@ -39,7 +39,7 @@ export const HEIGHT = 640
 	matchmaking: boolean = false;
 	showRules: boolean = false;
 	multiWindow: boolean = false;
-	// requestOver: boolean = true;
+	requestMatch: boolean = true;
 
 	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
@@ -69,6 +69,15 @@ export const HEIGHT = 640
 
 	handleOrder(order:string, payload:any)
 	{
+		if (order == "reload")
+			this.multiWindow = false;
+		if (order == "gameChecked")
+		{
+			if (payload.exists && this.matchmaking)
+				this.player.sendRequest("multiplayerRequest")
+			else
+				this.matchmaking = false
+		}
 		if (this.multiWindow == true)
 			return;
 		switch(order){
@@ -129,6 +138,15 @@ export const HEIGHT = 640
 				this.disconnect()
 
 			break;
+			// case "playerNotFound":
+			// 	this.matchmaking = true
+			// break;
+			// case "gameChecked":
+			// 	if (payload.exists && this.matchmaking)
+			// 		this.player.sendRequest("multiplayerRequest")
+			// 	else
+			// 		this.matchmaking = false
+			// break;
 		}
 	}
 
@@ -215,13 +233,18 @@ export const HEIGHT = 640
 
 	multiplayerRequest()
 	{
-		// if(this.isOnline)
-		// 	return;
-		this.player.sendRequest("gameExists")
-		if (this.multiWindow || this.isOnline)
+		if(this.isOnline)
 			return;
-		this.player.sendRequest("multiplayerRequest")
+		this.player.sendRequest("gameExists")
 		this.matchmaking = true
+
+		// this.player.sendRequest("multiplayerRequest")
+		
+		// this.player.sendRequest("gameExists")
+		// this.player.sendRequest("multiplayerRequest")
+		// if (this.multiWindow || this.isOnline)
+		// 	return;
+		// this.matchmaking = true
 	}
 
 	drawBoard()
@@ -246,7 +269,7 @@ export const HEIGHT = 640
 	{
 		// this.player.sendRequest("disconnectingClient")
 		if (!this.multiWindow)
-			this.player.disconnect(this.userPaddle.side)
+			this.player.disconnect()
 		this.resetOnline()
 		this.matchmaking = false
 

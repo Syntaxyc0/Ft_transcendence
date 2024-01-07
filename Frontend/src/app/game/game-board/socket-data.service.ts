@@ -45,14 +45,14 @@ getData(): Observable<any[]> {
     return this.login;
   }
 
-  disconnect(side: number)
+  disconnect()
   {
-    this.socket.emit("disconnectingClient", side)
+    this.socket.emit("disconnectingClient")
   }
 
   sendRequest(order: string)
   {
-    this.socket.emit(order)
+    this.socket.emit(order);
   }
 
   newPaddlePosition(paddle: {y: number, side: number})
