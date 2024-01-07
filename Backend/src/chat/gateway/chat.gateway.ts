@@ -478,4 +478,55 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 		}
 	}
+
+	@SubscribeMessage('AddUser')
+	async AddUser(socket: Socket, data: { user: UserI, room: RoomI }) {
+
+		const { user, room } = data;
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id},
+			include: {rooms: true}
+		});
+
+		// add user_ from the current room
+		await this.prisma.room.update({
+			where: { id: room_.id },
+			data: {
+			  users: { connect: { id: user_.id } },
+			},
+		});
+
+		const userRooms = user_.rooms;
+
+		const publicRooms = await this.prisma.room.findMany({
+			where: { public: true }
+		})
+		
+		const rooms = [...publicRooms, ...userRooms];
+		
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		for (const user of connectedUser) {
+			if (user.userId === user_.id) {
+				await this.server.to(user.socketId).emit('roomI', rooms);
+			}
+		}
+	}
+
+	@SubscribeMessage('getUsersRoom')
+	async getUsersRoom( socket: Socket, room: RoomI ) {
+
+		console.log("getUsersRoom");
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+			include: { users: true }
+		});
+
+		await socket.emit('UsersRoom', room_.users);
+	}	
+
 }

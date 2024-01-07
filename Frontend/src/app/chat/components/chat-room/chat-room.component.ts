@@ -19,12 +19,38 @@ import { HttpClient } from '@angular/common/http';
 import { CustomSocket } from '../../sockets/custom-socket';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
+import {
+	MatDialog,
+	MatDialogRef,
+	MatDialogActions,
+	MatDialogClose,
+	MatDialogTitle,
+	MatDialogContent,
+	MatDialogModule,
+  } from '@angular/material/dialog';
+import { AddUsersComponent } from '../add-users/add-users.component';
+
 @Component({
   selector: 'app-chat-room',
   standalone: true,
   templateUrl: './chat-room.component.html',
   styleUrls: ['./chat-room.component.scss'],
-  imports: [ ReactiveFormsModule, CommonModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatCardModule, RouterModule, MatIconModule, ChatMessageComponent ],
+  imports: [ ReactiveFormsModule,
+			 CommonModule, 
+			 MatInputModule, 
+			 MatFormFieldModule, 
+			 MatButtonModule, 
+			 MatCardModule, 
+			 RouterModule, 
+			 MatIconModule, 
+			 ChatMessageComponent,
+			 MatDialogModule,
+			 MatDialogActions,
+			 MatDialogClose,
+			 MatDialogTitle,
+			 MatDialogContent,
+			 AddUsersComponent,
+			],
 
 })
 export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
@@ -65,8 +91,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 			  public http: HttpClient,
 			  private socket: CustomSocket,
 			  private snackbar: MatSnackBar,
-			  private cdr: ChangeDetectorRef,
-			  private zone: NgZone,
+			  public dialog: MatDialog,
 			  ) {}
 
   ngOnInit(): void {
@@ -135,5 +160,18 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 				return true;
 		return false;
 	}
+
+	openUserSearchDialog(): void {
+		const dialogRef = this.dialog.open(AddUsersComponent, {
+		  width: '300px',
+		  data: { room: this.chatRoom }
+		  // Ajoutez d'autres options de dialogue au besoin
+		});
+	
+		dialogRef.afterClosed().subscribe(result => {
+		  console.log('Dialog closed with result:', result);
+		  // Ajoutez la logique de gestion des résultats de la recherche ici
+		});
+	  }
 
 }
