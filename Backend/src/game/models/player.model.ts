@@ -18,6 +18,6 @@ export class Player{
         this.room = undefined
         this.socket = socket;
         this.score = 0;
-        console.log(login + " player created.")
+        // console.log(login + " player created.")
     }
 }
