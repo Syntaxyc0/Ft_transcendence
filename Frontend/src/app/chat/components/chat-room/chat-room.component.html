@@ -7,14 +7,14 @@
 	<!-- Header -->
 	<div style="height: 20px;">
 	  <span style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
-		<h2 style="margin-left: 10px; font-size: 1.5em; color: #6fb6e8;">{{chatRoom.name}}</h2>
+		<h2 style="margin-left: 10px; font-size: 1.5em; color: #6fb6e8;"><strong>{{chatRoom.name}}</strong></h2>
 		<span style="display: flex; flex-direction: row; align-items: center;">
 		  <mat-icon>event</mat-icon>
 		  <p>{{chatRoom.updated_at | date}}</p>
 		</span>
 	  </span>
 	  <span>
-		<h3 style="color: rgb(230, 213, 213)">{{chatRoom.description}}</h3>
+		<h3 style="margin-left: 10px ; color: rgb(230, 213, 213)">{{chatRoom.description}}</h3>
 		<span *ngFor="let user of chatRoom.users">{{user.login}}, </span>
 	  </span>
 	</div>
