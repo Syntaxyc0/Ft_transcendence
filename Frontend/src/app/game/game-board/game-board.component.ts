@@ -214,10 +214,11 @@ export const HEIGHT = 640
 
 	multiplayerRequest()
 	{
-		if(this.isOnline || this.multiWindow)
-			return;
+		// if(this.isOnline)
+		// 	return;
 		this.player.sendRequest("gameExists")
-
+		if (this.multiWindow || this.isOnline)
+			return;
 		this.player.sendRequest("multiplayerRequest")
 		this.matchmaking = true
 	}

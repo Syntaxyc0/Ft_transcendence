@@ -45,6 +45,7 @@ export class GameGateway implements OnModuleInit{
         console.log(player.login + " has disconnected");
         player.status = false;
         player.connected = false;
+        player.lookingForPlayer = false
 
         const targetRoom = this.getRoom(socket.id)
         if (!targetRoom)
