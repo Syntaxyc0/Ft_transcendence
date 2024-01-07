@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener} from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, OnDestroy} from '@angular/core';
 import { PADDLE_HEIGHT, Paddle } from '../models/paddle.model';
 import { Ball } from '../models/ball.model';
 import { Socket } from 'socket.io-client';
@@ -6,6 +6,7 @@ import { SocketDataService } from 'src/app/game/game-board/socket-data.service';
 import { Observable, first } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.component';
+import { Router } from '@angular/router';
 
 export const WIDTH = 1000
 export const HEIGHT = 640 
@@ -19,7 +20,7 @@ export const HEIGHT = 640
 	imports: [CommonModule, HeaderbarComponent]
   })
 
-  export class GameBoardComponent implements OnInit{
+  export class GameBoardComponent implements OnInit, OnDestroy{
 
 	@ViewChild('canvas', {static: true}) gameCanvas!: ElementRef;
 	context!: CanvasRenderingContext2D;
@@ -62,6 +63,10 @@ export const HEIGHT = 640
 		requestAnimationFrame(this.gameLoop);
 	}
 
+	ngOnDestroy(): void {
+		this.disconnect()
+	}
+
 	handleOrder(order:string, payload:any)
 	{
 		if (this.multiWindow == true)
@@ -86,10 +91,6 @@ export const HEIGHT = 640
 				this.userPaddle.side = payload.side;
 				this.paddles[payload.side * -1 + 1].login = payload.login
 			break;
-			// case "paddleReload":
-			// 	console.log("paddleReload: " + payload)
-			// 	this.paddles[payload.side].x = payload.x
-			// 	this.paddles[payload.side].y = payload.y
 			case "multiWindow":
 				console.log("Many windows are open!")
 				this.multiWindow = true;
@@ -214,10 +215,11 @@ export const HEIGHT = 640
 
 	multiplayerRequest()
 	{
-		if(this.isOnline || this.multiWindow)
-			return;
+		// if(this.isOnline)
+		// 	return;
 		this.player.sendRequest("gameExists")
-
+		if (this.multiWindow || this.isOnline)
+			return;
 		this.player.sendRequest("multiplayerRequest")
 		this.matchmaking = true
 	}

@@ -8,11 +8,11 @@
 		<mat-list-item><strong>{{ room?.name }}</strong></mat-list-item>
 
 		<mat-list-item>
-			<button mat-raised-button extended color=primary><strong>PLAY</strong></button>
+			<button mat-raised-button extended color=primary (click)="inviteToPlay()"><strong>PLAY</strong></button>
 		</mat-list-item>
 
 		<mat-list-item>
-			<button mat-raised-button extended color=primary><strong>profile</strong></button>
+			<button mat-raised-button extended color=primary (click)="goToProfile()"><strong>profile</strong></button>
 		</mat-list-item>
 
 		<mat-list-item *ngIf="!isUserBlocked">

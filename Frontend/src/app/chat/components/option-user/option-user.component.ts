@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { UserI } from '../../model/user.interface';
 import { RoomI } from '../../model/room.interface';
 import { CustomSocket } from '../../sockets/custom-socket';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -46,7 +47,8 @@ export class OptionUserComponent implements OnInit{
 
   constructor(	private userService: UserService,
 				private socket: CustomSocket,
-				private socketService: SocketService) {}
+				private socketService: SocketService,
+				private router: Router) {}
   
   	ngOnInit(): void {
 		// Current user ?
@@ -102,6 +104,18 @@ export class OptionUserComponent implements OnInit{
 
 		});
 
+	}
+
+	inviteToPlay()/*invitedUser?: string, currentUser?: string*/
+	{
+		// console.log({currentUser, invitedUser})
+		this.socket.emit("pairPlayers", {currentUser: this.current_user?.login, invitedUser: this.user?.login})
+		this.router.navigate(['/game'])
+	}
+
+	goToProfile()
+	{
+		this.router.navigate(['/user'], { queryParams: { id: this.user?.id } })
 	}
 
 	getAdminArray(): Observable<UserI[]> {
