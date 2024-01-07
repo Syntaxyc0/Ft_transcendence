@@ -92,8 +92,9 @@ export class OptionUserComponent implements OnInit{
 			this.socket.emit("blockedUsers");
 			this.socket.fromEvent<UserI[] | undefined>("blockedUsersList").subscribe(value =>{
 				this.blockedUserList = value;
-				// this.isUserBlocked = this.isBlocked();
+				this.isUserBlocked = this.isBlocked();
 			});
+			
 			// Muted ?
 			this.socket.emit("MutedUsers", this.room);
 			this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
@@ -139,6 +140,7 @@ export class OptionUserComponent implements OnInit{
 	isBlocked(): boolean {
 		if (!this.blockedUserList )
 			return false;
+
 		for(const user of this.blockedUserList)
 			if (user.id === this.user?.id)
 				return true;
@@ -177,6 +179,11 @@ export class OptionUserComponent implements OnInit{
 
 	muteUser() {
 		this.socket.emit("muteUser", { user: this.user, room: this.room });
+		this.closeOption();
+	}
+
+	kickUser() {
+		this.socket.emit("kickUser", { user: this.user, room: this.room });
 		this.closeOption();
 	}
 }

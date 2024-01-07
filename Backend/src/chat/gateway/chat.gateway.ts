@@ -181,6 +181,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('roomsArray')
 	async getRooms(socket: Socket) {
 
+		if(!socket.data.user)
+			return;
+		
 		const user = await this.prisma.user.findUnique({
 			where: { id: socket.data.user.id },
 			include: {
@@ -196,7 +199,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		
 		const rooms = [...publicRooms, ...userRooms];
 		
-		return await this.server.to(socket.id).emit('roomsI', rooms);
+		return await socket.emit('roomsI', rooms);
 	}
 
 	@SubscribeMessage('getCurrentUser')
@@ -341,7 +344,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 
 		const user_ = await this.prisma.user.findUnique({
-			where: { id: user.id}
+			where: { id: user.id }
 		});
 
 		await this.prisma.user.update({
@@ -410,6 +413,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		await socket.emit('mutedUsersList', room_.mutedUsers);
 
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		for (const user of connectedUser) {
+			if (user.userId === user_.id) {
+				await this.server.to(user.socketId).emit('mutedUserTrue', room_.mutedUsers);
+			}
+		}
+
 		setTimeout( async () =>{
 
 			await this.prisma.room.update({
@@ -420,6 +430,52 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			  });
 
 			await socket.emit('mutedUsersList', room_.mutedUsers);
+
+			for (const user of connectedUser) {
+				if (user.userId === user_.id) {
+					await this.server.to(user.socketId).emit('mutedUserFalse', room_.mutedUsers);
+				}
+			}
+			
 		}, 15000);
+	}
+
+	@SubscribeMessage('kickUser')
+	async kickUser(socket: Socket, data: { user: UserI, room: RoomI }) {
+
+		const { user, room } = data;
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id},
+			include: {rooms: true}
+		});
+
+		// delete user_ from the current room
+		await this.prisma.room.update({
+			where: { id: room_.id },
+			data: {
+			  users: { disconnect: { id: user_.id } },
+			},
+		});
+
+		const userRooms = user_.rooms;
+
+		const publicRooms = await this.prisma.room.findMany({
+			where: { public: true }
+		})
+		
+		const rooms = [...publicRooms, ...userRooms];
+		
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		for (const user of connectedUser) {
+			if (user.userId === user_.id) {
+				await this.server.to(user.socketId).emit('roomI', rooms);
+				await this.server.to(user.socketId).emit('kicked');
+			}
+		}
 	}
 }
