@@ -65,9 +65,14 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 		this.userService.option$.subscribe(value => {
 			this.option = value;
 		  });
+
 		this.socket.fromEvent("kicked").subscribe(() => {
 			location.reload();
-		})
+		});
+
+		this.socket.fromEvent("invited").subscribe(() => {
+			location.reload();
+		});
 	}
 
 	ngOnDestroy(): void {	

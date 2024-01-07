@@ -468,12 +468,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			where: { public: true }
 		})
 		
-		const rooms = [...publicRooms, ...userRooms];
+		const Rooms = [...publicRooms, ...userRooms];
+		console.log(Rooms);
 		
 		const connectedUser = await this.prisma.connectedUser.findMany();
 		for (const user of connectedUser) {
 			if (user.userId === user_.id) {
-				await this.server.to(user.socketId).emit('roomI', rooms);
+				await this.server.to(user.socketId).emit('roomI', Rooms);
 				await this.server.to(user.socketId).emit('kicked');
 			}
 		}
@@ -487,18 +488,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const room_ = await this.prisma.room.findUnique({
 			where: { id: room.id },
 		});
-
-		const user_ = await this.prisma.user.findUnique({
-			where: { id: user.id},
-			include: {rooms: true}
-		});
-
+		
 		// add user_ from the current room
 		await this.prisma.room.update({
 			where: { id: room_.id },
 			data: {
-			  users: { connect: { id: user_.id } },
+				users: { connect: { id: user.id } },
 			},
+		});
+		
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id},
+			include: {rooms: true},
 		});
 
 		const userRooms = user_.rooms;
@@ -510,9 +511,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const rooms = [...publicRooms, ...userRooms];
 		
 		const connectedUser = await this.prisma.connectedUser.findMany();
-		for (const user of connectedUser) {
-			if (user.userId === user_.id) {
-				await this.server.to(user.socketId).emit('roomI', rooms);
+		for (const User of connectedUser) {
+			if (User.userId === user_.id) {
+				await this.server.to(User.socketId).emit("invited", rooms);
 			}
 		}
 	}
@@ -520,7 +521,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('getUsersRoom')
 	async getUsersRoom( socket: Socket, room: RoomI ) {
 
-		console.log("getUsersRoom");
 		const room_ = await this.prisma.room.findUnique({
 			where: { id: room.id },
 			include: { users: true }

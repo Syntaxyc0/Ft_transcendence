@@ -72,10 +72,9 @@ export class AddUsersComponent implements OnInit{
 					}
 					return this.userService.findByLogin(login).pipe(
 						tap((users: UserI[]) => {
-							for (const user of users)
-								if (user.id === this.currentUserId || !this.inRoom(user.id))
-									users.splice(users.indexOf(user), 1);
-							this.filteredUsers = users
+							this.filteredUsers = users.filter(user =>
+								user.id !== this.currentUserId && !this.inRoom(user.id)
+							  );
 						})
 					)
 				})
@@ -100,19 +99,6 @@ export class AddUsersComponent implements OnInit{
 				return true;
 		return false;
 	}
-	// addUserToForm() {
-	// 	if (this.selectedUser !== null) {
-	// 		this.addUser.emit(this.selectedUser);
-	// 	}
-	// 	this.filteredUsers = [];
-	// 	this.selectedUser = null;
-	// 	this.searchLogin.setValue(null);
-	// }
-	
-	
-	// removeUserFromForm(user: UserI) {
-	// 	this.removeuser.emit(user);
-	// }
 	
 	setSelectedUser(user: any) {
 		this.selectedUser = user;
@@ -125,6 +111,6 @@ export class AddUsersComponent implements OnInit{
 			return '';
 		}
 	}
-		}
+}
 		
 		

@@ -40,7 +40,7 @@ export class SelectUsersComponent implements OnInit, OnChanges{
 	searchLogin = new FormControl();
 	filteredUsers: UserI[] = [];
 	selectedUser: UserI | null = null;
-	currentUser$: Observable<UserI> = this.socketService.user;
+	currentUserId;
 	
 	constructor( private userService: UserService, private socketService: SocketService ) {}
 
@@ -59,13 +59,7 @@ export class SelectUsersComponent implements OnInit, OnChanges{
 		if (this.public)
 			this.searchLogin.disable();
 
-		this.socketService.emitGetCurrentUser();
-
-		let currentUser: UserI;
-
-		this.currentUser$.pipe(take(1)).subscribe(value => {
-		  currentUser = value;
-		});
+		this.currentUserId = JSON.parse(localStorage.getItem('id')!);
 
 		this.searchLogin.valueChanges.pipe(
 			debounceTime(500),
@@ -77,10 +71,9 @@ export class SelectUsersComponent implements OnInit, OnChanges{
 				}
 				return this.userService.findByLogin(login).pipe(
 					tap((users: UserI[]) => {
-						for (const user of users)
-							if (user.login === currentUser.login)
-								users.splice(users.indexOf(user), 1);
-						this.filteredUsers = users
+						this.filteredUsers = users.filter(user =>
+							user.id !== this.currentUserId 
+						);
 					})
 				)
 			})
