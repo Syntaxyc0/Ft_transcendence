@@ -12,6 +12,7 @@ export class Paddle{
 
 	score: number = 0;
 	side: number;
+	login: string | undefined;
 	
 
 	constructor( public context: CanvasRenderingContext2D)
@@ -26,11 +27,12 @@ export class Paddle{
 	}
 
 
-	reset(x: number, y: number)
+	reset(x: number, y: number, score: number)
 	{
 		this.x = x;
 		this.y = y;
 		this.targetY = y;
+		this.score = score
 	}
 
 	newPosition(y: number)

@@ -1,17 +1,26 @@
 import { Player } from "../models/player.model";
 import { Room } from "../models/room.model";
 import { Ball, Paddle } from "../models/game-elements.model";
+import { Injectable } from "@nestjs/common";
+import { GameService } from "../game.service";
+import { GameInfoDto } from "../dto/GameInfor.dto";
 
 export class MultiplayerService{
 
+    oldTimeStamp : number;
+
+
     previousBallState: {x: number, y : number, angle: number};
 
-    constructor(private room: Room){}
+    constructor(private room: Room, private gameService: GameService){}
 
     gameRequest(payload: any)
     {
         for (let i: number = 0; i < 2; i++)
-            this.room.players[i].socket.emit('onGameRequest', payload)
+        {
+            if (this.room.players[i].status == true)
+                this.room.players[i].socket.emit('onGameRequest', payload)
+        }
     }
 
 
@@ -44,7 +53,7 @@ export class MultiplayerService{
 
     paddleReset(paddle: Paddle)
     {
-        this.gameRequest({order: "resetPaddle", side: paddle.side, x: paddle.x, y: paddle.y})
+        this.gameRequest({order: "resetPaddle", side: paddle.side, x: paddle.x, y: paddle.y, score: paddle.score})
     }
 
     sendScore(side: number)
@@ -52,31 +61,75 @@ export class MultiplayerService{
         this.gameRequest({order: "newScore", side: side})
     }
 
+    gameWon(sideWinner: number)
+    {
+        const gameInfoDto = new GameInfoDto();
+        gameInfoDto.userId1 = this.room.players[0].socket.data.user.id
+        gameInfoDto.userId2 = this.room.players[1].socket.data.user.id
+        gameInfoDto.scoreUser1 = this.room.paddles[0].score
+        gameInfoDto.scoreUser2 = this.room.paddles[1].score
+        gameInfoDto.winnerId = this.room.players[sideWinner].socket.data.user.id
+        this.gameService.newgame(gameInfoDto)
+    }
+
     gameLoop()
 	{
-		if (!this.room || !this.room.isGameRunning) {
+        if (!this.room || !this.room.isGameRunning) {
             return;
         }
-        this.room.ball.updatePosition(this.room.paddles[0], this.room.paddles[1])
+        const timeStamp = Date.now()
+        const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
+        this.room.ball.updatePosition(this.room.paddles)
+        this.room.ball.speed *= 1 + secondsPassed / 30000
 		this.ballData(this.room.ball)
 
         setTimeout(() => {
             this.gameLoop();
         }, 1000 / 60);
 	}
+    
+
+    stopGame()
+    {
+        this.room.isGameRunning = false;
+        this.gameRequest({order: "stopGame"})
+    }
+
 
     gameBoardInit()
     {
         if (!this.room) {
             return;
         }
-        this.room.players[0].socket.emit('onGameRequest', {order: 'usersPaddle', side: 0})
-        this.room.players[1].socket.emit('onGameRequest', {order: 'usersPaddle', side: 1})
-        this.gameRequest({order: "setGameBoard", speed: this.room.ball.speed, x: this.room.ball.x, y: this.room.ball.y, angle: this.room.ball.angle})
-        this.room.isGameRunning = true
-        this.gameRequest({order: "startGame"})
+        this.room.players[0].socket.emit('onGameRequest', {order: 'usersPaddle', side: 0, login: this.room.players[1].login})
+        this.room.players[1].socket.emit('onGameRequest', {order: 'usersPaddle', side: 1, login: this.room.players[0].login})
+        this.gameRequest({order: "setGameBoard"})
 		this.gameLoop = this.gameLoop.bind(this)
-        this.gameLoop()
+        setTimeout(() => {
+            if (this.room.players[0].room == undefined && this.room.players[1].room == undefined)
+                return;
+            this.room.isGameRunning = true
+            this.gameRequest({order: "startGame"})
+            this.oldTimeStamp = Date.now()
+            this.gameLoop();
+        }, 3000);
+    }
+
+
+    reload(side: number)
+    {
+        this.room.players[side].status = true
+        this.room.players[side].socket.emit('onGameRequest', {order: 'usersPaddle', side: side, login: this.room.players[side * -1 + 1].login})
+        this.paddleReset(this.room.paddles[0])
+        this.paddleReset(this.room.paddles[1])
+        this.ballReset(this.room.ball)
+        this.room.players[side].socket.emit('onGameRequest', {order: "setGameBoard"})
+        this.room.players[side].socket.emit('onGameRequest', {order: "startGame"})
+        for (let i: number = 0; i < 2; i++)
+        {
+            if (this.room.paddles[i].score >= 10)
+			    this.room.players[side].socket.emit('onGameRequest',{order: "gameWon", side: i})
+        }
     }
 
 }

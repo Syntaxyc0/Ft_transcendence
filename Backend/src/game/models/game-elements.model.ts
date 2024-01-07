@@ -1,6 +1,7 @@
 import { WIDTH, HEIGHT } from "../game.service";
 import { MultiplayerService } from "../services/multiplayer.service";
 
+
 export class Paddle{
 	step!: number;
 
@@ -41,6 +42,11 @@ export class Ball{
     angle: number = Math.random() * 360;
     speed: number;
     radius: number = 15;
+	bottom = this.radius;
+	top = HEIGHT - this.radius;
+	left = this.radius;
+	right = WIDTH - this.radius;
+
 
     constructor(private multiplayer: MultiplayerService){
 		this.reset()
@@ -48,7 +54,7 @@ export class Ball{
 	
     reset()
 	{
-		this.speed = 15;
+		this.speed = 20;
 		this.x = WIDTH / 2;
 		this.y = HEIGHT / 2;
 		this.angle = Math.random() * 360;
@@ -68,12 +74,17 @@ export class Ball{
 	updateCollide(paddle: Paddle, y: number, x: number, playerColliding: number)
 	{
 		if (playerColliding == 1)
+		{
 			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, 225, 135);
+			this.x = paddle.x + (-this.radius);
+
+		}
 		else
+		{
 			this.angle = this.calculateReflectionAngle(y - (paddle.y - paddle.height / 2), paddle.height, -45, 45);
-		this.x = paddle.x + (-this.radius) * playerColliding;
-		if (playerColliding == -1)
-			this.x += paddle.width;
+			this.x = paddle.x + this.radius + paddle.width;
+
+		}
 		this.multiplayer.ballData(this)
 
 	}
@@ -82,10 +93,10 @@ export class Ball{
 	{
 
 		if(x - this.radius <= paddleLeft.width + paddleLeft.x)
-			return -1;
+			return 0;
 		else if (x + this.radius >= paddleRight.x)
 			return 1;
-		return 0;
+		return -1;
 	}
 
 	yIsColliding(paddle: Paddle, y: number): boolean
@@ -100,54 +111,49 @@ export class Ball{
 		return false
 	}
 
-	updatePosition(paddleLeft: Paddle, paddleRight: Paddle)
+	pointMarked(paddles: Paddle[] ,winner: number)
+	{
+		paddles[winner].score++;
+        this.multiplayer.gameRequest({order: "newScore", side: winner})
+		this.reset();
+		if (paddles[winner].score >= 10)
+		{
+			this.multiplayer.stopGame()
+			this.multiplayer.gameRequest({order: "gameWon", side: winner})
+			// this.multiplayer.gameWon(winner)
+		}
+		return;
+	}
+
+	updatePosition(paddles: Paddle[])
 	{
 		let hx: number = Math.cos((this.angle * Math.PI) / 180) * this.speed  + this.x;
 		let hy: number = Math.sin((this.angle * Math.PI) / 180) * this.speed  + this.y;
 
-		const bottom = this.radius;
-		const top = HEIGHT - this.radius;
-
-		const left = this.radius;
-		const right = WIDTH - this.radius;
-
-		let playerColliding = this.xIsColliding(paddleRight, paddleLeft, hx)
-		if (playerColliding != 0){
-			if (playerColliding == 1 && this.yIsColliding(paddleRight, hy))
-				return this.updateCollide(paddleRight, hy, hx, playerColliding)
-			else if (this.yIsColliding(paddleLeft, hy) && playerColliding == -1)
-				return this.updateCollide(paddleLeft, hy, hx, playerColliding)
+		let playerColliding = this.xIsColliding(paddles[1], paddles[0], hx)
+		if (playerColliding != -1){
+			if (this.yIsColliding(paddles[playerColliding], hy))
+				return this.updateCollide(paddles[playerColliding], hy, hx, playerColliding)
 		}
-		if (hx < right && hx > left && hy < top && hy > bottom)
+		if (hx < this.right && hx > this.left && hy < this.top && hy > this.bottom)
 		{
 			this.x = hx;
 			this.y = hy;
 			return;
 		}
-		if (hx <= left || hx >= right)
-		{
-			if (hx <= left)
-			{
-				this.x = left
-				paddleRight.score++;
-				this.multiplayer.sendScore(1)
-			}
-			else
-			{
-				this.x = right
-				paddleLeft.score++;
-				this.multiplayer.sendScore(0)
-			}
-			this.reset();
-			return;
-		}
-		if (hy <= bottom || hy >= top)
+
+		if (hx <= this.left)
+			this.pointMarked(paddles, 1)
+		else if(hx >= this.right)
+			this.pointMarked(paddles, 0)
+
+		if (hy <= this.bottom || hy >= this.top)
 		{
 			this.angle = (-this.angle);
-			if (hy <= bottom)
-				this.y = bottom
+			if (hy <= this.bottom)
+				this.y = this.bottom
 			else
-				this.y = top
+				this.y = this.top
 
 			this.multiplayer.ballData(this)
 		}

@@ -5,6 +5,7 @@ import { Socket } from 'socket.io-client';
 import { SocketDataService } from 'src/app/game/game-board/socket-data.service';
 import { Observable, first } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.component';
 
 export const WIDTH = 1000
 export const HEIGHT = 640 
@@ -15,7 +16,7 @@ export const HEIGHT = 640
 	templateUrl: './game-board.component.html',
 	styleUrls: ['./game-board.component.scss'],
 	providers:[],
-	imports: [CommonModule]
+	imports: [CommonModule, HeaderbarComponent]
   })
 
   export class GameBoardComponent implements OnInit{
@@ -32,8 +33,12 @@ export const HEIGHT = 640
 	userPaddle: Paddle;
     paddles: Paddle[] = [];
 
-	oldTimeStamp: number;
-	isGameRunning: boolean;
+	isGameRunning: boolean = false;
+	isOnline: boolean = false;
+	matchmaking: boolean = false;
+	showRules: boolean = false;
+	multiWindow: boolean = false;
+	// requestOver: boolean = true;
 
 	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
@@ -50,12 +55,17 @@ export const HEIGHT = 640
 				return;
 			this.handleOrder(payload.order, payload);
 		});
+
+		this.player.sendRequest("gameExists")
+		console.log("onInit")
 		this.gameLoop = this.gameLoop.bind(this);
 		requestAnimationFrame(this.gameLoop);
 	}
 
 	handleOrder(order:string, payload:any)
 	{
+		if (this.multiWindow == true)
+			return;
 		switch(order){
 			case "ballPosition":
 				this.newMovement(payload.angle, payload.x, payload.y)
@@ -65,35 +75,80 @@ export const HEIGHT = 640
 				this.ball.reset(payload.angle, payload.x, payload.y)
 			break;
 			case "resetPaddle":
-				this.paddles[payload.side].reset(payload.x, payload.y)
+				this.paddles[payload.side].reset(payload.x, payload.y, payload.score)
 			break;
 			case "paddlePosition":
 				this.paddles[payload.side].newPosition(payload.y)
 			break;
 			case "usersPaddle":
 				this.userPaddle = this.paddles[payload.side]
+				this.userPaddle.login = this.player.getLogin();
 				this.userPaddle.side = payload.side;
+				this.paddles[payload.side * -1 + 1].login = payload.login
+			break;
+			// case "paddleReload":
+			// 	console.log("paddleReload: " + payload)
+			// 	this.paddles[payload.side].x = payload.x
+			// 	this.paddles[payload.side].y = payload.y
+			case "multiWindow":
+				console.log("Many windows are open!")
+				this.multiWindow = true;
+				this.drawBoard()
+				this.context.font = '30px Arial';
+    			this.context.fillStyle = 'white';
+				this.context.fillText(`There is another game instance on this profile, you can close this window.`, 10, HEIGHT/2);
 			break;
 			case "setGameBoard":
-				this.ball.speed = payload.speed
+				this.matchmaking = false
+				this.isOnline = true
 				this.draw()
 			break;
 			case "startGame":
 				this.startGame()
 			break;
+			case "otherDisconnected":
+				this.resetOnline()
+			break;
 			case "stopGame":
 				this.stopGame()
+			break;
+			case "resetBoard":
+				this.resetOnline()
+				this.drawBoard()
 			break;
 			case "newScore":
 				this.paddles[payload.side].score++
 			break;
+			case "gameWon":
+				this.stopGame()
+				this.draw()
+				this.context.fillText(`${this.paddles[payload.side].login} WINS`, WIDTH / 2 * payload.side + WIDTH / 6, HEIGHT / 2);
+				this.context.fillText(`${this.paddles[payload.side * -1 + 1].login} LOSES`, WIDTH / 2 * (payload.side * -1 + 1) + WIDTH / 6, HEIGHT / 2)
+				this.player.sendRequest("gameOver")
+				this.disconnect()
+
+			break;
 		}
+	}
+
+	resetOnline()
+	{
+		console.log("resetOnline")
+		this.isOnline = false
+		this.isGameRunning = false;
+		this.paddles[0].score = 0;
+		this.paddles[1].score = 0;
+		this.paddles.forEach((paddle) => {
+			paddle.login = undefined
+		})
 	}
 
 	newMovement(angle: number, deltaX: number, deltaY: number)
 	{
 		this.movementQueue.push({ deltaX: deltaX, deltaY: deltaY, angle: angle});
 	}
+
+
 
 	applyMovement(movement: { deltaX: number; deltaY: number, angle: number}/*, secondsPassed: number*/)
 	{
@@ -104,17 +159,21 @@ export const HEIGHT = 640
 
 	log()
 	{
-		console.log(" ************* ")
 		this.player.sendRequest("logRequest")
-		this.paddles.forEach((paddle) => {
-			console.log("paddle " + paddle.side)
-			console.log("x: " + paddle.x + " / y: " + paddle.y + " / targetY: " + paddle.targetY)
-			console.log(" -------------------------- ")
-		})
+		console.log(" ************* ")
+        for (let i = 0; i < 2; i++)
+        {
+            console.log("player: " + this.paddles[i].login)
+            console.log("paddle " + this.paddles[i].side)
+			console.log("x: " + this.paddles[i].x + " / y: " + this.paddles[i].y)
+            console.log(" -------------------------- ")
+            
+        }
 		console.log("ball: x: " + this.ball.x + " / y: " + this.ball.y)
 		console.log(" ************* ")
 
 	}
+
 
 	gameLoop()
 	{
@@ -122,7 +181,7 @@ export const HEIGHT = 640
 			return
 		// const timeStamp = Date.now();
 		// const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
-		let y = this.lerp(this.userPaddle.y, this.userPaddle.targetY, 0.3)
+		let y = this.lerp(this.userPaddle.y, this.userPaddle.targetY, 0.2)
 		this.player.newPaddlePosition({y: y - this.userPaddle.y, side: this.userPaddle.side})
 		this.userPaddle.y = y;
 		this.movementQueue.forEach((movement) => {
@@ -155,7 +214,12 @@ export const HEIGHT = 640
 
 	multiplayerRequest()
 	{
+		if(this.isOnline || this.multiWindow)
+			return;
+		this.player.sendRequest("gameExists")
+
 		this.player.sendRequest("multiplayerRequest")
+		this.matchmaking = true
 	}
 
 	drawBoard()
@@ -168,21 +232,22 @@ export const HEIGHT = 640
 
 	startGame() {
 		this.isGameRunning = true;
-		this.oldTimeStamp = Date.now()
 		this.gameLoop();
 	}
 
 	stopGame()
 	{
 		this.isGameRunning = false;
-		this.paddles[0].score = 0;
-		this.paddles[1].score = 0;
-		this.drawBoard()
 	}
 
 	disconnect()
 	{
-		this.player.sendRequest("disconnectingClient")
+		// this.player.sendRequest("disconnectingClient")
+		if (!this.multiWindow)
+			this.player.disconnect(this.userPaddle.side)
+		this.resetOnline()
+		this.matchmaking = false
+
 	}
 
 	@HostListener('document:keydown', ['$event'])
@@ -218,7 +283,17 @@ export const HEIGHT = 640
 		}
 	}
 
+	showPongRules() {
+		console.log(this.showRules)
+		this.showRules = true;
+	  }
+	  
+	  closePongRules() {
+		this.showRules = false;
+	  }
   }
+
+  
 
   // this.paddles.forEach((paddle) => {
 		// 	let y = this.lerp(
