@@ -35,17 +35,6 @@ export class AchievementsComponent {
 		this.id = JSON.parse(localStorage.getItem('id')!)
 		this.http.get('http://localhost:3333/users/' + this.id + '/achievements').subscribe(
 			res => {
-				console.log(res)
-
-
-
-
-
-
-
-
-
-
 				this.accomplishments = [
 					{ title: '42 student', instructions:'Log in with the 42 api', currentScore: res[0], paliers: [0, 0, 1] },
 					{ title: 'Paranoid', instructions:'Use 2 factor authentication', currentScore: res[1], paliers: [0, 0, 1] },
@@ -56,7 +45,7 @@ export class AchievementsComponent {
 					{ title: 'Bipolar', instructions:'Remove friends', currentScore: res[6], paliers: [1, 2, 5] },
 					{ title: 'Schizophrenic', instructions:'Change name', currentScore: res[7], paliers: [1, 2, 4] },
 					{ title: 'Lunatic', instructions:'Change picture', currentScore: res[8], paliers: [1, 2, 4] },
-					{ title: 'Stalker', instructions:'Look at profiles', currentScore: res[9], paliers: [1, 5, 10] },
+					{ title: 'Stalker', instructions:'Search for profiles', currentScore: res[9], paliers: [1, 5, 10] },
 					{ title: 'Addicted', instructions:'Play Games', currentScore: res[10], paliers: [1, 10, 20] },
 					{ title: 'Tryharder', instructions:'Win games', currentScore: res[11], paliers: [1, 5, 10] },
 					{ title: 'Optimistic', instructions:'Lose games', currentScore: res[12], paliers: [1, 5, 10] },
