@@ -38,23 +38,20 @@ export class GameGateway implements OnModuleInit{
       this.connectedPlayers.set(socket.id, new Player(socket, user.login))
 
       socket.on('disconnect', () => {
-
-        const player = this.connectedPlayers.get(socket.id)
-        if (!player)
-          return
-        console.log(player.login + " has disconnected");
-        player.status = false;
-        player.connected = false;
-        player.lookingForPlayer = false
-
-        const targetRoom = this.getRoom(socket.id)
-        if (!targetRoom)
-          return;
-        if (!targetRoom.players[0].status && !targetRoom.players[1].status)
-          this.disconnectRoom(socket.id);
-
+        this.disconnect(socket)
+        
       });
     });
+  }
+
+  async connection(socket:Socket)
+  {
+    const decodedToken = await this.authService.verifyJwt(socket.handshake.headers.authorization);
+            const user: UserI = await this.prisma.user.findUnique({
+                where: { id: decodedToken.sub },
+            });
+      
+      this.connectedPlayers.set(socket.id, new Player(socket, user.login))
   }
 
   playerExists(newPlayer: Player)
@@ -76,6 +73,28 @@ export class GameGateway implements OnModuleInit{
         this.connectedPlayers.delete(newPlayer.socket.id)
       }
     })
+  }
+
+  @SubscribeMessage('gameExists')
+  async lookForGame(client: Socket)
+  {
+    // await this.connection(client)
+    const player = this.connectedPlayers.get(client.id)
+    if (!player)
+    {
+      client.emit('onGameRequest', {order: "multiWindow"})
+      return;
+    }
+    this.playerExists(this.connectedPlayers.get(client.id))
+    if (player.room != undefined)
+    {
+      for (let i: number = 0; i < 2; i++)
+        if (player.login == player.room.players[i].login)
+        {
+            player.room.players[i] = this.connectedPlayers.get(client.id)
+            player.room.multiplayer.reload(i)
+        }
+    }
   }
 
 
@@ -115,40 +134,62 @@ export class GameGateway implements OnModuleInit{
     client.emit('login', this.connectedPlayers.get(client.id).login)
   }
 
-  @SubscribeMessage('gameExists')
-  lookForGame(client: Socket)
+
+  getPlayer(login: string): Player
   {
-    const player = this.connectedPlayers.get(client.id)
-    if (!player)
-    {
-      client.emit('onGameRequest', {order: "multiWindow"})
+    console.log(login)
+    for (const [socketId, player] of this.connectedPlayers) {
+      console.log(player.login + " " + player.connected)
+      if (login == player.login)
+        return player;
+    }
+    return undefined
+  }
+
+  @SubscribeMessage('pairPlayers')
+  pairPlayers(@ConnectedSocket() client: Socket, @MessageBody() players: {currentUser: string, invitedUser: string})
+  {
+    console.log(players)
+    const invitedPlayer = this.getPlayer(players.invitedUser)
+    const currentPlayer = this.getPlayer(players.currentUser)
+    if (!invitedPlayer || !currentPlayer || currentPlayer.room || invitedPlayer.room)
       return;
-    }
-    this.playerExists(this.connectedPlayers.get(client.id))
-    if (player.room != undefined)
-    {
-      for (let i: number = 0; i < 2; i++)
-        if (player.login == player.room.players[i].login)
-        {
-            player.room.players[i] = this.connectedPlayers.get(client.id)
-            player.room.multiplayer.reload(i)
-        }
-    }
+    console.log("went through")
+    this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService))
   }
 
   @SubscribeMessage('disconnectingClient')
-  warnOther(@ConnectedSocket() client: Socket, @MessageBody() side: number)
+  warnOther(@ConnectedSocket() client: Socket)
+  {
+    this.disconnect(client)
+  }
+
+  disconnect(client: Socket)
   {
     const player = this.connectedPlayers.get(client.id)
-    console.log(player.login + " is disconnecting")
+    if (!player)
+      return
+    console.log(player.login + " has disconnected");
+    player.connected = false;
+    player.status = false;
     player.lookingForPlayer = false
-    player.status = false
+
     const targetRoom = this.getRoom(client.id)
     if (!targetRoom)
       return;
-    if (!targetRoom.players[side * -1 + 1].status)
-      this.disconnectRoom(client.id)
+    if (!targetRoom.players[0].status && !targetRoom.players[1].status)
+      this.disconnectRoom(client.id);
   }
+  // const player = this.connectedPlayers.get(client.id)
+    // console.log(player.login + " is disconnecting")
+    // player.lookingForPlayer = false
+    // player.status = false
+    // const targetRoom = this.getRoom(client.id)
+    // if (!targetRoom)
+    //   return;
+    // if (!targetRoom.players[side * -1 + 1].status)
+    //   this.disconnectRoom(client.id)
+  
 
   @SubscribeMessage('newPaddlePosition')
   setPaddle(@ConnectedSocket() client: Socket, @MessageBody() paddle: {y: number, side: number})
