@@ -71,6 +71,11 @@ export class GameGateway implements OnModuleInit{
   }
 
   @SubscribeMessage('gameExists')
+  gameExist(client:Socket)
+  {
+    this.lookForGame(client)
+  }
+
   async lookForGame(client: Socket)
   {
     let player = this.connectedPlayers.get(client.id)
@@ -135,9 +140,7 @@ export class GameGateway implements OnModuleInit{
 
   getPlayer(login: string): Player
   {
-    console.log(login)
     for (const [socketId, player] of this.connectedPlayers) {
-      console.log(player.login + " " + player.connected)
       if (login == player.login)
         return player;
     }
@@ -145,9 +148,9 @@ export class GameGateway implements OnModuleInit{
   }
 
   @SubscribeMessage('pairPlayers')
-  pairPlayers(@ConnectedSocket() client: Socket, @MessageBody() players: {currentUser: string, invitedUser: string})
+  async pairPlayers(@ConnectedSocket() client: Socket, @MessageBody() players: {currentUser: string, invitedUser: string})
   {
-    console.log(players)
+    await this.lookForGame(client)
     const invitedPlayer = this.getPlayer(players.invitedUser)
     const currentPlayer = this.getPlayer(players.currentUser)
     if (!invitedPlayer || !currentPlayer || currentPlayer.room || invitedPlayer.room)
@@ -205,11 +208,11 @@ export class GameGateway implements OnModuleInit{
     for (const [socketId, player] of this.connectedPlayers) {
       if (player.socket.id != client.id && player.lookingForPlayer)
       {
-        this.rooms.push(new Room(this.rooms.length ,this.connectedPlayers.get(client.id), player, this.gameService))
+        this.rooms.push(new Room(this.rooms.length ,matchPlayer, player, this.gameService))
         return;
       }
     }
-    this.connectedPlayers.get(client.id).lookingForPlayer = true
+    matchPlayer.lookingForPlayer = true
     matchPlayer.socket.emit('onGameRequest', {order: "playerNotFound"})
   }
 }

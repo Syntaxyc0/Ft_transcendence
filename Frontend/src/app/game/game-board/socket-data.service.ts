@@ -40,8 +40,6 @@ getData(): Observable<any[]> {
 
   getLogin(): string
   {
-    console.log("getting login " + this.login)
-
     return this.login;
   }
 
