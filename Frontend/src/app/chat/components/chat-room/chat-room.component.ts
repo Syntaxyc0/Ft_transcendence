@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Observable, combineLatest, map, mergeMap, of, startWith, tap } from 'rxjs';
 import { RoomI } from 'src/app/chat/model/room.interface';
@@ -35,7 +35,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 	
   currentId: UserI;
   mutedUserList: UserI[] | undefined;
-  isCurrentMuted: boolean;
+  isCurrentMuted: boolean = this.isMuted();
   
   messages$: Observable<MessageI[]> = combineLatest([
 	this.chatService.getMessage(), 
@@ -65,20 +65,32 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 			  public http: HttpClient,
 			  private socket: CustomSocket,
 			  private snackbar: MatSnackBar,
-			  private cdr: ChangeDetectorRef) {}
+			  private cdr: ChangeDetectorRef,
+			  private zone: NgZone,
+			  ) {}
 
   ngOnInit(): void {
-	this.userService.changeRoom(this.chatRoom);
-	this.currentId = JSON.parse(localStorage.getItem('id')!);
+	  this.currentId = JSON.parse(localStorage.getItem('id')!);
+	  this.userService.changeRoom(this.chatRoom);
 
-	// muted?
-	this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
+	  this.socket.emit("MutedUsers", this.chatRoom);
+	  this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
+		  this.mutedUserList = value;
+		  this.isCurrentMuted = this.isMuted();
+	  });
+
+	  this.socket.fromEvent<UserI[] | undefined>("mutedUserTrue").subscribe(value =>{
 		this.mutedUserList = value;
-		this.isCurrentMuted = this.isMuted();
-		console.log('is current Muted? =>', this.isCurrentMuted);
+		this.isCurrentMuted = true;
+		this.snackbar.open(`You have been muted`, 'Close' ,{
+			duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
+		} );
+	  });
 
-		this.cdr.detectChanges();
-	});
+	  this.socket.fromEvent<UserI[] | undefined>("mutedUserFalse").subscribe(value =>{
+		this.mutedUserList = value;
+		this.isCurrentMuted = false;
+	  });
   }
 
   ngOnChanges(changes: SimpleChanges) {
