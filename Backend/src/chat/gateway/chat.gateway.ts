@@ -255,17 +255,171 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     	}
 	}
 
-	@SubscribeMessage('getIsAdmin')
+	@SubscribeMessage('getAdminList')
 	async isAdmin(socket: Socket, current_room: RoomI) {
+
+		const room = await this.prisma.room.findUnique({
+			where: { id: current_room.id },
+			include: { admin: true },
+		});
+      	return await socket.emit('isAdmin', room.admin);
+	}
+
+	@SubscribeMessage('setAsAdmin')
+	async setAsAdmin(socket: Socket, data: { user: UserI, room: RoomI }) {
+
+		const { user, room } = data;
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id}
+		});
+
+		await this.prisma.room.update({
+			where: { id: room_.id },
+			data: {
+			  admin: { connect: { id: user_.id } },
+			},
+		  });
+		await socket.emit("adminList", room_);
+	}
+
+	@SubscribeMessage('unsetAsAdmin')
+	async unsetAsAdmin(socket: Socket, data: { user: UserI, room: RoomI }) {
+
+		const { user, room } = data;
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id}
+		});
+
+		await this.prisma.room.update({
+			where: { id: room_.id },
+			data: {
+			  admin: { disconnect: { id: user_.id } },
+			},
+		  });
+		await socket.emit("adminList", room_);
+	}
+
+	@SubscribeMessage("getCreatorId")
+	async getCreatorId(socket: Socket, room: RoomI) {
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+			include: {
+				creator: true
+			}
+		});
+		return await socket.emit("creatorId", room_.creatorId);
+	}
+
+	@SubscribeMessage('blockedUsers')
+	async blockedUserList(socket: Socket) {
 
 		const user = await this.prisma.user.findUnique({
 			where: { id: socket.data.user.id },
-			include: { AdminRooms: true },
+			include: { blockedUsers: true },
 		});
 
-		for(const room of user.AdminRooms)
-			if (room.name === current_room.name)
-      			return await socket.emit('isAdmin', true);
-      	return await socket.emit('isAdmin', false);
+      	return await socket.emit('blockedUsersList', user.blockedUsers);
+	}
+
+	@SubscribeMessage('blockUser')
+	async blockUser(socket: Socket, user: UserI) {
+
+		const current = await this.prisma.user.findUnique({
+			where: { id: socket.data.user.id },
+			include: { blockedUsers: true}
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id}
+		});
+
+		await this.prisma.user.update({
+			where: { id: current.id },
+			data: {
+			  blockedUsers: { connect: { id: user_.id } },
+			},
+		});
+
+		await socket.emit("blockedUsersList", current.blockedUsers);
+	}
+
+	@SubscribeMessage('unblockUser')
+	async unblockUser(socket: Socket, user: UserI) {
+
+		const current = await this.prisma.user.findUnique({
+			where: { id: socket.data.user.id },
+			include: { blockedUsers: true}
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id}
+		});
+
+		await this.prisma.user.update({
+			where: { id: current.id },
+			data: {
+			  blockedUsers: { disconnect: { id: user_.id } },
+			},
+		});
+
+		await socket.emit("blockedUsersList", current.blockedUsers);
+	}
+
+	@SubscribeMessage('MutedUsers')
+	async MutedUserList(socket: Socket, room: RoomI) {
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+			include: { mutedUsers: true },
+		});
+
+      	return await socket.emit('mutedUsersList', room_.mutedUsers);
+	}
+
+	@SubscribeMessage('muteUser')
+	async muteUser(socket: Socket, data: { user: UserI, room: RoomI }) {
+
+		const { user, room } = data;
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+			include: { mutedUsers: true },
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id}
+		});
+
+		await this.prisma.room.update({
+			where: { id: room_.id },
+			data: {
+			  mutedUsers: { connect: { id: user_.id } },
+			},
+		  });
+
+		await socket.emit('mutedUsersList', room_.mutedUsers);
+
+		setTimeout( async () =>{
+
+			await this.prisma.room.update({
+				where: { id: room_.id },
+				data: {
+				  mutedUsers: { disconnect: { id: user_.id } },
+				},
+			  });
+
+			await socket.emit('mutedUsersList', room_.mutedUsers);
+		}, 15000);
 	}
 }

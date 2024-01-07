@@ -8,4 +8,5 @@ export interface RoomI {
 	created_at?: Date;
 	updated_at?: Date;
 	public: boolean;
+	creator: UserI;
 }

@@ -19,6 +19,8 @@ import { ChatRoomComponent } from '../chat-room/chat-room.component';
 import { UserService } from '../../services/user.service';
 import { OptionUserComponent } from '../option-user/option-user.component';
 import { SocketService } from '../../services/socket.service';
+import { CustomSocket } from '../../sockets/custom-socket';
+import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.component';
 
 
 @Component({
@@ -35,7 +37,8 @@ import { SocketService } from '../../services/socket.service';
 			HttpClientModule,
 			RouterModule,
 			ChatRoomComponent,
-			OptionUserComponent
+			OptionUserComponent,
+			HeaderbarComponent,
 			],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
@@ -45,7 +48,7 @@ export class ChatComponent implements AfterViewInit, OnInit{
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
 	userList :object[] = []
-	user = this.userService.getLoggedInUser();
+	login;
 	option: boolean;
 
 
@@ -54,17 +57,26 @@ export class ChatComponent implements AfterViewInit, OnInit{
 		private chatService: ChatService,
 		private socketService: SocketService,
 		public http: HttpClient,
-		private userService: UserService) {}
+		private userService: UserService,
+		private socket: CustomSocket) {}
 
 	ngOnInit(): void {
-		this.socketService.emitGetCurrentUser();
-		this.socketService.getCurrentUser().pipe(take(1)).subscribe( value => {
-			this.user = value;
-		});
-
+		this.retrieveUser();
 		this.userService.option$.subscribe(value => {
 			this.option = value;
 		  });
+	}
+
+	retrieveUser() {
+		const id = JSON.parse(localStorage.getItem('id')!);
+
+		this.http.get<any>("http://localhost:3333/users/" + id).subscribe (
+		   res => {
+			   this.login = res['login'];
+		   },
+		   err => {
+			   alert("user doesn't exist");
+		   })
 	}
 
 	ngAfterViewInit() {
