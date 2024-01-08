@@ -22,7 +22,7 @@ export class MailService {
     text: string,
   ): Promise<void> {
     const mailOptions: nodemailer.SendMailOptions = {
-      from: 'transcendencemail@mailo.com',
+      from: process.env.MAIL_ACCOUNT,
       to: destination,
       subject: subject,
       text: text,

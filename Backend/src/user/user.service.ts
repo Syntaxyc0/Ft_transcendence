@@ -820,11 +820,20 @@ export class UserService
 		res.push(user.gameHistory.length);
 		res.push(user.gamesWon);
 		res.push(user.gameHistory.length - user.gamesWon);
-		res.push(0)
 		res.push(user.cancelled_count);
 		res.push(user.refused_count);
-		return res
 
+		let counter = 0;
+		let master = [0,1,5,100,5,5,5,4,4,10,20,10,10,5,5];
+		for (let i=0; i < 14; i++)
+		{
+			if (res[i] > master[i])
+			{
+				counter++;
+			}
+		}
+		res.push(counter)
+		return res
 	}
 
 	async findAllByLogin(login: string): Promise<UserI[]> {
