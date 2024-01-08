@@ -50,7 +50,6 @@ export class FriendComponent {
 			this.name = res['login'];
 		},
 		err => {
-			alert("user doesn't exist");
 		})
 		this.get_avatar().subscribe (data => {
 			this.createImageFromBlob(data)

@@ -6,8 +6,10 @@ import { Prisma, Room, User } from '@prisma/client';
 import { UserI } from "src/chat/model/user.interface";
 import * as argon from 'argon2'
 import { MailService } from "src/mail/mail.service";
+import { UUID } from "typeorm/driver/mongodb/bson.typings";
 
 var path = require('path');
+const fs = require("fs");
 
 
 @Injectable()
@@ -87,6 +89,16 @@ export class UserService
 			},
 			where: {
 				id: uid,
+			}
+		})
+		await this.prisma.user.update({
+			where: {
+				 id: user.id
+			},
+      		data: {
+			name_changed	: {
+					increment: 1
+				}
 			}
 		})
 	}
@@ -199,6 +211,16 @@ export class UserService
 			FriendRequestsReceived : newfriendrequestsreceived
 		}
 	})
+	await this.prisma.user.update({
+		where: {
+			 id: uid
+		},
+		  data: {
+		cancelled_count	: {
+				increment: 1
+			}
+		}
+	})
 	}
 	
 	async RefuseRequest(uid:number, id:number)
@@ -243,6 +265,16 @@ export class UserService
 			},
 			data: {
 				FriendRequestsReceived : newuserreceived
+			}
+		})
+		await this.prisma.user.update({
+			where: {
+				 id: uid
+			},
+			  data: {
+			refused_count	: {
+					increment: 1
+				}
 			}
 		})
 
@@ -404,6 +436,16 @@ export class UserService
 				id: friend.id,
 			}
 		})
+		await this.prisma.user.update({
+			where: {
+				 id: user.id
+			},
+      		data: {
+			friends_added	: {
+					increment: 1
+				}
+			}
+		})
 		
 
 	}
@@ -456,6 +498,16 @@ export class UserService
 				friendList : newfriendlist2
 			}
 		})
+		await this.prisma.user.update({
+			where: {
+				 id: user.id
+			},
+      		data: {
+			friends_removed	: {
+					increment: 1
+				}
+			}
+		})
 		
 
 	}
@@ -484,6 +536,16 @@ export class UserService
                 avatar: file['filename']
             }
 		});
+		await this.prisma.user.update({
+			where: {
+				 id: user.id
+			},
+      		data: {
+			picture_changed	: {
+					increment: 1
+				}
+			}
+		})
 	}
 
 	validate_extension(ext: string)
@@ -634,6 +696,14 @@ export class UserService
 				is2favalidated:true
 			}
 		})
+		await this.prisma.user.update({
+			where: {
+				id: uid,
+            },
+            data: {
+				twofa_used:1
+			}
+		})
 		return true
 		
 	}
@@ -684,12 +754,76 @@ export class UserService
 		}
 		await this.prisma.user.update({
 			where: {
-				id: uid,
-            },
-            data: {
-				userStatus: 'OFFLINE'
+				 id: uid
+			},
+      		data: {
+			quit_count	: {
+					increment: 1
+				}
 			}
 		})
+
+	}
+
+	async updateSearches(uid: number)
+	{
+		const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid            
+			},
+        })
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		await this.prisma.user.update({
+			where: {
+				 id: uid
+			},
+      		data: {
+			profiles_searched	: {
+					increment: 1
+				}
+			}
+		})
+		console.log(user.profiles_searched	)
+
+	}
+	
+	async achievements(uid:number)
+	{
+		const res = [];
+		const user = await this.prisma.user.findUnique({
+            where: {
+                id: uid
+            },
+        })
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		const messages = await this.prisma.message.findMany({
+			where: {
+				userId: user.id,
+			},
+		});
+		res.push(user.api_used);
+		res.push(user.twofa_used);
+		res.push(user.quit_count);
+		res.push(messages.length);
+		res.push(user.friends_added);
+		res.push(user.friendList.length);
+		res.push(user.friends_removed);
+		res.push(user.name_changed);
+		res.push(user.picture_changed);
+		res.push(user.profiles_searched);
+		res.push(user.gameHistory.length);
+		res.push(user.gamesWon);
+		res.push(user.gameHistory.length - user.gamesWon);
+		res.push(0)
+		res.push(user.cancelled_count);
+		res.push(user.refused_count);
+		return res
 
 	}
 
@@ -706,6 +840,13 @@ export class UserService
 
 	async allUser(): Promise<UserI[]> {
 		return await this.prisma.user.findMany();
+	}
+	
+	getRandomFilename()
+	{
+		const filenames = ["Wtf.gif","awkward_2.gif", "homer_gif.gif", "minion.png", "snoop.gif", "awkward.gif", "homer.png", "mindblown.gif", "pikachu.png", "stitch.png"]
+		let index = Math.round(Math.random() * 10);
+		return filenames[index];
 	}
 
 }

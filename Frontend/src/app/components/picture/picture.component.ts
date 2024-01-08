@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Input } from '@angular/core';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { ErrorModalComponent } from '../error-modal/error-modal.component';
 
 @Component({
   selector: 'app-picture',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, ErrorModalComponent],
   templateUrl: './picture.component.html',
   styleUrls: ['./picture.component.scss']
 })
@@ -16,6 +17,8 @@ export class PictureComponent {
 	@Input() id:number = 0;
 	name:string = '';
 	avatar: any ;
+	showError:boolean = false;
+	errorMessage:string =""
 
 	ngOnInit() {
         this.retrieveUser();
@@ -26,7 +29,8 @@ export class PictureComponent {
 			this.name = res['login'];
 		},
 		err => {
-			alert("user doesn't exist");
+			this.errorMessage = "User doesn't exist"
+			this.openErrorModal();
 			this.location.back()
 		})
 		this.get_avatar().subscribe (data => {
@@ -47,5 +51,13 @@ export class PictureComponent {
 
 	get_avatar() {
 		return this.http.get<Blob>("http://localhost:3333/users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
+	}
+
+	openErrorModal(): void {
+		this.showError = true;
+	  }
+	
+	closeErrorModal(): void {
+		this.showError = false;
 	}
 }

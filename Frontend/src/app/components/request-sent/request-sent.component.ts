@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { ErrorModalComponent } from '../error-modal/error-modal.component';
 
 @Component({
   selector: 'app-request-sent',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, ErrorModalComponent],
   templateUrl: './request-sent.component.html',
   styleUrls: ['./request-sent.component.scss']
 })
@@ -15,6 +16,8 @@ export class RequestSentComponent {
 	@Input() Id:number = 0;
 	name:string = "";
 	avatar;
+	showError:boolean = false;
+	errorMessage:string =""
 
 
 	ngOnInit() {
@@ -26,7 +29,6 @@ export class RequestSentComponent {
 			this.name = res['login'];
 		},
 		err => {
-			alert("user doesn't exist");
 		})
 		this.get_avatar().subscribe (data => {
 			this.createImageFromBlob(data)
@@ -55,8 +57,17 @@ export class RequestSentComponent {
 				window.location.reload()
 			},
             err => {
-				alert(err.error.message);
+				this.errorMessage = err.error.message
+				this.openErrorModal();
 			}
 			);
+	}
+
+	openErrorModal(): void {
+		this.showError = true;
+		}
+		
+	closeErrorModal(): void {
+		this.showError = false;
 	}
 }

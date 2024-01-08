@@ -10,7 +10,7 @@ export class GameService {
 
 
 	constructor(private prisma: PrismaService) {}
-
+	
 	async newgame(gameinfo: GameInfoDto)
 	{
 		const game = await this.prisma.gameInfo.create(
@@ -55,7 +55,37 @@ export class GameService {
 				}
 			}
 		})
-		console.log(game)
+		await this.prisma.user.update({
+			where: {
+				 id: gameinfo.winnerId
+			},
+      		data: {
+				gamesWon: {
+					increment: 1
+				}
+			}
+		})
+		await this.prisma.user.update({
+			where: {
+				 id: gameinfo.winnerId
+			},
+      		data: {
+				elo: {
+					increment: 100
+				}
+			}
+		})
+		await this.prisma.user.update({
+			where: {
+				 id: user1.id + user2.id - gameinfo.winnerId
+			},
+      		data: {
+				elo: {
+					decrement: 100
+				}
+			}
+		})
+		
 	}
 
 	async getGameHistory(uid: number)
