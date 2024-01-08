@@ -49,9 +49,9 @@ export class AchievementsComponent {
 					{ title: 'Addicted', instructions:'Play Games', currentScore: res[10], paliers: [1, 10, 20] },
 					{ title: 'Tryharder', instructions:'Win games', currentScore: res[11], paliers: [1, 5, 10] },
 					{ title: 'Optimistic', instructions:'Lose games', currentScore: res[12], paliers: [1, 5, 10] },
-					{ title: 'Clubber', instructions:'Join rooms', currentScore: res[13], paliers: [1, 3, 5] },
-					{ title: 'Undecided', instructions:'Cancel friend requests', currentScore: res[14], paliers: [1, 3, 5] },
-					{ title: 'Antisocial', instructions:'Refuse friend requests', currentScore: res[15], paliers: [1, 3, 5] },
+					{ title: 'Undecided', instructions:'Cancel friend requests', currentScore: res[13], paliers: [1, 3, 5] },
+					{ title: 'Antisocial', instructions:'Refuse friend requests', currentScore: res[14], paliers: [1, 3, 5] },
+					{ title: 'Nolife', instructions:'Master achievements', currentScore: res[15], paliers: [5, 10, 15] },
 				  ];
 			},
 			err => {
