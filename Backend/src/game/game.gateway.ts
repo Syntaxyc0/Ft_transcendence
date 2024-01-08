@@ -191,6 +191,7 @@ export class GameGateway implements OnModuleInit{
     targetRoom.multiplayer.paddleData(paddle);
   }
 
+  
   @SubscribeMessage('logRequest')
   log(@ConnectedSocket() client: Socket)
   {

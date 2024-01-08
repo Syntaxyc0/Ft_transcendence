@@ -24,4 +24,9 @@ export class FriendMenuComponent {
 		}
 	}
 
+	pairPlayers()
+	{
+		
+	}
+
 }
