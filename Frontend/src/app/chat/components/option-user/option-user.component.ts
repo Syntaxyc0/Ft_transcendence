@@ -113,7 +113,6 @@ export class OptionUserComponent implements OnInit{
 			this.socket.fromEvent<UserI[] | undefined>("banList").subscribe(value =>{
 				this.banList = value;
 				this.isUserBan = this.isBan();
-				console.log(this.banList)
 			});
 		});
 
