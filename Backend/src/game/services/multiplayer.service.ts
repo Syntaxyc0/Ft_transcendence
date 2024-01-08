@@ -118,6 +118,7 @@ export class MultiplayerService{
 
     reload(side: number)
     {
+        this.room.players[side].socket.emit('onGameRequest', {order: "reload"})
         this.room.players[side].status = true
         this.room.players[side].socket.emit('onGameRequest', {order: 'usersPaddle', side: side, login: this.room.players[side * -1 + 1].login})
         this.paddleReset(this.room.paddles[0])

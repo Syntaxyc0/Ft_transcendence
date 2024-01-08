@@ -9,12 +9,13 @@ import { RouterModule, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { CustomSocket } from '../chat/sockets/custom-socket';
 import { FooterBarComponent } from '../components/footer-bar/footer-bar.component';
+import { ErrorModalComponent } from '../components/error-modal/error-modal.component';
 
 
 @Component({
   selector: 'app-signin',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatFormFieldModule, RouterModule, FooterBarComponent],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatFormFieldModule, RouterModule, FooterBarComponent, ErrorModalComponent],
   templateUrl: './signin.component.html',
   styleUrls: ['./signin.component.scss']
 })
@@ -26,12 +27,14 @@ export class SigninComponent {
     	password: new FormControl(null, [Validators.required]),
 	});
 
+	showError:boolean = false;
+	errorMessage:string =""
+
     signin(): void {
 		this.http.post<any>('http://localhost:3333/auth/signin', {login: this.login.value, password:this.password.value}).subscribe(
 				res => {
 					localStorage.setItem('access_token', res['access_token']);
 					localStorage.setItem('id', JSON.stringify(res['id']));
-					// this.http.patch<any>('http://localhost:3333/users/' + res['id'] + '/status', {status: "ONLINE"}).subscribe()
 					this.http.get<any>('http://localhost:3333/users/' + res['id'] + '/2faenabled').subscribe( res => {
 						if (res === false)
 						{
@@ -46,7 +49,8 @@ export class SigninComponent {
 					})
 				},
 				err => {
-					alert("User not found")
+					this.errorMessage = err.error.message
+					this.openErrorModal();
 				})
 	}
 	
@@ -59,5 +63,13 @@ export class SigninComponent {
 	get	password(): FormControl
 	{
 		return this.signinForm.get('password') as FormControl;
+	}
+
+	openErrorModal(): void {
+		this.showError = true;
+	}
+			
+	closeErrorModal(): void {
+		this.showError = false;
 	}
 }

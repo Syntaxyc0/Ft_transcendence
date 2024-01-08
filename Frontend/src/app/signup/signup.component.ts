@@ -7,11 +7,12 @@ import { CustomValidators } from '../helpers/custom-validators';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { RouterModule, Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { ErrorModalComponent } from '../components/error-modal/error-modal.component';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatFormFieldModule, RouterModule ],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatFormFieldModule, RouterModule, ErrorModalComponent],
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss']
 })
@@ -25,6 +26,9 @@ export class SignupComponent {
 {validators: [CustomValidators.passwordMatching, CustomValidators.logintoolong]});
 
 	id:number = 0;
+	showError:boolean = false;
+	errorMessage:string =""
+
 	signup(): void{
 			this.http.post<any>('http://localhost:3333/auth/signup', {email: this.mail.value, password:this.password.value, confirm_password:this.confirm_password.value}).subscribe(
 				res => {
@@ -34,7 +38,8 @@ export class SignupComponent {
 					this.router.navigate(['/edit']	)
 				},
 				err => {
-					alert(err.error.message)
+					this.errorMessage = err.error.message
+					this.openErrorModal();
 				})
 			}
 			
@@ -51,5 +56,13 @@ export class SignupComponent {
 	get	confirm_password(): FormControl
 	{
 		return this.signupForm.get('confirmpassword') as FormControl;
+	}
+
+	openErrorModal(): void {
+		this.showError = true;
+	}
+			
+	closeErrorModal(): void {
+		this.showError = false;
 	}
 }

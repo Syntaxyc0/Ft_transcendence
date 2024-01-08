@@ -7,11 +7,12 @@ import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CustomValidators } from 'src/app/helpers/custom-validators';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { ErrorModalComponent } from '../error-modal/error-modal.component';
 
 @Component({
 	selector: 'app-profile-picture',
 	standalone: true,
-	imports: [CommonModule, HttpClientModule, ReactiveFormsModule, MatFormFieldModule],
+	imports: [CommonModule, HttpClientModule, ReactiveFormsModule, MatFormFieldModule, ErrorModalComponent],
 	templateUrl: './profile-picture.component.html',
 	styleUrls: ['./profile-picture.component.scss']
 })
@@ -28,6 +29,8 @@ export class ProfilePictureComponent {
 	name:string = '';
 	avatar: any ;
 	showModal = false;
+	showError:boolean = false;
+	errorMessage:string =""
 	
 	ngOnInit() {
         this.retrieveUser();
@@ -39,8 +42,6 @@ export class ProfilePictureComponent {
 			this.name = res['login'];
 		},
 		err => {
-			alert("user doesn't exist");
-			this.router.navigate(['/'])
 		})
 		this.get_avatar().subscribe (data => {
 			this.createImageFromBlob(data)
@@ -79,7 +80,9 @@ export class ProfilePictureComponent {
 	  
 		this.http.post<any>(url, formData).subscribe({
 		  next: (data: any) => window.location.reload(),
-		  error: (error: any) => alert(error.error.message)
+		  error: (error: any) => {
+			this.errorMessage = error.error.message
+			this.openErrorModal();}
 		})
 	}
 
@@ -95,7 +98,8 @@ export class ProfilePictureComponent {
 				window.location.reload()
 			},
             err => {
-				alert(err.error.message);
+				this.errorMessage = err.error.message
+				this.openErrorModal();
 			}
 			);
 		this.editNameForm.reset();
@@ -109,4 +113,12 @@ export class ProfilePictureComponent {
 	enterKey(){
 		this.editName()
 	  }
+
+	openErrorModal(): void {
+	this.showError = true;
+	}
+	
+	closeErrorModal(): void {
+		this.showError = false;
+	}
 }

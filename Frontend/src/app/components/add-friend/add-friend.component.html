@@ -1,6 +1,7 @@
 <button class="bg-[#1D5DE8] text-black active:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button" (click)="toggleModal()">
 	Add Friend
   </button>
+  <app-error-modal *ngIf="showError" [message]="errorMessage" (onClose)="closeErrorModal()"></app-error-modal>
   <form [formGroup]="AddFriendForm" (submit)="addFriend()">
 
   <div *ngIf="showModal" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex">

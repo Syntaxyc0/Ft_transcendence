@@ -25,10 +25,27 @@ export class PrivateProfileComponent {
 
 	id:number = 0;
 	elo:number = 0;
+	played:number = 0;
+	won:number = 0;
+	winrate:number = 0;
 
 	ngOnInit()
 	{
 		this.id = JSON.parse(localStorage.getItem('id')!)
+		this.http.get<number>('http://localhost:3333/users/' + this.id ).subscribe(
+			res => {
+				this.elo = res['elo']
+				this.played = res['gameHistory'].length
+				this.won = res['gamesWon']
+				if (this.played == 0)
+					this.winrate = 0;
+				else
+					this.winrate = Math.round(res['gamesWon'] / res['gameHistory'].length * 100)
+			},
+			err => {
+				console.log(err)
+			}
+		)
 		this.getuserElo();
 	}
 

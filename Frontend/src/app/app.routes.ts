@@ -84,6 +84,12 @@ export const routes: Routes = [{
 	loadComponent:    () => import('./private-profile/private-profile.component').then(m => m.PrivateProfileComponent),
 },
 {
+	path:    'achievements',
+	title:	'Achievements',
+	canActivate: [AuthGuard],
+	loadComponent:    () => import('./achievements/achievements.component').then(m => m.AchievementsComponent),
+},
+{
 	path:    'game',
 	title:	'Game',
 	canActivate: [AuthGuard],

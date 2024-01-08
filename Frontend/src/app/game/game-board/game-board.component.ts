@@ -39,7 +39,7 @@ export const HEIGHT = 640
 	matchmaking: boolean = false;
 	showRules: boolean = false;
 	multiWindow: boolean = false;
-	// requestOver: boolean = true;
+	requestMatch: boolean = true;
 
 	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
@@ -69,6 +69,18 @@ export const HEIGHT = 640
 
 	handleOrder(order:string, payload:any)
 	{
+		if (order == "reload")
+		{
+			this.drawBoard()
+			this.multiWindow = false;
+		}
+		if (order == "gameChecked")
+		{
+			if (payload.exists && this.matchmaking)
+				this.player.sendRequest("multiplayerRequest")
+			else
+				this.matchmaking = false
+		}
 		if (this.multiWindow == true)
 			return;
 		switch(order){
@@ -92,12 +104,14 @@ export const HEIGHT = 640
 				this.paddles[payload.side * -1 + 1].login = payload.login
 			break;
 			case "multiWindow":
-				console.log("Many windows are open!")
+				// console.log("Many windows are open!")
 				this.multiWindow = true;
+				this.matchmaking = false;
 				this.drawBoard()
 				this.context.font = '30px Arial';
     			this.context.fillStyle = 'white';
-				this.context.fillText(`There is another game instance on this profile, you can close this window.`, 10, HEIGHT/2);
+				this.context.fillText(`There is another game instance on this profile`, WIDTH/5, HEIGHT/2 - HEIGHT/3);
+				this.context.fillText(`If this is not the case, click on multiplayer`, WIDTH/4, HEIGHT/4);
 			break;
 			case "setGameBoard":
 				this.matchmaking = false
@@ -129,6 +143,15 @@ export const HEIGHT = 640
 				this.disconnect()
 
 			break;
+			// case "playerNotFound":
+			// 	this.matchmaking = true
+			// break;
+			// case "gameChecked":
+			// 	if (payload.exists && this.matchmaking)
+			// 		this.player.sendRequest("multiplayerRequest")
+			// 	else
+			// 		this.matchmaking = false
+			// break;
 		}
 	}
 
@@ -183,8 +206,12 @@ export const HEIGHT = 640
 		// const timeStamp = Date.now();
 		// const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
 		let y = this.lerp(this.userPaddle.y, this.userPaddle.targetY, 0.2)
-		this.player.newPaddlePosition({y: y - this.userPaddle.y, side: this.userPaddle.side})
-		this.userPaddle.y = y;
+		let deltaY = y - this.userPaddle.y
+		if (deltaY)
+		{
+			this.player.newPaddlePosition({y: y - this.userPaddle.y, side: this.userPaddle.side})
+			this.userPaddle.y = y;
+		}
 		this.movementQueue.forEach((movement) => {
 			this.applyMovement(movement);
 
@@ -215,13 +242,18 @@ export const HEIGHT = 640
 
 	multiplayerRequest()
 	{
-		// if(this.isOnline)
-		// 	return;
-		this.player.sendRequest("gameExists")
-		if (this.multiWindow || this.isOnline)
+		if(this.isOnline)
 			return;
-		this.player.sendRequest("multiplayerRequest")
+		this.player.sendRequest("gameExists")
 		this.matchmaking = true
+
+		// this.player.sendRequest("multiplayerRequest")
+		
+		// this.player.sendRequest("gameExists")
+		// this.player.sendRequest("multiplayerRequest")
+		// if (this.multiWindow || this.isOnline)
+		// 	return;
+		// this.matchmaking = true
 	}
 
 	drawBoard()
@@ -246,7 +278,7 @@ export const HEIGHT = 640
 	{
 		// this.player.sendRequest("disconnectingClient")
 		if (!this.multiWindow)
-			this.player.disconnect(this.userPaddle.side)
+			this.player.disconnect()
 		this.resetOnline()
 		this.matchmaking = false
 
