@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { ErrorModalComponent } from '../error-modal/error-modal.component';
 
 @Component({
   selector: 'app-friendrequest',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, ErrorModalComponent],
   templateUrl: './friendrequest.component.html',
   styleUrls: ['./friendrequest.component.scss']
 })
@@ -13,6 +14,8 @@ export class FriendrequestComponent {
 
 	constructor(public http: HttpClient) {}
 	@Input() Id:number = 0;
+	showError:boolean = false;
+	errorMessage:string =""
 	name:string = "";
 	avatar;
 
@@ -26,7 +29,8 @@ export class FriendrequestComponent {
 			this.name = res['login'];
 		},
 		err => {
-			alert("user doesn't exist");
+			this.errorMessage = "User doesn't exist"
+			this.openErrorModal();
 		})
 		this.get_avatar().subscribe (data => {
 			this.createImageFromBlob(data)
@@ -56,20 +60,30 @@ export class FriendrequestComponent {
 				window.location.reload()
 			},
             err => {
-				alert(err.error.message);
+				this.errorMessage = err.error.message
+				this.openErrorModal();
 			}
 			);
 		}
 		
-		deny()
-		{
-			this.http.patch("http://localhost:3333/users/" + localStorage.getItem('id') + "/RefuseRequest", {id: this.Id}).subscribe(
-				res => {
-					window.location.reload()
-				},
-				err => {
-					alert(err.error.message);
-				}
-				);
-		}
+	deny()
+	{
+		this.http.patch("http://localhost:3333/users/" + localStorage.getItem('id') + "/RefuseRequest", {id: this.Id}).subscribe(
+			res => {
+				window.location.reload()
+			},
+			err => {
+				this.errorMessage = err.error.message
+				this.openErrorModal();
+			}
+			);
 	}
+
+	openErrorModal(): void {
+		this.showError = true;
+	  }
+	
+	closeErrorModal(): void {
+		this.showError = false;
+	}
+}

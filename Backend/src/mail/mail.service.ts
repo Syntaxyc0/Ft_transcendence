@@ -10,8 +10,8 @@ export class MailService {
         host: 'mail.mailo.com',
     port: 465,
     auth: {
-        user: 'transcendencemail@mailo.com',
-        pass: 'Test.1234'
+        user: process.env.MAIL_ACCOUNT,
+        pass: process.env.MAIL_PASSWORD
     }
     });
   }
@@ -22,7 +22,7 @@ export class MailService {
     text: string,
   ): Promise<void> {
     const mailOptions: nodemailer.SendMailOptions = {
-      from: 'transcendencemail@mailo.com',
+      from: process.env.MAIL_ACCOUNT,
       to: destination,
       subject: subject,
       text: text,

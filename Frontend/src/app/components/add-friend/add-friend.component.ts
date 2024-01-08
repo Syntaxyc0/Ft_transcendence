@@ -2,12 +2,13 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { ErrorModalComponent } from '../error-modal/error-modal.component';
 
 
 @Component({
   selector: 'app-add-friend',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, ErrorModalComponent],
   templateUrl: './add-friend.component.html',
   styleUrls: ['./add-friend.component.scss']
 })
@@ -19,6 +20,8 @@ export class AddFriendComponent {
 		name: new FormControl(null, [Validators.required])
 	});
 
+	showError:boolean = false;
+	errorMessage:string =""
 	showModal = false;
 	@Input() id:number = 0;
 
@@ -33,7 +36,8 @@ export class AddFriendComponent {
 				window.location.reload()
 			},
             err => {
-				alert(err.error.message);
+				this.errorMessage = err.error.message
+				this.openErrorModal();
 			}
 			);
 		this.AddFriendForm.reset();
@@ -47,4 +51,12 @@ export class AddFriendComponent {
 	enterKey(){
 		this.addFriend()
 	  }
+
+	openErrorModal(): void {
+	this.showError = true;
+	}
+	
+	closeErrorModal(): void {
+		this.showError = false;
+	}
 }

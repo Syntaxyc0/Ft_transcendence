@@ -29,13 +29,8 @@ export class GameGateway implements OnModuleInit{
   onModuleInit(){
     console.log("Server up")
     this.server.on('connection', async (socket) => {
+      await this.connection(socket)
 
-      const decodedToken = await this.authService.verifyJwt(socket.handshake.headers.authorization);
-            const user: UserI = await this.prisma.user.findUnique({
-                where: { id: decodedToken.sub },
-            });
-      
-      this.connectedPlayers.set(socket.id, new Player(socket, user.login))
 
       socket.on('disconnect', () => {
         this.disconnect(socket)
@@ -59,15 +54,15 @@ export class GameGateway implements OnModuleInit{
     this.connectedPlayers.forEach((player, index) => {
       if (player.login != newPlayer.login || newPlayer.socket.id == player.socket.id)
         return;
-      if(player.connected == false)
+      if(player.status == false)
       {
         if (player.room != undefined)
           newPlayer.room = player.room
+        newPlayer.socket.emit('onGameRequest', {order: "reload"})
         player.socket.emit('onGameRequest', {order: "multiWindow"})
         this.connectedPlayers.delete(index)
-        console.log(player.login + ' recovered')
       }
-      else if(player.connected == true)
+      else if(player.status == true)
       {
         newPlayer.socket.emit('onGameRequest', {order: "multiWindow"})
         this.connectedPlayers.delete(newPlayer.socket.id)
@@ -76,16 +71,23 @@ export class GameGateway implements OnModuleInit{
   }
 
   @SubscribeMessage('gameExists')
+  gameExist(client:Socket)
+  {
+    this.lookForGame(client)
+  }
+
   async lookForGame(client: Socket)
   {
-    // await this.connection(client)
-    const player = this.connectedPlayers.get(client.id)
+    let player = this.connectedPlayers.get(client.id)
+    if (!player)
+      await this.connection(client);
+    this.playerExists(this.connectedPlayers.get(client.id))
+    player = this.connectedPlayers.get(client.id)
     if (!player)
     {
-      client.emit('onGameRequest', {order: "multiWindow"})
+      client.emit('onGameRequest', {order: "gameChecked", exists: false})
       return;
     }
-    this.playerExists(this.connectedPlayers.get(client.id))
     if (player.room != undefined)
     {
       for (let i: number = 0; i < 2; i++)
@@ -95,6 +97,7 @@ export class GameGateway implements OnModuleInit{
             player.room.multiplayer.reload(i)
         }
     }
+    client.emit('onGameRequest', {order: "gameChecked", exists: true})
   }
 
 
@@ -137,9 +140,7 @@ export class GameGateway implements OnModuleInit{
 
   getPlayer(login: string): Player
   {
-    console.log(login)
     for (const [socketId, player] of this.connectedPlayers) {
-      console.log(player.login + " " + player.connected)
       if (login == player.login)
         return player;
     }
@@ -147,14 +148,14 @@ export class GameGateway implements OnModuleInit{
   }
 
   @SubscribeMessage('pairPlayers')
-  pairPlayers(@ConnectedSocket() client: Socket, @MessageBody() players: {currentUser: string, invitedUser: string})
+  async pairPlayers(@ConnectedSocket() client: Socket, @MessageBody() players: {currentUser: string, invitedUser: string})
   {
-    console.log(players)
+    await this.lookForGame(client)
     const invitedPlayer = this.getPlayer(players.invitedUser)
     const currentPlayer = this.getPlayer(players.currentUser)
     if (!invitedPlayer || !currentPlayer || currentPlayer.room || invitedPlayer.room)
       return;
-    console.log("went through")
+
     this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService))
   }
 
@@ -180,16 +181,6 @@ export class GameGateway implements OnModuleInit{
     if (!targetRoom.players[0].status && !targetRoom.players[1].status)
       this.disconnectRoom(client.id);
   }
-  // const player = this.connectedPlayers.get(client.id)
-    // console.log(player.login + " is disconnecting")
-    // player.lookingForPlayer = false
-    // player.status = false
-    // const targetRoom = this.getRoom(client.id)
-    // if (!targetRoom)
-    //   return;
-    // if (!targetRoom.players[side * -1 + 1].status)
-    //   this.disconnectRoom(client.id)
-  
 
   @SubscribeMessage('newPaddlePosition')
   setPaddle(@ConnectedSocket() client: Socket, @MessageBody() paddle: {y: number, side: number})
@@ -211,15 +202,17 @@ export class GameGateway implements OnModuleInit{
 
   @SubscribeMessage('multiplayerRequest')
   searchMultiplayer(@ConnectedSocket() client: Socket) {
-    if (this.connectedPlayers.get(client.id).room != undefined)
+    const matchPlayer = this.connectedPlayers.get(client.id)
+    if (!matchPlayer || matchPlayer.room != undefined)
       return;
     for (const [socketId, player] of this.connectedPlayers) {
       if (player.socket.id != client.id && player.lookingForPlayer)
       {
-        this.rooms.push(new Room(this.rooms.length ,this.connectedPlayers.get(client.id), player, this.gameService))
+        this.rooms.push(new Room(this.rooms.length ,matchPlayer, player, this.gameService))
         return;
       }
     }
-    this.connectedPlayers.get(client.id).lookingForPlayer = true
+    matchPlayer.lookingForPlayer = true
+    matchPlayer.socket.emit('onGameRequest', {order: "playerNotFound"})
   }
 }

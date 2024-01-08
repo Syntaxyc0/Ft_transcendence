@@ -5,11 +5,12 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
 import { CustomValidators } from '../helpers/custom-validators';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { ErrorModalComponent } from '../components/error-modal/error-modal.component';
 
 @Component({
   selector: 'app-edit-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatFormFieldModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatFormFieldModule, RouterModule, ErrorModalComponent],
   templateUrl: './edit-page.component.html',
   styleUrls: ['./edit-page.component.scss']
 })
@@ -24,6 +25,8 @@ export class EditPageComponent {
 
 	id:number = 0;
 	avatar;
+	showError:boolean = false;
+	errorMessage:string =""
 
 
 	ngOnInit() {
@@ -40,7 +43,9 @@ export class EditPageComponent {
 				localStorage.setItem('is_authenticated', 'true');
 				this.router.navigate(["/home"]);
 			},
-			err => { alert(err.error.message)}
+			err => { this.errorMessage = err.error.message
+				this.openErrorModal();
+			}
 		)
 
 			}
@@ -83,7 +88,18 @@ export class EditPageComponent {
 		 
 		   this.http.post<any>(url, formData).subscribe({
 			 next: (data: any) => window.location.reload(),
-			 error: (error: any) => console.log(error)
+			 error: (error: any) => {
+				this.errorMessage = error.error.message
+				this.openErrorModal();
+			 }
 		   })
 	   }
+
+	openErrorModal(): void {
+	this.showError = true;
+	}
+		
+	closeErrorModal(): void {
+		this.showError = false;
+	}
 }
