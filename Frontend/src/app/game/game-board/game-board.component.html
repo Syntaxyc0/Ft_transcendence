@@ -5,7 +5,8 @@
 	<div class = grid>
 		<button (click)="multiplayerRequest()"> Multiplayer </button>
 		<button (click)="disconnect()"> Disconnect </button>
-		<button (click)="log()"> Log </button>
+		<!-- <button (click)="log()"> Log </button> -->
+		<button [style.background]="getColor()" (click)="changeColor()"> Color </button>
 	</div>
 	<canvas #canvas width="1000" height="640" class="game-board">
 		Warning, your navigator needs to be compatible with canvas!

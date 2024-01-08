@@ -39,7 +39,8 @@ export const HEIGHT = 640
 	matchmaking: boolean = false;
 	showRules: boolean = false;
 	multiWindow: boolean = false;
-	requestMatch: boolean = true;
+	colorTab: string[] = ['black', 'darkred', 'limegreen', 'purple'];
+	colorId: number = 0;
 
 	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
@@ -143,21 +144,30 @@ export const HEIGHT = 640
 				this.disconnect()
 
 			break;
-			// case "playerNotFound":
-			// 	this.matchmaking = true
-			// break;
-			// case "gameChecked":
-			// 	if (payload.exists && this.matchmaking)
-			// 		this.player.sendRequest("multiplayerRequest")
-			// 	else
-			// 		this.matchmaking = false
-			// break;
 		}
+	}
+
+	changeColor()
+	{
+		this.paddles[0].changeColor()
+		this.paddles[1].changeColor()
+		this.ball.changeColor()
+		this.colorId++
+		if (this.colorId >= this.colorTab.length)
+			this.colorId = 0;
+		if (this.isOnline)
+			this.draw()
+		if (this.matchmaking)
+			this.drawBoard()
+	}
+	
+	getColor() :string
+	{
+		return this.colorTab[this.colorId]
 	}
 
 	resetOnline()
 	{
-		console.log("resetOnline")
 		this.isOnline = false
 		this.isGameRunning = false;
 		this.paddles[0].score = 0;
@@ -229,7 +239,7 @@ export const HEIGHT = 640
 
 	draw()
 	{
-		this.context.fillStyle = 'black';
+		this.context.fillStyle = this.colorTab[this.colorId];
 		this.context.clearRect(0, 0, WIDTH, HEIGHT);
 		this.context?.fillRect(0, 0, WIDTH, HEIGHT);
 		this.ball.draw();
@@ -246,20 +256,12 @@ export const HEIGHT = 640
 			return;
 		this.player.sendRequest("gameExists")
 		this.matchmaking = true
-
-		// this.player.sendRequest("multiplayerRequest")
-		
-		// this.player.sendRequest("gameExists")
-		// this.player.sendRequest("multiplayerRequest")
-		// if (this.multiWindow || this.isOnline)
-		// 	return;
-		// this.matchmaking = true
 	}
 
 	drawBoard()
 	{
 		this.ball.draw()
-		this.context.fillStyle = 'black';
+		this.context.fillStyle = this.colorTab[this.colorId];
 		this.context.clearRect(0, 0, WIDTH, HEIGHT);
 		this.context?.fillRect(0, 0, WIDTH, HEIGHT);
 	}

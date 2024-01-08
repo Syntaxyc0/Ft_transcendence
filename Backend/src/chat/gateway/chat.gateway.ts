@@ -620,6 +620,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@SubscribeMessage('acceptGame')
+	async acceptGame( socket: Socket, user: UserI ) 
+	{
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		for (const User of connectedUser) {
+			if(user.id === User.userId) {
+				await this.server.to(User.socketId).emit("accepted to play", {
+					inviterI: socket.data.user,
+					// inviter_socket: socket,
+					invited_login: user.login,
+				});
+			}
+		}
+	}
+
 	@SubscribeMessage('refuseGame')
 	async refuseGame( socket: Socket, user: UserI ) {
 

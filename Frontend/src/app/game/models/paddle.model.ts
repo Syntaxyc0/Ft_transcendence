@@ -4,7 +4,7 @@ export const PADDLE_HEIGHT = 200
 export const PADDLE_WIDTH = 25
 
 export class Paddle{
-	step: number = 175;
+	step: number = 160;
 
 	x!: number;
 	y!: number;
@@ -13,6 +13,9 @@ export class Paddle{
 	score: number = 0;
 	side: number;
 	login: string | undefined;
+
+	colorId: number = 0;
+	colorTab: string[] = ['red', 'dodgerblue', 'black', 'yellow'];
 	
 
 	constructor( public context: CanvasRenderingContext2D)
@@ -21,9 +24,17 @@ export class Paddle{
 	  
 
 	draw(){
-		this.context.fillStyle = 'red';
+		console.log(this.colorTab[this.colorId])
+		this.context.fillStyle = this.colorTab[this.colorId];
 		this.context.fillRect(this.x, this.y - PADDLE_HEIGHT/2, PADDLE_WIDTH, PADDLE_HEIGHT);
 		this.context.fillRect(this.x, this.y - PADDLE_HEIGHT/2, PADDLE_WIDTH, PADDLE_HEIGHT);
+	}
+
+	changeColor()
+	{
+		this.colorId++
+		if (this.colorId >= this.colorTab.length)
+			this.colorId = 0;
 	}
 
 
