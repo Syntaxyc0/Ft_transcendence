@@ -825,7 +825,7 @@ export class UserService
 
 		let counter = 0;
 		let master = [1,1,5,100,5,5,5,4,4,10,20,10,10,5,5];
-		for (let i=0; i < 14; i++)
+		for (let i=0; i <= 14; i++)
 		{
 			if (res[i] >= master[i])
 			{
