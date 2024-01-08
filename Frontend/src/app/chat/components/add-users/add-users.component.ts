@@ -46,6 +46,7 @@ export class AddUsersComponent implements OnInit{
 	selectedUser: UserI | null = null;
 	currentUser$: Observable<UserI>;
 	currentUserId;
+	banList: UserI[] | undefined;
 	
 	constructor( private userService: UserService,
 				 private socketService: SocketService,
@@ -73,7 +74,7 @@ export class AddUsersComponent implements OnInit{
 					return this.userService.findByLogin(login).pipe(
 						tap((users: UserI[]) => {
 							this.filteredUsers = users.filter(user =>
-								user.id !== this.currentUserId && !this.inRoom(user.id)
+								user.id !== this.currentUserId && !this.inRoom(user.id) && !this.isBan(user.id)
 							  );
 						})
 					)
@@ -110,6 +111,22 @@ export class AddUsersComponent implements OnInit{
 		} else {
 			return '';
 		}
+	}
+
+	getBanList() {
+		this.socket.emit("getBanList", this.room).subscribe(value => {
+			this.banList = value;
+		});
+	}
+
+	isBan(id: number | undefined): boolean {
+		if (!this.banList )
+			return false;
+
+		for(const user of this.banList)
+			if (user.id === id)
+				return true;
+		return false;
 	}
 }
 		

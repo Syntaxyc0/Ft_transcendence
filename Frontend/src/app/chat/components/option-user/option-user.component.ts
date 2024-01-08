@@ -34,6 +34,7 @@ export class OptionUserComponent implements OnInit{
 	adminArray: UserI[] | undefined;
 	blockedUserList: UserI[] | undefined;
 	mutedUserList: UserI[] | undefined;
+	banList: UserI[] | undefined;
 
 	adminUser: boolean;
 	adminCurrent: boolean;
@@ -44,6 +45,8 @@ export class OptionUserComponent implements OnInit{
 	isUserBlocked: boolean;
 
 	isUserMuted: boolean;
+
+	isUserBan: boolean;
 
   constructor(	private userService: UserService,
 				private socket: CustomSocket,
@@ -185,5 +188,25 @@ export class OptionUserComponent implements OnInit{
 	kickUser() {
 		this.socket.emit("kickUser", { user: this.user, room: this.room });
 		this.closeOption();
+	}
+
+	banUser() {
+		this.socket.emit("banUser", { user: this.user, room: this.room });
+		this.closeOption();
+	}
+
+	unbanUser() {
+		this.socket.emit("unbanUser", { user: this.user, room: this.room });
+		this.closeOption();
+	} 
+
+	isBan(): boolean {
+		if (!this.banList )
+			return false;
+
+		for(const user of this.banList)
+			if (user.id === this.user?.id)
+				return true;
+		return false;
 	}
 }
