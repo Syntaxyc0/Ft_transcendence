@@ -529,4 +529,104 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		await socket.emit('UsersRoom', room_.users);
 	}	
 
+	@SubscribeMessage('banUser')
+	async banUser( socket: Socket, data: { user: UserI, room: RoomI } ) {
+
+		this.kickUser(socket, data);
+
+		const { user, room } = data;
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+			include: {BanUsers: true, users: true}
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id},
+		});
+
+		await this.prisma.room.update({
+			where: {id: room_.id},
+			data: {
+				BanUsers: { connect: { id: user_.id } },
+			}
+		});
+
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		for (const User of connectedUser) {
+			for(const users of room_.users)
+				if(users.id === User.id) {
+					console.log(users.id, User.id, room_.BanUsers)
+					await this.server.to(User.socketId).emit("banList", room_.BanUsers);
+				}
+		}
+	}
+
+	@SubscribeMessage('unbanUser')
+	async unbanUser( socket: Socket, data: { user: UserI, room: RoomI } ) {
+
+		const { user, room } = data;
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+			include: { BanUsers: true, users: true }
+		});
+
+		const user_ = await this.prisma.user.findUnique({
+			where: { id: user.id },
+		});
+
+		await this.prisma.room.update({
+			where: {id: room_.id},
+			data: {
+				BanUsers: { disconnect: { id: user_.id } },
+			}
+		});
+
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		for (const User of connectedUser) {
+			for(const users of room_.users)
+				if(users.id === User.id) {
+					console.log(users.id, User.id, room_.BanUsers)
+					await this.server.to(User.socketId).emit("banList", room_.BanUsers);
+				}
+		}
+	}
+
+	@SubscribeMessage('getBanList')
+	async getBanList( socket: Socket, room: RoomI ) {
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+			include: { BanUsers: true },
+		});
+		console.log(room_.BanUsers);
+
+		return await socket.emit('banList', room_.BanUsers);
+	}
+
+	@SubscribeMessage('invite_to_play?')
+	async invite_to_play( socket: Socket, user: UserI ) {
+
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		for (const User of connectedUser) {
+			if(user.id === User.userId) {
+				await this.server.to(User.socketId).emit("invited to play", {
+					inviterI: socket.data.user,
+					// inviter_socket: socket,
+					invited_login: user.login,
+				});
+			}
+		}
+	}
+
+	@SubscribeMessage('refuseGame')
+	async refuseGame( socket: Socket, user: UserI ) {
+
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		for (const User of connectedUser)
+			if(user.id === User.userId)
+				await this.server.to(User.socketId).emit("refuse to play", socket.data.user.login)
+				
+	}
 }

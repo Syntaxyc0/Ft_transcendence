@@ -11,6 +11,8 @@ import { UserI } from '../../model/user.interface';
 import { RoomI } from '../../model/room.interface';
 import { CustomSocket } from '../../sockets/custom-socket';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { invite_to_playComponent } from '../invite_to_play/invite_to_play.component';
 
 
 @Component({
@@ -22,6 +24,7 @@ import { Router } from '@angular/router';
 			MatListModule,
 			MatIconModule,
 			MatButtonModule,
+			invite_to_playComponent,
 			],
   styleUrls: ['./option-user.component.scss']
 })
@@ -34,6 +37,7 @@ export class OptionUserComponent implements OnInit{
 	adminArray: UserI[] | undefined;
 	blockedUserList: UserI[] | undefined;
 	mutedUserList: UserI[] | undefined;
+	banList: UserI[] | undefined;
 
 	adminUser: boolean;
 	adminCurrent: boolean;
@@ -45,10 +49,13 @@ export class OptionUserComponent implements OnInit{
 
 	isUserMuted: boolean;
 
+	isUserBan: boolean;
+
   constructor(	private userService: UserService,
 				private socket: CustomSocket,
 				private socketService: SocketService,
-				private router: Router) {}
+				private router: Router,
+				public dialog: MatDialog) {}
   
   	ngOnInit(): void {
 		// Current user ?
@@ -102,15 +109,19 @@ export class OptionUserComponent implements OnInit{
 				this.isUserMuted = this.isMuted();
 			});
 
+			this.socket.emit("getBanList", this.room);
+			this.socket.fromEvent<UserI[] | undefined>("banList").subscribe(value =>{
+				this.banList = value;
+				this.isUserBan = this.isBan();
+				console.log(this.banList)
+			});
 		});
 
 	}
 
 	inviteToPlay()/*invitedUser?: string, currentUser?: string*/
 	{
-		// console.log({currentUser, invitedUser})
-		this.socket.emit("pairPlayers", {currentUser: this.current_user?.login, invitedUser: this.user?.login})
-		this.router.navigate(['/game'])
+		this.socket.emit("invite_to_play?", this.user);
 	}
 
 	goToProfile()
@@ -185,5 +196,25 @@ export class OptionUserComponent implements OnInit{
 	kickUser() {
 		this.socket.emit("kickUser", { user: this.user, room: this.room });
 		this.closeOption();
+	}
+
+	banUser() {
+		this.socket.emit("banUser", { user: this.user, room: this.room });
+		this.closeOption();
+	}
+
+	unbanUser() {
+		this.socket.emit("unbanUser", { user: this.user, room: this.room });
+		this.closeOption();
+	} 
+
+	isBan(): boolean {
+		if ( !this.banList )
+			return false;
+
+		for(const user of this.banList)
+			if (user.id === this.user?.id)
+				return true;
+		return false;
 	}
 }

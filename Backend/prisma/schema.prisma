@@ -14,20 +14,20 @@ model User {
   login                  String          @unique
   login42                String          @unique
   hash                   String
-  access_token           String  @default("")
-  is2faenabled           Boolean @default(false)
-  is2favalidated         Boolean @default(false)
-  twofacode              String  @default("")
-  avatar                 String  @default("")
-  default_avatar         String  @default("")
-  elo                    Int     @default(1000)
-  userStatus             String  @default("OFFLINE")
+  access_token           String          @default("")
+  is2faenabled           Boolean         @default(false)
+  is2favalidated         Boolean         @default(false)
+  twofacode              String          @default("")
+  avatar                 String          @default("")
+  default_avatar         String          @default("")
+  elo                    Int             @default(1000)
+  userStatus             String          @default("OFFLINE")
   gameHistory            Int[]
-  gamesWon 		         Int	 @default(0)
-  friendList             Int[]   @default([])
-  FriendRequestsEmitted  Int[]   @default([])
-  FriendRequestsReceived Int[]   @default([])
-   rooms                  Room[]          @relation("UserRooms")
+  gamesWon               Int             @default(0)
+  friendList             Int[]           @default([])
+  FriendRequestsEmitted  Int[]           @default([])
+  FriendRequestsReceived Int[]           @default([])
+  rooms                  Room[]          @relation("UserRooms")
   connectedUser          ConnectedUser[]
   joinedRoom             JoinedRoom[]
   Message                Message[]
@@ -35,19 +35,19 @@ model User {
   AdminRooms             Room[]          @relation("AdminRooms")
   blockedUsers           User[]          @relation("BlockedUser")
   blockedByUsers         User[]          @relation("BlockedUser")
+  banInRoom              Room[]          @relation("BanUserRoom")
   muteInRoom             Room[]          @relation("Muted")
-  
-  api_used                    	  Int     @default(0)
-  twofa_used                   	  Int    @default(0)
-  quit_count                      Int     @default(0)
-  friends_added                   Int     @default(0)
-  friends_removed                 Int     @default(0)
-  name_changed                    Int     @default(-1)
-  picture_changed                 Int     @default(0)
-  profiles_searched               Int     @default(0)
-  cancelled_count                 Int     @default(0)
-  refused_count                   Int     @default(0)
 
+  api_used          Int @default(0)
+  twofa_used        Int @default(0)
+  quit_count        Int @default(0)
+  friends_added     Int @default(0)
+  friends_removed   Int @default(0)
+  name_changed      Int @default(-1)
+  picture_changed   Int @default(0)
+  profiles_searched Int @default(0)
+  cancelled_count   Int @default(0)
+  refused_count     Int @default(0)
 }
 
 model GameInfo {
@@ -80,6 +80,7 @@ model Room {
   public      Boolean
   password    String?
   mutedUsers  User[]       @relation("Muted")
+  BanUsers    User[]       @relation("BanUserRoom")
 }
 
 model ConnectedUser {

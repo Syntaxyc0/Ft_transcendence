@@ -88,9 +88,7 @@ export class AuthController
 	async getRooms() {
   		return await this.prismaService.room.findMany({
    			include: {
-     			creator: true,
-				admin: true,
-				users: true,
+				BanUsers: true,
    			},
   		});
 	}
