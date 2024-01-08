@@ -539,11 +539,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const connectedUser = await this.prisma.connectedUser.findMany();
 		for (const User of connectedUser) {
 			if(user.id === User.userId) {
-				await this.server.to(User.socketId).emit("invited to play", {
-					inviterI: socket.data.user,
-					// inviter_socket: socket,
-					invited_login: user.login,
-				});
+				await this.server.to(User.socketId).emit("invited to play", { inviterI: socket.data.user });
 			}
 		}
 	}

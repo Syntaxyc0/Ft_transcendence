@@ -47,7 +47,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
+export class ChatComponent implements AfterViewInit, OnInit{
 	
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
@@ -77,24 +77,19 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 
 		this.socket.fromEvent("invited to play").subscribe((value: any) => {
 
-			const { inviterI, /*inviter_socket,*/ invited_login} = value;
+			const { inviterI } = value;
 			
 			const dialogRef = this.dialog.open(invite_to_playComponent, {
 				width: '300px',
 				data: { login: inviterI.login }
 			});
-			// {currentUser: inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: invited_login}
-			dialogRef.afterClosed().subscribe(async result => {
+			dialogRef.afterClosed().subscribe(result => {
 				if (result) {
-				  // L'utilisateur a accepté, émettez l'événement pairPlayers et naviguez vers la page de jeu
 					// this.socket.emit("gameExists")
 					this.socket.emit('checkAndAccept', inviterI)
 					// this.socket.emit("acceptGame", inviterI)
 					this.router.navigate(['/game'])
-
-
 				} else {
-				  // L'utilisateur a refusé l'invitation
 				  this.socket.emit("refuseGame", inviterI);
 				}
 			});
@@ -114,9 +109,6 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
 			});
 		})
-	}
-
-	ngOnDestroy(): void {	
 	}
 
 	retrieveUser() {
