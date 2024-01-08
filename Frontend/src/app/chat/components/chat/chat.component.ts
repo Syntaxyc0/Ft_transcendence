@@ -87,8 +87,9 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 			dialogRef.afterClosed().subscribe(async result => {
 				if (result) {
 				  // L'utilisateur a accepté, émettez l'événement pairPlayers et naviguez vers la page de jeu
-					await this.socket.emit("gameExists")
-					await this.socket.emit("acceptGame", inviterI);
+					// this.socket.emit("gameExists")
+					this.socket.emit('checkAndAccept', inviterI)
+					// this.socket.emit("acceptGame", inviterI)
 					this.router.navigate(['/game'])
 
 
@@ -100,10 +101,12 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 			
 		})
 
-		this.socket.fromEvent("accepted to play").subscribe((value:any)=>{
-			this.socket.emit("gameExists")
+		this.socket.fromEvent("accepted to play").subscribe(async (value:any)=>{
+			console.log("game accepted")
+
+			this.socket.emit("checkAndLaunch", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
 			this.router.navigate(['/game'])
-			this.socket.emit("pairPlayers", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
+			// this.socket.emit("pairPlayers", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
 		})
 
 		this.socket.fromEvent("refuse to play").subscribe((value) => {

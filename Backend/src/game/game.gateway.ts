@@ -1,4 +1,4 @@
-import { Body, OnModuleInit } from '@nestjs/common';
+import { Body, OnModuleInit, PayloadTooLargeException } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket} from "socket.io"
 import { Player } from './models/player.model'; 
@@ -9,6 +9,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserI } from 'src/chat/model/user.interface';
 import { UserService } from 'src/user/user.service';
 import { GameService } from './game.service';
+import { pbkdf2 } from 'crypto';
 
 
 @WebSocketGateway({
@@ -49,6 +50,7 @@ export class GameGateway implements OnModuleInit{
       this.connectedPlayers.set(socket.id, new Player(socket, user.login))
   }
 
+
   playerExists(newPlayer: Player)
   {
     this.connectedPlayers.forEach((player, index) => {
@@ -70,6 +72,38 @@ export class GameGateway implements OnModuleInit{
     })
   }
 
+  @SubscribeMessage('checkAndAccept')
+  async checkAndAccept(@ConnectedSocket() client : Socket, @MessageBody() user: UserI)
+  {
+    console.log("checkedAndAccepted")
+    await this.lookForGame(client)
+    // console.log("2checkedAndAccepted")
+
+    client.emit("acceptGame", user);
+
+    const connectedUser = await this.prisma.connectedUser.findMany();
+		for (const User of connectedUser) {
+			if(user.id === User.userId) {
+				await this.server.to(User.socketId).emit("accepted to play", {
+					inviterI: client.data.user,
+					// inviter_socket: socket,
+					invited_login: user.login,
+				});
+			}
+		}
+  }
+
+
+  @SubscribeMessage('checkAndLaunch')
+  async checkAndLaunch(@ConnectedSocket() client : Socket, @MessageBody() payload: any)
+  {
+    await this.lookForGame(client)
+    this.pairPlayers({currentUser: payload.currentUser, invitedUser: payload.invitedUser})
+
+  }
+
+
+
 
   @SubscribeMessage('gameExists')
   gameExist(client:Socket)
@@ -77,7 +111,7 @@ export class GameGateway implements OnModuleInit{
     this.lookForGame(client)
   }
 
-  async lookForGame(client: Socket)
+  async lookForGame(client: Socket): Promise<boolean>
   {
     let player = this.connectedPlayers.get(client.id)
     if (!player)
@@ -87,7 +121,7 @@ export class GameGateway implements OnModuleInit{
     if (!player)
     {
       client.emit('onGameRequest', {order: "gameChecked", exists: false})
-      return;
+      return false;
     }
     if (player.room != undefined)
     {
@@ -99,6 +133,7 @@ export class GameGateway implements OnModuleInit{
         }
     }
     client.emit('onGameRequest', {order: "gameChecked", exists: true})
+    return true;
   }
 
 
@@ -148,8 +183,8 @@ export class GameGateway implements OnModuleInit{
     return undefined
   }
 
-  @SubscribeMessage('pairPlayers')
-  async pairPlayers(@ConnectedSocket() client: Socket, @MessageBody() players: {currentUser: string, invitedUser: string})
+  // @SubscribeMessage('pairPlayers')
+  /*async */pairPlayers(/*@ConnectedSocket() client: Socket, @MessageBody() */players: {currentUser: string, invitedUser: string})
   {
     // await this.lookForGame(client)
     const invitedPlayer = this.getPlayer(players.invitedUser)

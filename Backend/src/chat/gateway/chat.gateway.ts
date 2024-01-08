@@ -551,6 +551,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('acceptGame')
 	async acceptGame( socket: Socket, user: UserI ) 
 	{
+		// console.log("game accepted")
 		const connectedUser = await this.prisma.connectedUser.findMany();
 		for (const User of connectedUser) {
 			if(user.id === User.userId) {
