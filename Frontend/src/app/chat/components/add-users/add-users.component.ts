@@ -17,6 +17,7 @@ import { MatDialogClose } from '@angular/material/dialog';
 import { CustomSocket } from '../../sockets/custom-socket';
 import { RoomI } from '../../model/room.interface';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-add-users',
@@ -51,6 +52,7 @@ export class AddUsersComponent implements OnInit{
 	constructor( private userService: UserService,
 				 private socketService: SocketService,
 				 private socket: CustomSocket,
+				 private snackbar: MatSnackBar,
 				 @Inject(MAT_DIALOG_DATA) public data: any) {
 		this.room = data.room;
 	}
@@ -59,10 +61,17 @@ export class AddUsersComponent implements OnInit{
 	ngOnInit() : void {
 		this.currentUserId = JSON.parse(localStorage.getItem('id')!);
 
+		this.socket.emit("getBanList", this.room);
+		this.socket.fromEvent<UserI[] | undefined>("banList").subscribe(value => {
+			this.banList = value;
+		});
+
 		this.socket.emit("getUsersRoom", this.room);
+
 		this.socket.fromEvent<UserI[]>("UsersRoom").subscribe(value => {
 			this.UsersRoom = value;
 			
+
 			this.searchLogin.valueChanges.pipe(
 				debounceTime(500),
 				distinctUntilChanged(),
@@ -74,7 +83,7 @@ export class AddUsersComponent implements OnInit{
 					return this.userService.findByLogin(login).pipe(
 						tap((users: UserI[]) => {
 							this.filteredUsers = users.filter(user =>
-								user.id !== this.currentUserId && !this.inRoom(user.id) && !this.isBan(user.id)
+								user.id !== this.currentUserId && !this.inRoom(user.id)
 							  );
 						})
 					)
@@ -85,9 +94,17 @@ export class AddUsersComponent implements OnInit{
 	}
 
 	addUserToRoom() {
-		if (this.selectedUser !== null) {
+		const isban = this.isBan( this.selectedUser?.id );
+
+		if ( this.selectedUser !== null && !isban) {
 			this.socket.emit("AddUser", { user: this.selectedUser, room: this.room })
+		} else if ( isban ) {
+			this.snackbar.open(`${this.selectedUser?.login} is ban from this room`, 'Close' ,{
+				duration: 4000, horizontalPosition: 'right', verticalPosition: 'top'
+			});
 		}
+
+
 
 		this.filteredUsers = [];
 		this.selectedUser = null;
@@ -113,15 +130,12 @@ export class AddUsersComponent implements OnInit{
 		}
 	}
 
-	getBanList() {
-		this.socket.emit("getBanList", this.room).subscribe(value => {
-			this.banList = value;
-		});
-	}
-
 	isBan(id: number | undefined): boolean {
 		if (!this.banList )
+		{
+			console.log("here");
 			return false;
+		}
 
 		for(const user of this.banList)
 			if (user.id === id)

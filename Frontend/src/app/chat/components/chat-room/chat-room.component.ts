@@ -172,6 +172,6 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 		  console.log('Dialog closed with result:', result);
 		  // Ajoutez la logique de gestion des résultats de la recherche ici
 		});
-	  }
+	}
 
 }

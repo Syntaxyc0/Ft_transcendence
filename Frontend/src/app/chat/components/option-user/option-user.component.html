@@ -39,8 +39,12 @@
 			<button mat-stroked-button color=warn (click)="kickUser()">Kick</button>
 		</mat-list-item>
 
-		<mat-list-item *ngIf="adminCurrent && !isUserCreator">
-			<button mat-stroked-button color=warn>Ban</button>
+		<mat-list-item *ngIf="adminCurrent && !isUserCreator && !isUserBan">
+			<button mat-stroked-button color=warn (click)="banUser()">Ban</button>
+		</mat-list-item>
+
+		<mat-list-item *ngIf="adminCurrent && !isUserCreator && isUserBan">
+			<button mat-stroked-button color=warn (click)="unbanUser()">Unban</button>
 		</mat-list-item>
 
 		<mat-icon (click)="closeOption()">cancel</mat-icon>

@@ -18,9 +18,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { ChatRoomComponent } from '../chat-room/chat-room.component';
 import { UserService } from '../../services/user.service';
 import { OptionUserComponent } from '../option-user/option-user.component';
-import { SocketService } from '../../services/socket.service';
 import { CustomSocket } from '../../sockets/custom-socket';
 import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.component';
+import { invite_to_playComponent } from '../invite_to_play/invite_to_play.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
@@ -39,6 +41,8 @@ import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.compo
 			ChatRoomComponent,
 			OptionUserComponent,
 			HeaderbarComponent,
+			invite_to_playComponent,
+			MatDialogModule,
 			],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
@@ -55,10 +59,11 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	constructor(private route:ActivatedRoute,
 		private router: Router,
 		private chatService: ChatService,
-		private socketService: SocketService,
 		public http: HttpClient,
 		private userService: UserService,
-		private socket: CustomSocket) {}
+		private socket: CustomSocket,
+		public dialog: MatDialog,
+		public snackbar: MatSnackBar) {}
 
 	ngOnInit(): void {
 		this.retrieveUser();
@@ -73,6 +78,34 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 		this.socket.fromEvent("invited").subscribe(() => {
 			location.reload();
 		});
+
+		this.socket.fromEvent("invited to play").subscribe((value: any) => {
+
+			const { inviterI, /*inviter_socket,*/ invited_login} = value;
+			
+			const dialogRef = this.dialog.open(invite_to_playComponent, {
+				width: '300px',
+				data: { login: value }
+			});
+
+			dialogRef.afterClosed().subscribe(result => {
+				if (result) {
+				  // L'utilisateur a accepté, émettez l'événement pairPlayers et naviguez vers la page de jeu
+					this.socket.emit("pairPlayers", {inviterlogin: inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: invited_login})
+					this.router.navigate(['/game'])
+				} else {
+				  // L'utilisateur a refusé l'invitation
+				  this.socket.emit("refuseGame", inviterI);
+				}
+			  });
+			
+		})
+
+		this.socket.fromEvent("refuse to play").subscribe((value) => {
+			this.snackbar.open(`${value} has refuse to play with you`, 'Close' ,{
+				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+			});
+		})
 	}
 
 	ngOnDestroy(): void {	
