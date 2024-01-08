@@ -91,8 +91,11 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 			dialogRef.afterClosed().subscribe(result => {
 				if (result) {
 				  // L'utilisateur a accepté, émettez l'événement pairPlayers et naviguez vers la page de jeu
-					this.socket.emit("pairPlayers", {inviterlogin: inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: invited_login})
+					this.socket.emit("pairPlayers", {currentUser: inviterI.login, invitedUser: invited_login})
 					this.router.navigate(['/game'])
+									
+					// this.socket.emit("pairPlayers", {currentUser: this.current_user?.login, invitedUser: this.user?.login})
+					// this.router.navigate(['/game'])
 				} else {
 				  // L'utilisateur a refusé l'invitation
 				  this.socket.emit("refuseGame", inviterI);
