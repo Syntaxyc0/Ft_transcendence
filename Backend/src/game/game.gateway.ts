@@ -70,6 +70,7 @@ export class GameGateway implements OnModuleInit{
     })
   }
 
+
   @SubscribeMessage('gameExists')
   gameExist(client:Socket)
   {
@@ -150,7 +151,7 @@ export class GameGateway implements OnModuleInit{
   @SubscribeMessage('pairPlayers')
   async pairPlayers(@ConnectedSocket() client: Socket, @MessageBody() players: {currentUser: string, invitedUser: string})
   {
-    await this.lookForGame(client)
+    // await this.lookForGame(client)
     const invitedPlayer = this.getPlayer(players.invitedUser)
     const currentPlayer = this.getPlayer(players.currentUser)
     if (!invitedPlayer || !currentPlayer || currentPlayer.room || invitedPlayer.room)
@@ -158,6 +159,9 @@ export class GameGateway implements OnModuleInit{
 
     this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService))
   }
+
+
+
 
   @SubscribeMessage('disconnectingClient')
   warnOther(@ConnectedSocket() client: Socket)
