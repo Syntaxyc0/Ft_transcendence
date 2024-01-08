@@ -8,9 +8,10 @@ stop:
 clean: stop
 	docker system prune -af
 
-fclean:
+fclean: clean
 	docker volume rm -f $(CURRENT_DIR)_backend
 	docker volume rm -f $(CURRENT_DIR)_frontend
+	
 
 nocache:
 	docker-compose -f docker-compose.yml build --no-cache
