@@ -574,6 +574,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				
 	}
 
+	@SubscribeMessage('verifyPass')
+	async isRightPass( socket: Socket, data: { pass: string, room: RoomI }) {
+
+		const { pass, room } = data;
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+		});
+		
+		if (pass === room_.password) 
+			socket.emit("PassResponse", true); 
+
+		else
+			socket.emit("PassResponse", false);
+	}
+
+
 	async allowedRooms( userId: number ) {
 		
 		const publicRooms = await this.prisma.room.findMany({

@@ -1,12 +1,13 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
-import { RoomI } from '../../model/room.interface';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { CustomSocket } from '../../sockets/custom-socket';
+import { RoomI } from '../../model/room.interface';
 
 @Component({
   selector: 'app-invite-to-play',
@@ -20,26 +21,36 @@ import { FormsModule } from '@angular/forms';
 	MatButtonModule,
 	MatDialogTitle,
 	MatFormFieldModule,
+	MatInputModule,
 	FormsModule,
 ],
   templateUrl: './password.component.html',
   styleUrls: ['./password.component.scss'],
 })
-export class invite_to_playComponent implements OnInit{
+export class PasswordRoomComponent implements OnInit{
 
-	login: string;
+	room: RoomI;
 	currentUserId;
 	password;
 	
-	constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-		this.login = data.login;
+	constructor(
+		private dialogRef: MatDialogRef<PasswordRoomComponent>,
+		private socket: CustomSocket,
+		@Inject(MAT_DIALOG_DATA) public data: any) {
+		this.room = data.room;
 	}
-
 
 	ngOnInit() : void {
 		this.currentUserId = JSON.parse(localStorage.getItem('id')!);
 	}
 
+	verifyPassword() {
+		this.socket.emit("verifyPass", { pass: this.password, room: this.room });
+		this.socket.fromEvent("PassResponse").subscribe((value) => {
+			console.log(value);
+			this.dialogRef.close(value);
+		});
+	}
 }
 		
 		

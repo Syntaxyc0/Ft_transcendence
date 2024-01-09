@@ -1,6 +1,6 @@
-import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable, combineLatest, map, mergeMap, of, startWith, tap } from 'rxjs';
+import { Observable, combineLatest, map, startWith, tap } from 'rxjs';
 import { RoomI } from 'src/app/chat/model/room.interface';
 import { MessageI } from '../../model/message.interface';
 import { ChatService } from '../../services/chat.service';
@@ -21,7 +21,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import {
 	MatDialog,
-	MatDialogRef,
 	MatDialogActions,
 	MatDialogClose,
 	MatDialogTitle,
@@ -29,6 +28,7 @@ import {
 	MatDialogModule,
   } from '@angular/material/dialog';
 import { AddUsersComponent } from '../add-users/add-users.component';
+import { PasswordRoomComponent } from '../Password/password.component';
 
 @Component({
   selector: 'app-chat-room',
@@ -94,28 +94,31 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 			  public dialog: MatDialog,
 			  ) {}
 
-  ngOnInit(): void {
-	  this.currentId = JSON.parse(localStorage.getItem('id')!);
-	  this.userService.changeRoom(this.chatRoom);
+	ngOnInit(): void {
+		if (this.chatRoom.isPass)
+			this.passwordWindow();
 
-	  this.socket.emit("MutedUsers", this.chatRoom);
-	  this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
-		  this.mutedUserList = value;
-		  this.isCurrentMuted = this.isMuted();
-	  });
+		this.currentId = JSON.parse(localStorage.getItem('id')!);
+		this.userService.changeRoom(this.chatRoom);
 
-	  this.socket.fromEvent<UserI[] | undefined>("mutedUserTrue").subscribe(value =>{
-		this.mutedUserList = value;
-		this.isCurrentMuted = true;
-		this.snackbar.open(`You have been muted`, 'Close' ,{
-			duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
-		} );
-	  });
+		this.socket.emit("MutedUsers", this.chatRoom);
+		this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
+			this.mutedUserList = value;
+			this.isCurrentMuted = this.isMuted();
+		});
 
-	  this.socket.fromEvent<UserI[] | undefined>("mutedUserFalse").subscribe(value =>{
-		this.mutedUserList = value;
-		this.isCurrentMuted = false;
-	  });
+		this.socket.fromEvent<UserI[] | undefined>("mutedUserTrue").subscribe(value =>{
+			this.mutedUserList = value;
+			this.isCurrentMuted = true;
+			this.snackbar.open(`You have been muted`, 'Close' ,{
+				duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
+			});
+		});
+
+		this.socket.fromEvent<UserI[] | undefined>("mutedUserFalse").subscribe(value =>{
+			this.mutedUserList = value;
+			this.isCurrentMuted = false;
+		});
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -124,6 +127,9 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 		this.userService.changeRoom(this.chatRoom);
 		this.userService.changeOption(false, undefined);
     }
+
+	if (this.chatRoom.isPass)
+		this.passwordWindow();
   }
 
   ngAfterViewInit() {
@@ -164,14 +170,23 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 	openUserSearchDialog(): void {
 		const dialogRef = this.dialog.open(AddUsersComponent, {
 		  width: '300px',
-		  data: { room: this.chatRoom }
-		  // Ajoutez d'autres options de dialogue au besoin
+		//   data: { room: this.chatRoom }
 		});
-	
-		dialogRef.afterClosed().subscribe(result => {
-		  console.log('Dialog closed with result:', result);
-		  // Ajoutez la logique de gestion des résultats de la recherche ici
-		});
+	}
+
+	passwordWindow() {
+		const dialogRef = this.dialog.open(PasswordRoomComponent, {
+			width: '300px',
+			data: { room: this.chatRoom }
+		  });
+	  
+		  dialogRef.afterClosed().subscribe(result => {
+			if(result)
+				console.log("good pass");
+			else
+				console.log("bad pass");
+				// location.reload();
+		  });
 	}
 
 }

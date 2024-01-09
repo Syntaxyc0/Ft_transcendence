@@ -25,7 +25,7 @@ import { CustomSocket } from '../../sockets/custom-socket';
   templateUrl: './create-room.component.html',
   styleUrls: ['./create-room.component.scss']
 })
-export class CreateRoomComponent {
+export class CreateRoomComponent implements OnInit {
 
 	form: FormGroup = new FormGroup({
 		name: new FormControl(null, [Validators.required]),
@@ -33,12 +33,20 @@ export class CreateRoomComponent {
 		users: new FormArray([],[Validators.required]),
 		public: new FormControl(false),
 		password: new FormControl({value: null, disabled: true }),
+		isPass: new FormControl(false),
 	});
 	currentUser$: Observable<UserI> = this.socketService.user;
 	
 	
 	constructor(private chatService: ChatService, private router: Router, private activateRoute: ActivatedRoute, private socketService: SocketService, private socket: CustomSocket) {}
 	
+	ngOnInit() {
+		this.form.get('password')?.valueChanges.subscribe((password) => {
+			this.form.patchValue({ isPass: !!password });
+			console.log('isPass:', this.form.get('isPass')?.value);
+		});
+	}
+
 	create() {
 		if (this.form.valid) {
 			this.chatService.createRoom(this.form.getRawValue());
