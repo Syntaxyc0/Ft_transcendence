@@ -23,6 +23,7 @@ import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.compo
 import { invite_to_playComponent } from '../invite_to_play/invite_to_play.component';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { HostListener } from '@angular/core';
 
 
 @Component({
@@ -54,6 +55,7 @@ export class ChatComponent implements AfterViewInit, OnInit{
 	userList :object[] = []
 	login;
 	option: boolean;
+	isPageVisible: boolean;
 
 
 	constructor(
@@ -68,6 +70,7 @@ export class ChatComponent implements AfterViewInit, OnInit{
 
 	ngOnInit(): void {
 		this.retrieveUser();
+		this.isPageVisible = this.isVisible()
 		this.userService.option$.subscribe(value => {
 			this.option = value;
 		  });
@@ -80,21 +83,22 @@ export class ChatComponent implements AfterViewInit, OnInit{
 
 			const { inviterI } = value;
 			let invite: boolean = false;
-			
+			if(!this.isPageVisible)
+			{
+				this.dialog.closeAll();
+				return;
+			}
 			const dialogRef = this.dialog.open(invite_to_playComponent, {
 				width: '300px',
 				data: { login: inviterI.login }
 			});
-
 			dialogRef.afterClosed().subscribe(result => {
 				if (result) {
-					// this.router.navigate(['/game']);
 					this.socket.emit('checkAndAccept', inviterI)
-					// this.dialog.closeAll();
 				} else {
 					this.socket.emit("refuseGame", inviterI);
-					// this.dialog.closeAll();
 				}
+				this.dialog.closeAll();
 			});
 		})
 
@@ -116,6 +120,22 @@ export class ChatComponent implements AfterViewInit, OnInit{
 			this.router.navigate(['/game'])
 		})
 	}
+
+	@HostListener('document:visibilitychange', ['$event'])
+	onVisibilityChange(event: Event): void {
+		this.isPageVisible = this.isVisible()
+		// if (!this.isPageVisible)
+			// this.dialog.closeAll();
+
+	 }
+
+	 isVisible(): boolean
+	 {
+		if (document.visibilityState === 'visible') 
+			return true;
+		else 
+			return false;
+	 }
 
 	retrieveUser() {
 		const id = JSON.parse(localStorage.getItem('id')!);
