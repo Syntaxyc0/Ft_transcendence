@@ -22,7 +22,7 @@ export class GameGateway implements OnModuleInit{
   server: Server;
 
 
-  private connectedPlayers: Map<string, Player> = new Map()
+  private connectedPlayers?: Map<string, Player> = new Map()
   private rooms: Room[] = []
 
   constructor(private prisma: PrismaService, private authService: AuthService, private userService: UserService, private gameService: GameService) {}
@@ -75,16 +75,14 @@ export class GameGateway implements OnModuleInit{
     return true;
   }
 
-
-
   playerExists(newPlayer: Player)
   {
-    // if (!newPlayer.login)
-    //   return;
+    if (!newPlayer || !newPlayer.login)
+      return;
     this.connectedPlayers.forEach((player, index) => {
-      if (!player || player.login != newPlayer.login || newPlayer.socket.id == player.socket.id)
+      if (!player || !player.login || player.login !== newPlayer.login || newPlayer.socket.id === player.socket.id)
         return;
-      if(player.status == false)
+      if(player.status === false)
       {
         if (player.room != undefined)
           newPlayer.room = player.room
@@ -92,7 +90,7 @@ export class GameGateway implements OnModuleInit{
         player.socket.emit('onGameRequest', {order: "multiWindow"})
         this.connectedPlayers.delete(index)
       }
-      else if(player.status == true)
+      else if(player.status === true)
       {
         newPlayer.socket.emit('onGameRequest', {order: "multiWindow"})
         this.connectedPlayers.delete(newPlayer.socket.id)
@@ -107,7 +105,7 @@ export class GameGateway implements OnModuleInit{
     const connectedUser = await this.prisma.connectedUser.findMany();
 		for (const User of connectedUser) {
 			if(user.id === User.userId) {
-				await this.server.to(User.socketId).emit("accepted to play", {
+				this.server.to(User.socketId).emit("accepted to play", {
 					inviterI: client.data.user,
 					// inviter_socket: socket,
 					invited_login: user.login,
@@ -120,8 +118,11 @@ export class GameGateway implements OnModuleInit{
   @SubscribeMessage('checkAndLaunch')
   async checkAndLaunch(@ConnectedSocket() client : Socket, @MessageBody() payload: any)
   {
-    await this.lookForGame(client)
-    this.pairPlayers({currentUser: payload.currentUser, invitedUser: payload.invitedUser})
+    setTimeout(() => {
+      this.lookForGame(client)
+      this.pairPlayers({currentUser: payload.currentUser, invitedUser: payload.invitedUser})
+      
+  }, 100);
 
   }
 
@@ -203,6 +204,24 @@ export class GameGateway implements OnModuleInit{
     currentPlayer.socket.emit("go on page")
     this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService))
   }
+
+  @SubscribeMessage('invite_to_play?')
+	async invite_to_play( socket: Socket, user: UserI ) {
+
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		if(this.isOnline(user.login))
+		{
+			socket.emit("player in game", user.login)
+			return;
+		}
+		for (const User of connectedUser) {
+			if(user.id === User.userId) {
+        // console.log(user.login + " " + User.socketId)
+				await this.server.to(User.socketId).emit("invited to play", { inviterI: socket.data.user });
+			}
+
+		}
+	}
 
 
 

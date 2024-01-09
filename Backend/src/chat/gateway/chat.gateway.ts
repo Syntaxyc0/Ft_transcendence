@@ -15,6 +15,7 @@ import { MessageI } from '../model/message.interface';
 import { RoomI } from '../model/room.interface';
 import { JoinedRoomI } from '../model/joinedRoom.interface';
 import { RoomService } from '../service/room.service';
+import { GameGateway } from 'src/game/game.gateway';
 
 @WebSocketGateway({ cors: { origin: ['http://localhost:3333', 'http://localhost:4200'] } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -537,20 +538,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		return await socket.emit('banList', room_.BanUsers);
 	}
 
-	@SubscribeMessage('invite_to_play?')
-	async invite_to_play( socket: Socket, user: UserI ) {
+	// @SubscribeMessage('invite_to_play?')
+	// async invite_to_play( socket: Socket, user: UserI ) {
 
-		const connectedUser = await this.prisma.connectedUser.findMany();
-		for (const User of connectedUser) {
-			if(user.id === User.userId) {
-				// socket("isVisible")
-				await this.server.to(User.socketId).emit("invited to play", { inviterI: socket.data.user });
+	// 	const connectedUser = await this.prisma.connectedUser.findMany();
+	// 	// console.log(this.gameGateway.isOnline(user.login))
+	// 	// if(this.gameGateway.isOnline(user.login))
+	// 	// {
+	// 	// 	console.log("is returned")
+	// 	// 	return;
+	// 	// }
+	// 	for (const User of connectedUser) {
+	// 		if(user.id === User.userId) {
+	// 			// socket("isVisible")
+	// 			await this.server.to(User.socketId).emit("invited to play", { inviterI: socket.data.user });
 
-				// return;
-			}
+	// 			// return;
+	// 		}
 
-		}
-	}
+	// 	}
+	// }
 
 	@SubscribeMessage('acceptGame')
 	async acceptGame( socket: Socket, user: UserI ) 
