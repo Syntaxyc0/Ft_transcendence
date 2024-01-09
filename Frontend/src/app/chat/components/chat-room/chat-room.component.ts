@@ -186,6 +186,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 			else
 				console.log("bad pass");
 				// location.reload();
+			this.dialog.closeAll();
 		  });
 	}
 
