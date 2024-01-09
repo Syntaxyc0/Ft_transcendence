@@ -9,6 +9,7 @@
 	  <span style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
 		<h2 style="margin-left: 10px; font-size: 1.5em; color: #6fb6e8;"><strong>{{chatRoom.name}}</strong></h2>
 		<button *ngIf="!chatRoom.public" mat-mini-fab matTooltip="Primary" color="primary" style="margin-right: 300px;" (click)="openUserSearchDialog()"><mat-icon>person_add</mat-icon></button>
+		<button *ngIf="chatRoom.public && adminCurrent" mat-mini-fab matTooltip="Primary" color="warn" style="margin-right: 300px;" (click)="SetPassword()"><mat-icon> vpn_key</mat-icon></button>
 		<span style="display: flex; flex-direction: row; align-items: center;">
 		  <mat-icon>event</mat-icon>
 		  <p>{{chatRoom.updated_at | date}}</p>
