@@ -29,6 +29,7 @@ import {
   } from '@angular/material/dialog';
 import { AddUsersComponent } from '../add-users/add-users.component';
 import { PasswordRoomComponent } from '../Password/password.component';
+import { SetPasswordComponent } from '../set-password/set-password.component';
 
 @Component({
   selector: 'app-chat-room',
@@ -59,9 +60,11 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   @ViewChild('messages') private messagesScroller: ElementRef;
 
 	
-  currentId: UserI;
+  currentId: number;
   mutedUserList: UserI[] | undefined;
   isCurrentMuted: boolean = this.isMuted();
+  adminArray;
+  adminCurrent;
   
   messages$: Observable<MessageI[]> = combineLatest([
 	this.chatService.getMessage(), 
@@ -99,6 +102,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 		
 		this.userService.changeRoom(this.chatRoom);
 
+		// Muted ?
 		this.socket.emit("MutedUsers", this.chatRoom);
 		this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
 			this.mutedUserList = value;
@@ -117,43 +121,50 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 			this.mutedUserList = value;
 			this.isCurrentMuted = false;
 		});
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if(this.chatRoom) {
-    	this.chatService.joinRoom(this.chatRoom);
-		this.userService.changeRoom(this.chatRoom);
-		this.userService.changeOption(false, undefined);
-    }
-
-	if (this.chatRoom.isPass)
-		this.passwordWindow();
-  }
-
-  ngAfterViewInit() {
-    this.scrollToBottom();
-  }
-
-  ngOnDestroy() {
-    this.chatService.leaveRoom(this.chatRoom);
-	this.userService.changeOption(false, undefined);
-  }
-
-  sendMessage() {
-	if (this.isCurrentMuted) {
-		this.snackbar.open(`You are muted`, 'Close' ,{
-			duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
-		} );
-		return;
 	}
 
-    this.chatService.sendMessage({text: this.chatMessage.value, room: this.chatRoom});
-    this.chatMessage.reset();
-  }
+	ngOnChanges(changes: SimpleChanges) {
+		if (this.chatRoom) {
 
-  scrollToBottom(): void {
-    setTimeout(() => {this.messagesScroller.nativeElement.scrollTop = this.messagesScroller.nativeElement.scrollHeight}, 1);
-  }
+			// Admin ?
+			this.getAdminArray().subscribe(value => {
+				this.adminArray = value;
+				this.adminCurrent = this.isAdmin(this.currentId) 
+			});
+
+			this.chatService.joinRoom(this.chatRoom);
+			this.userService.changeRoom(this.chatRoom);
+			this.userService.changeOption(false, undefined);
+    	}
+
+		if (this.chatRoom.isPass)
+			this.passwordWindow();
+  	}
+
+	ngAfterViewInit() {
+  		this.scrollToBottom();
+	}
+
+	ngOnDestroy() {
+		this.chatService.leaveRoom(this.chatRoom);
+		this.userService.changeOption(false, undefined);
+	}
+
+	sendMessage() {
+		if (this.isCurrentMuted) {
+			this.snackbar.open(`You are muted`, 'Close' ,{
+				duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
+			});
+			return;
+		}
+
+		this.chatService.sendMessage({text: this.chatMessage.value, room: this.chatRoom});
+		this.chatMessage.reset();
+	}
+
+	scrollToBottom(): void {
+		setTimeout(() => {this.messagesScroller.nativeElement.scrollTop = this.messagesScroller.nativeElement.scrollHeight}, 1);
+	}
 
   	isMuted(): boolean {
 		if (!this.mutedUserList)
@@ -184,4 +195,25 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 		  });
 	}
 
+	SetPassword() {
+		const dialogRef = this.dialog.open(SetPasswordComponent, {
+			width: '300px',
+			data: { room: this.chatRoom }
+		  });
+	}
+
+	getAdminArray(): Observable<UserI[]> {
+		this.socket.emit("getAdminList", this.chatRoom);
+		return this.socket.fromEvent("isAdmin");
+	}
+
+	isAdmin(userId: number | undefined): boolean {
+		if (!this.adminArray)
+			return false;
+	
+		for(const admin of this.adminArray)
+			if (admin.id === userId)
+				return true;
+		return false;
+	}
 }

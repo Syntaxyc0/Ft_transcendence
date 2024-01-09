@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable, of, take } from 'rxjs';
+import { Observable, Subscription, of, take } from 'rxjs';
 import { RoomI } from '../../model/room.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatService } from '../../services/chat.service';
@@ -48,14 +48,15 @@ import { HostListener } from '@angular/core';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements AfterViewInit, OnInit{
+export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
 	selectedRoom = null;
 	userList :object[] = []
 	login;
 	option: boolean;
-	isPageVisible: boolean;
+
+	invitedToPlaySubscription: Subscription;
 
 
 	constructor(
@@ -70,7 +71,6 @@ export class ChatComponent implements AfterViewInit, OnInit{
 
 	ngOnInit(): void {
 		this.retrieveUser();
-		this.isPageVisible = this.isVisible()
 		this.userService.option$.subscribe(value => {
 			this.option = value;
 		  });
@@ -79,41 +79,41 @@ export class ChatComponent implements AfterViewInit, OnInit{
 			location.reload();
 		});
 
-		this.socket.fromEvent("invited to play").subscribe((value: any) => {
-			
-			this.dialog.closeAll();
+		this.invitedToPlaySubscription = this.socket.fromEvent("invited to play").subscribe(async (value: any) => {
 
 			const { inviterI } = value;
-			if(!this.isPageVisible)
+			if(!this.isVisible())
 			{
+				this.socket.emit("notInChat");
 				this.dialog.closeAll();
 				return;
 			}
+			console.log("invited" + this.isVisible())
+
 			const dialogRef = this.dialog.open(invite_to_playComponent, {
 				width: '300px',
 				data: { login: inviterI.login }
 			});
 			dialogRef.afterClosed().subscribe(result => {
 				if (result) {
-					console.log(result);
+					this.dialog.closeAll()
 					this.socket.emit('checkAndAccept', inviterI)
 				} else {
+					this.dialog.closeAll()
 					this.socket.emit("refuseGame", inviterI);
 				}
 			});
 		})
 
-		this.socket.fromEvent("accepted to play").subscribe(async (value:any)=>{
-			console.log("game accepted")
-			// this.router.navigate(['/game'])
 
+
+		this.socket.fromEvent("accepted to play").subscribe(async (value:any)=>{
 			this.socket.emit("checkAndLaunch", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
-			// this.router.navigate(['/game'])
-			// this.socket.emit("pairPlayers", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
+			this.router.navigate(['/game'])
 		})
 
 		this.socket.fromEvent("refuse to play").subscribe((value) => {
-			this.snackbar.open(`${value} has refuse to play with you`, 'Close' ,{
+			this.snackbar.open(`${value} has refused to play with you`, 'Close' ,{
 				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
 			});
 		});
@@ -121,11 +121,23 @@ export class ChatComponent implements AfterViewInit, OnInit{
 		this.socket.fromEvent("go on page").subscribe(async (value:any)=>{
 			this.router.navigate(['/game'])
 		})
+
+		this.socket.fromEvent("player in game").subscribe((value) => {
+			this.snackbar.open(`${value} is in game`, 'Close' ,{
+				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+			});
+		})
+	}
+
+	ngOnDestroy(): void {
+			// Unsubscribe to avoid memory leaks
+		this.invitedToPlaySubscription.unsubscribe();
 	}
 
 	@HostListener('document:visibilitychange', ['$event'])
 	onVisibilityChange(event: Event): void {
-		this.isPageVisible = this.isVisible()
+		if(!this.isVisible())
+			this.dialog.closeAll()
 	 }
 
 	 isVisible(): boolean

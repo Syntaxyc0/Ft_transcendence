@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.component';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 
 export const WIDTH = 1000
 export const HEIGHT = 640 
@@ -45,6 +46,8 @@ export const HEIGHT = 640
 	colorTab: string[] = ['black', 'darkred', 'limegreen', 'purple'];
 	colorId: number = 0;
 
+	private dataSubscription: Subscription;
+
 	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
 	ngOnInit(): void {
@@ -55,7 +58,7 @@ export const HEIGHT = 640
 
 		this.ball = new Ball(this.context);
 		this.data = this.player.getData();
-		this.data.subscribe((payload: any) =>{
+		this.dataSubscription = this.data.subscribe((payload: any) =>{
 			if (!payload.order)
 				return;
 			this.handleOrder(payload.order, payload);
@@ -68,12 +71,9 @@ export const HEIGHT = 640
 	}
 
 	ngOnDestroy(): void {
+
 		this.disconnect()
-	}
-
-	closeAllWindows()
-	{
-
+		this.dataSubscription.unsubscribe()
 	}
 
 	handleOrder(order:string, payload:any)
