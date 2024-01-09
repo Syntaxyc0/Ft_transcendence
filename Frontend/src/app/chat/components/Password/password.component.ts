@@ -47,7 +47,6 @@ export class PasswordRoomComponent implements OnInit{
 	verifyPassword() {
 		this.socket.emit("verifyPass", { pass: this.password, room: this.room });
 		this.socket.fromEvent("PassResponse").subscribe((value) => {
-			console.log(value);
 			this.dialogRef.close(value);
 		});
 	}

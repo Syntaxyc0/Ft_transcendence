@@ -591,7 +591,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		
 		if (pass === room_.password) 
 			socket.emit("PassResponse", true); 
-
 		else
 			socket.emit("PassResponse", false);
 	}

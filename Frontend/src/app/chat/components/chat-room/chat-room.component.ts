@@ -96,6 +96,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 
 	ngOnInit(): void {
 		this.currentId = JSON.parse(localStorage.getItem('id')!);
+		
 		this.userService.changeRoom(this.chatRoom);
 
 		this.socket.emit("MutedUsers", this.chatRoom);

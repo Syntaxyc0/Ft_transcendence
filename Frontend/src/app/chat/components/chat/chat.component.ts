@@ -79,7 +79,9 @@ export class ChatComponent implements AfterViewInit, OnInit{
 			location.reload();
 		});
 
-		this.socket.fromEvent("invited to play").subscribe(async (value: any) => {
+		this.socket.fromEvent("invited to play").subscribe((value: any) => {
+			
+			this.dialog.closeAll();
 
 			const { inviterI } = value;
 			if(!this.isPageVisible)
@@ -93,11 +95,11 @@ export class ChatComponent implements AfterViewInit, OnInit{
 			});
 			dialogRef.afterClosed().subscribe(result => {
 				if (result) {
+					console.log(result);
 					this.socket.emit('checkAndAccept', inviterI)
 				} else {
 					this.socket.emit("refuseGame", inviterI);
 				}
-				this.dialog.closeAll();
 			});
 		})
 

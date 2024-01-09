@@ -48,7 +48,6 @@ export const HEIGHT = 640
 	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
 	ngOnInit(): void {
-		this.dialog.closeAll();
 		this.context = this.gameCanvas.nativeElement.getContext('2d');
 
         this.paddles.push(new Paddle(this.context))
