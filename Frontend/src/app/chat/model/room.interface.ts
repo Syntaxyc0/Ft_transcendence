@@ -9,4 +9,5 @@ export interface RoomI {
 	updated_at?: Date;
 	public: boolean;
 	creator: UserI;
+	isPass: boolean:
 }

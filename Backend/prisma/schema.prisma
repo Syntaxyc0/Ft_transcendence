@@ -37,6 +37,7 @@ model User {
   blockedByUsers         User[]          @relation("BlockedUser")
   banInRoom              Room[]          @relation("BanUserRoom")
   muteInRoom             Room[]          @relation("Muted")
+  PassRoom				 Room[]			 @relation("PassRoom")
 
   api_used          Int @default(0)
   twofa_used        Int @default(0)
@@ -79,6 +80,8 @@ model Room {
   admin       User[]       @relation("AdminRooms")
   public      Boolean
   password    String?
+  isPass	  Boolean
+  RightPass	  User[]	   @relation("PassRoom")
   mutedUsers  User[]       @relation("Muted")
   BanUsers    User[]       @relation("BanUserRoom")
 }
