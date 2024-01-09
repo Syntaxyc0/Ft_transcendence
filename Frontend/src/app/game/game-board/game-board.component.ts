@@ -7,6 +7,7 @@ import { Observable, first } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.component';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 
 export const WIDTH = 1000
 export const HEIGHT = 640 
@@ -25,7 +26,9 @@ export const HEIGHT = 640
 	@ViewChild('canvas', {static: true}) gameCanvas!: ElementRef;
 	context!: CanvasRenderingContext2D;
 
-	constructor(private player: SocketDataService) {}
+	constructor(private player: SocketDataService,
+		public dialog: MatDialog,
+		) {}
 
 	data: Observable<any>;
 	
@@ -45,6 +48,7 @@ export const HEIGHT = 640
 	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
 	ngOnInit(): void {
+		this.dialog.closeAll();
 		this.context = this.gameCanvas.nativeElement.getContext('2d');
 
         this.paddles.push(new Paddle(this.context))
