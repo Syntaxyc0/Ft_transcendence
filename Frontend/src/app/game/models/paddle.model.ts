@@ -24,7 +24,7 @@ export class Paddle{
 	  
 
 	draw(){
-		console.log(this.colorTab[this.colorId])
+		// console.log(this.colorTab[this.colorId])
 		this.context.fillStyle = this.colorTab[this.colorId];
 		this.context.fillRect(this.x, this.y - PADDLE_HEIGHT/2, PADDLE_WIDTH, PADDLE_HEIGHT);
 		this.context.fillRect(this.x, this.y - PADDLE_HEIGHT/2, PADDLE_WIDTH, PADDLE_HEIGHT);

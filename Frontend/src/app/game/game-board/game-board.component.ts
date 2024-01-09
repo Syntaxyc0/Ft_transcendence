@@ -72,6 +72,11 @@ export const HEIGHT = 640
 		this.disconnect()
 	}
 
+	closeAllWindows()
+	{
+
+	}
+
 	handleOrder(order:string, payload:any)
 	{
 		if (order == "reload")

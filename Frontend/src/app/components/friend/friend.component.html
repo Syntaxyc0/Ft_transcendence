@@ -5,5 +5,5 @@
 		<img src={{avatar}} alt="avatar" class="object-cover rounded-full h-10 w-10 mx-2">
 		<a class="font-henny">{{ name }}</a>
 	</div>
-	<div #menu [hidden]="!showMenu" class="mx-8" ><app-friend-menu [id]="id"></app-friend-menu></div>
+	<div #menu [hidden]="!showMenu" class="mx-8" ><app-friend-menu [id]="id" [name]="name"></app-friend-menu></div>
 </main>
