@@ -88,21 +88,22 @@ export class ChatComponent implements AfterViewInit, OnInit{
 
 			dialogRef.afterClosed().subscribe(result => {
 				if (result) {
-					// this.socket.emit("gameExists")
-					this.socket.emit('checkAndAccept', inviterI)
-					// this.socket.emit("acceptGame", inviterI)
 					this.router.navigate(['/game']);
+					this.socket.emit('checkAndAccept', inviterI)
+					// this.dialog.closeAll();
 				} else {
 					this.socket.emit("refuseGame", inviterI);
+					// this.dialog.closeAll();
 				}
 			});
 		})
 
 		this.socket.fromEvent("accepted to play").subscribe(async (value:any)=>{
 			console.log("game accepted")
+			this.router.navigate(['/game'])
 
 			this.socket.emit("checkAndLaunch", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
-			this.router.navigate(['/game'])
+			// this.router.navigate(['/game'])
 			// this.socket.emit("pairPlayers", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
 		})
 

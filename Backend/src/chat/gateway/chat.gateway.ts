@@ -540,6 +540,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		for (const User of connectedUser) {
 			if(user.id === User.userId) {
 				await this.server.to(User.socketId).emit("invited to play", { inviterI: socket.data.user });
+				// return;
 			}
 		}
 	}
@@ -567,6 +568,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		for (const User of connectedUser)
 			if(user.id === User.userId)
 				await this.server.to(User.socketId).emit("refuse to play", socket.data.user.login)
+
 				
 	}
 
