@@ -21,7 +21,7 @@ import { OptionUserComponent } from '../option-user/option-user.component';
 import { CustomSocket } from '../../sockets/custom-socket';
 import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.component';
 import { invite_to_playComponent } from '../invite_to_play/invite_to_play.component';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 
@@ -56,14 +56,15 @@ export class ChatComponent implements AfterViewInit, OnInit{
 	option: boolean;
 
 
-	constructor(private route:ActivatedRoute,
+	constructor(
 		private router: Router,
 		private chatService: ChatService,
 		public http: HttpClient,
 		private userService: UserService,
 		private socket: CustomSocket,
 		public dialog: MatDialog,
-		public snackbar: MatSnackBar) {}
+		public snackbar: MatSnackBar,
+		) {}
 
 	ngOnInit(): void {
 		this.retrieveUser();
@@ -75,25 +76,26 @@ export class ChatComponent implements AfterViewInit, OnInit{
 			location.reload();
 		});
 
-		this.socket.fromEvent("invited to play").subscribe((value: any) => {
+		this.socket.fromEvent("invited to play").subscribe(async (value: any) => {
 
 			const { inviterI } = value;
+			let invite: boolean = false;
 			
 			const dialogRef = this.dialog.open(invite_to_playComponent, {
 				width: '300px',
 				data: { login: inviterI.login }
 			});
+
 			dialogRef.afterClosed().subscribe(result => {
 				if (result) {
 					// this.socket.emit("gameExists")
 					this.socket.emit('checkAndAccept', inviterI)
 					// this.socket.emit("acceptGame", inviterI)
-					this.router.navigate(['/game'])
+					this.router.navigate(['/game']);
 				} else {
-				  this.socket.emit("refuseGame", inviterI);
+					this.socket.emit("refuseGame", inviterI);
 				}
 			});
-			
 		})
 
 		this.socket.fromEvent("accepted to play").subscribe(async (value:any)=>{
