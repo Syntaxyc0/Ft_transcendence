@@ -82,7 +82,6 @@ export class ChatComponent implements AfterViewInit, OnInit{
 		this.socket.fromEvent("invited to play").subscribe(async (value: any) => {
 
 			const { inviterI } = value;
-			let invite: boolean = false;
 			if(!this.isPageVisible)
 			{
 				this.dialog.closeAll();
@@ -115,7 +114,8 @@ export class ChatComponent implements AfterViewInit, OnInit{
 			this.snackbar.open(`${value} has refuse to play with you`, 'Close' ,{
 				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
 			});
-		})
+		});
+		
 		this.socket.fromEvent("go on page").subscribe(async (value:any)=>{
 			this.router.navigate(['/game'])
 		})
@@ -124,9 +124,6 @@ export class ChatComponent implements AfterViewInit, OnInit{
 	@HostListener('document:visibilitychange', ['$event'])
 	onVisibilityChange(event: Event): void {
 		this.isPageVisible = this.isVisible()
-		// if (!this.isPageVisible)
-			// this.dialog.closeAll();
-
 	 }
 
 	 isVisible(): boolean

@@ -95,9 +95,6 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 			  ) {}
 
 	ngOnInit(): void {
-		if (this.chatRoom.isPass)
-			this.passwordWindow();
-
 		this.currentId = JSON.parse(localStorage.getItem('id')!);
 		this.userService.changeRoom(this.chatRoom);
 
@@ -170,7 +167,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 	openUserSearchDialog(): void {
 		const dialogRef = this.dialog.open(AddUsersComponent, {
 		  width: '300px',
-		//   data: { room: this.chatRoom }
+		  data: { room: this.chatRoom }
 		});
 	}
 
@@ -181,12 +178,8 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 		  });
 	  
 		  dialogRef.afterClosed().subscribe(result => {
-			if(result)
-				console.log("good pass");
-			else
-				console.log("bad pass");
-				// location.reload();
-			this.dialog.closeAll();
+			if(!result)
+				location.reload();
 		  });
 	}
 
