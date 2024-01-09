@@ -50,11 +50,39 @@ export class GameGateway implements OnModuleInit{
       this.connectedPlayers.set(socket.id, new Player(socket, user.login))
   }
 
+  async lookForGame(client: Socket): Promise<boolean>
+  {
+    let player = this.connectedPlayers.get(client.id)
+    if (!player)
+      await this.connection(client);
+    this.playerExists(this.connectedPlayers.get(client.id))
+    player = this.connectedPlayers.get(client.id)
+    if (!player)
+    {
+      client.emit('onGameRequest', {order: "gameChecked", exists: false})
+      return false;
+    }
+    if (player.room != undefined)
+    {
+      for (let i: number = 0; i < 2; i++)
+        if (player.login == player.room.players[i].login)
+        {
+            player.room.players[i] = this.connectedPlayers.get(client.id)
+            player.room.multiplayer.reload(i)
+        }
+    }
+    client.emit('onGameRequest', {order: "gameChecked", exists: true})
+    return true;
+  }
+
+
 
   playerExists(newPlayer: Player)
   {
+    // if (!newPlayer.login)
+    //   return;
     this.connectedPlayers.forEach((player, index) => {
-      if (player.login != newPlayer.login || newPlayer.socket.id == player.socket.id)
+      if (!player || player.login != newPlayer.login || newPlayer.socket.id == player.socket.id)
         return;
       if(player.status == false)
       {
@@ -75,12 +103,7 @@ export class GameGateway implements OnModuleInit{
   @SubscribeMessage('checkAndAccept')
   async checkAndAccept(@ConnectedSocket() client : Socket, @MessageBody() user: UserI)
   {
-    console.log("checkedAndAccepted")
     await this.lookForGame(client)
-    // console.log("2checkedAndAccepted")
-
-    client.emit("acceptGame", user);
-
     const connectedUser = await this.prisma.connectedUser.findMany();
 		for (const User of connectedUser) {
 			if(user.id === User.userId) {
@@ -110,32 +133,6 @@ export class GameGateway implements OnModuleInit{
   {
     this.lookForGame(client)
   }
-
-  async lookForGame(client: Socket): Promise<boolean>
-  {
-    let player = this.connectedPlayers.get(client.id)
-    if (!player)
-      await this.connection(client);
-    this.playerExists(this.connectedPlayers.get(client.id))
-    player = this.connectedPlayers.get(client.id)
-    if (!player)
-    {
-      client.emit('onGameRequest', {order: "gameChecked", exists: false})
-      return false;
-    }
-    if (player.room != undefined)
-    {
-      for (let i: number = 0; i < 2; i++)
-        if (player.login == player.room.players[i].login)
-        {
-            player.room.players[i] = this.connectedPlayers.get(client.id)
-            player.room.multiplayer.reload(i)
-        }
-    }
-    client.emit('onGameRequest', {order: "gameChecked", exists: true})
-    return true;
-  }
-
 
   async getId(login: string): Promise<number>{
     return this.userService.getUserIdFromLogin(login)
@@ -192,6 +189,8 @@ export class GameGateway implements OnModuleInit{
     if (!invitedPlayer || !currentPlayer || currentPlayer.room || invitedPlayer.room)
       return;
 
+    invitedPlayer.socket.emit("go on page")
+    currentPlayer.socket.emit("go on page")
     this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService))
   }
 

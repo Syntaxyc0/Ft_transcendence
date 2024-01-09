@@ -88,7 +88,7 @@ export class ChatComponent implements AfterViewInit, OnInit{
 
 			dialogRef.afterClosed().subscribe(result => {
 				if (result) {
-					this.router.navigate(['/game']);
+					// this.router.navigate(['/game']);
 					this.socket.emit('checkAndAccept', inviterI)
 					// this.dialog.closeAll();
 				} else {
@@ -100,7 +100,7 @@ export class ChatComponent implements AfterViewInit, OnInit{
 
 		this.socket.fromEvent("accepted to play").subscribe(async (value:any)=>{
 			console.log("game accepted")
-			this.router.navigate(['/game'])
+			// this.router.navigate(['/game'])
 
 			this.socket.emit("checkAndLaunch", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
 			// this.router.navigate(['/game'])
@@ -111,6 +111,9 @@ export class ChatComponent implements AfterViewInit, OnInit{
 			this.snackbar.open(`${value} has refuse to play with you`, 'Close' ,{
 				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
 			});
+		})
+		this.socket.fromEvent("go on page").subscribe(async (value:any)=>{
+			this.router.navigate(['/game'])
 		})
 	}
 
