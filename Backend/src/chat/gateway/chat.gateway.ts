@@ -560,6 +560,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 		}
 	}
+	
 
 	@SubscribeMessage('refuseGame')
 	async refuseGame( socket: Socket, user: UserI ) {

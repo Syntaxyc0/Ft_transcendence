@@ -180,6 +180,16 @@ export class GameGateway implements OnModuleInit{
     return undefined
   }
 
+  isOnline(login: string): boolean
+  {
+    const player = this.getPlayer(login)
+    if (!player)
+      return false;
+    if(player.room)
+      return true
+    return false;
+  }
+
   // @SubscribeMessage('pairPlayers')
   /*async */pairPlayers(/*@ConnectedSocket() client: Socket, @MessageBody() */players: {currentUser: string, invitedUser: string})
   {
