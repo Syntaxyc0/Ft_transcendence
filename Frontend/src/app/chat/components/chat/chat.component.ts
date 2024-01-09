@@ -116,7 +116,8 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 			this.snackbar.open(`${value} has refused to play with you`, 'Close' ,{
 				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
 			});
-		})
+		});
+		
 		this.socket.fromEvent("go on page").subscribe(async (value:any)=>{
 			this.router.navigate(['/game'])
 		})
