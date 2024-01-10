@@ -219,8 +219,6 @@ export const HEIGHT = 640
 		this.movementQueue.push({ deltaX: deltaX, deltaY: deltaY, angle: angle});
 	}
 
-
-
 	applyMovement(movement: { deltaX: number; deltaY: number, angle: number}/*, secondsPassed: number*/)
 	{
 		this.ball.x += movement.deltaX
