@@ -582,6 +582,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			socket.emit("PassResponse", false);
 	}
 
+	@SubscribeMessage('setPassword')
+	async setPassword( socket: Socket, data: { newPass: string, room: RoomI }) {
+
+		const { newPass, room } = data;
+
+		await this.prisma.room.update({
+			where: { id: room.id },
+			data: { password: newPass}
+		});
+	}
 
 	async allowedRooms( userId: number ) {
 		
