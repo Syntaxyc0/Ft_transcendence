@@ -9,6 +9,8 @@ export class MultiplayerService{
 
     oldTimeStamp : number;
 
+    random: boolean = false;
+
 
     previousBallState: {x: number, y : number, angle: number};
 
@@ -95,6 +97,13 @@ export class MultiplayerService{
         this.gameRequest({order: "stopGame"})
     }
 
+    activateGameMode(wanted: boolean)
+    {
+        this.random = wanted;
+        this.gameRequest({order: "gameModeChange", status: this.random})
+    }
+
+
 
     gameBoardInit()
     {
@@ -120,7 +129,8 @@ export class MultiplayerService{
     {
         this.room.players[side].socket.emit('onGameRequest', {order: "reload"})
         this.room.players[side].status = true
-        this.room.players[side].socket.emit('onGameRequest', {order: 'usersPaddle', side: side, login: this.room.players[side * -1 + 1].login})
+        this.room.paddles[side].randomWanted = false
+        this.room.players[side].socket.emit('onGameRequest', {order: 'usersPaddle', side: side, login: this.room.players[side * -1 + 1].login, random: this.random})
         this.paddleReset(this.room.paddles[0])
         this.paddleReset(this.room.paddles[1])
         this.ballReset(this.room.ball)
@@ -132,5 +142,4 @@ export class MultiplayerService{
 			    this.room.players[side].socket.emit('onGameRequest',{order: "gameWon", side: i})
         }
     }
-
 }

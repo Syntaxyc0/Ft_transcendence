@@ -9,6 +9,8 @@ import { HeaderbarComponent } from 'src/app/components/headerbar/headerbar.compo
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export const WIDTH = 1000
 export const HEIGHT = 640 
@@ -29,6 +31,8 @@ export const HEIGHT = 640
 
 	constructor(private player: SocketDataService,
 		public dialog: MatDialog,
+		public http: HttpClient,
+		public snackbar: MatSnackBar,
 		) {}
 
 	data: Observable<any>;
@@ -43,14 +47,21 @@ export const HEIGHT = 640
 	matchmaking: boolean = false;
 	showRules: boolean = false;
 	multiWindow: boolean = false;
+
+	randomMode: boolean = false;
+
 	colorTab: string[] = ['black', 'darkred', 'limegreen', 'purple'];
 	colorId: number = 0;
+
+	login: string
 
 	private dataSubscription: Subscription;
 
 	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
-	ngOnInit(): void {
+	ngOnInit() {
+		// this.retrieveUser();
+		// console.log(this.login)
 		this.context = this.gameCanvas.nativeElement.getContext('2d');
 
         this.paddles.push(new Paddle(this.context))
@@ -108,12 +119,12 @@ export const HEIGHT = 640
 			break;
 			case "usersPaddle":
 				this.userPaddle = this.paddles[payload.side]
-				this.userPaddle.login = this.player.getLogin();
+				this.userPaddle.login = this.player.getLogin()
 				this.userPaddle.side = payload.side;
 				this.paddles[payload.side * -1 + 1].login = payload.login
+				this.randomMode = payload.random
 			break;
 			case "multiWindow":
-				// console.log("Many windows are open!")
 				this.multiWindow = true;
 				this.matchmaking = false;
 				this.drawBoard()
@@ -150,8 +161,16 @@ export const HEIGHT = 640
 				this.context.fillText(`${this.paddles[payload.side * -1 + 1].login} LOSES`, WIDTH / 2 * (payload.side * -1 + 1) + WIDTH / 6, HEIGHT / 2)
 				this.player.sendRequest("gameOver")
 				this.disconnect()
-
 			break;
+			case "gameModeChange":
+				console.log(this.randomMode)
+				this.randomMode = payload.status
+			break;
+			case "otherWantMode":
+
+				this.snackbar.open(`${this.paddles[this.userPaddle.side * -1 + 1].login} wants to change the gamemode!`, 'Close' ,{
+					duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'});
+				break;
 		}
 	}
 
@@ -174,8 +193,17 @@ export const HEIGHT = 640
 		return this.colorTab[this.colorId]
 	}
 
+	activateRandom()
+	{
+		if(!this.isOnline)
+			return;
+		// console.log(this.requestRandom)
+		this.player.gameMode(this.userPaddle.side, !this.randomMode)
+	}
+
 	resetOnline()
 	{
+		this.randomMode = false;
 		this.isOnline = false
 		this.isGameRunning = false;
 		this.paddles[0].score = 0;
@@ -335,6 +363,18 @@ export const HEIGHT = 640
 	  closePongRules() {
 		this.showRules = false;
 	  }
+
+	//   retrieveUser() {
+	// 	const id = JSON.parse(localStorage.getItem('id')!);
+
+	// 	this.http.get<any>("http://localhost:3333/users/" + id).subscribe (
+	// 	   res => {
+	// 		   this.login = res['login'];
+	// 	   },
+	// 	   err => {
+	// 		   alert("user doesn't exist");
+	// 	   })
+	// }
   }
 
   

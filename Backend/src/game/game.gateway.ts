@@ -99,27 +99,29 @@ export class GameGateway implements OnModuleInit{
   }
 
   @SubscribeMessage('checkAndAccept')
-  async checkAndAccept(@ConnectedSocket() client : Socket, @MessageBody() user: UserI)
+  checkAndAccept(@ConnectedSocket() client : Socket, @MessageBody() user: UserI)
   {
-    await this.lookForGame(client)
-    const connectedUser = await this.prisma.connectedUser.findMany();
-		for (const User of connectedUser) {
-			if(user.id === User.userId) {
-				this.server.to(User.socketId).emit("accepted to play", {
-					inviterI: client.data.user,
-					// inviter_socket: socket,
-					invited_login: user.login,
-				});
-			}
-		}
+    setTimeout( async() => {
+      await this.lookForGame(client)
+      const connectedUser = await this.prisma.connectedUser.findMany();
+		  for (const User of connectedUser) {
+		  	if(user.id === User.userId) {
+		  		this.server.to(User.socketId).emit("accepted to play", {
+		  			inviterI: client.data.user,
+		  			// inviter_socket: socket,
+		  			invited_login: user.login,
+		  		});
+		  	}
+		  }
+    }, 100);
   }
 
 
   @SubscribeMessage('checkAndLaunch')
-  async checkAndLaunch(@ConnectedSocket() client : Socket, @MessageBody() payload: any)
+ checkAndLaunch(@ConnectedSocket() client : Socket, @MessageBody() payload: any)
   {
-    setTimeout(() => {
-      this.lookForGame(client)
+    setTimeout(async () => {
+      await this.lookForGame(client)
       this.pairPlayers({currentUser: payload.currentUser, invitedUser: payload.invitedUser})
       
   }, 100);
@@ -247,6 +249,22 @@ export class GameGateway implements OnModuleInit{
       return;
     if (!targetRoom.players[0].status && !targetRoom.players[1].status)
       this.disconnectRoom(client.id);
+  }
+
+  @SubscribeMessage('randomWanted')
+  randomWanted(@ConnectedSocket() client: Socket, @MessageBody() body: {side: number, wanted: boolean})
+  {
+    const targetRoom = this.getRoom(client.id)
+    if (!targetRoom)
+      return;
+    targetRoom.paddles[body.side].randomWanted = body.wanted
+    
+
+    if(targetRoom.multiplayer.random != body.wanted && targetRoom.paddles[body.side].randomWanted == targetRoom.paddles[body.side * -1 + 1].randomWanted)
+      targetRoom.multiplayer.activateGameMode(targetRoom.paddles[body.side].randomWanted)
+    else if (body.wanted != targetRoom.multiplayer.random)
+    targetRoom.players[body.side * -1 + 1].socket.emit("onGameRequest", {order: "otherWantMode"})
+    
   }
 
   @SubscribeMessage('newPaddlePosition')
