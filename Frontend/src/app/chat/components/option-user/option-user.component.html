@@ -35,7 +35,7 @@
 			<button mat-stroked-button color=warn (click)="muteUser()">Mute</button>
 		</mat-list-item>
 
-		<mat-list-item *ngIf="!room?.public && adminCurrent && !isUserCreator">
+		<mat-list-item *ngIf="!room?.public && adminCurrent && !isUserCreator && isUserInRoom">
 			<button mat-stroked-button color=warn (click)="kickUser()">Kick</button>
 		</mat-list-item>
 

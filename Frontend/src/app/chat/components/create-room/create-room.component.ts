@@ -53,9 +53,10 @@ export class CreateRoomComponent implements OnInit {
 		});
 
 		this.socket.fromEvent<boolean>("roomExisting").subscribe((value) => {
-			this.snackbar.open(`Room ${this.name.value} already exist`, 'Close' ,{
-				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
-			});
+			if (value)
+				this.snackbar.open(`Room ${this.name.value} already exists`, 'Close' ,{
+					duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+				});
 		});
 	}
 

@@ -16,7 +16,7 @@ export class Room{
 
     isGameRunning: boolean = false
 
-    constructor(roomId: number, playerOne: Player, playerTwo: Player, gameService: GameService){
+    constructor(roomId: number, playerOne: Player, playerTwo: Player, gameService: GameService, private prisma: PrismaService){
 
         this.multiplayer = new MultiplayerService(this, gameService)
 
@@ -25,6 +25,14 @@ export class Room{
         this.players.push(playerTwo)
         for (let i: number = 0; i < 2; i++)
         {
+            this.prisma.user.update({
+                where: {
+                    login: this.players[i].login,
+                },
+                data: {
+                    is_ingame : true
+                }
+            })
             this.players[i].lookingForPlayer = false
             this.players[i].room = this
             this.players[i].status = true;
@@ -71,6 +79,14 @@ export class Room{
         for (let i: number = 0; i < 2; i++)
         {
             this.players[i].room = undefined
+            this.prisma.user.update({
+                where: {
+                    login: this.players[i].login,
+                },
+                data: {
+                    is_ingame : false
+                }
+                })
         }
     }
     

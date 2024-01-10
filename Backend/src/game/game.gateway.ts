@@ -106,9 +106,9 @@ export class GameGateway implements OnModuleInit{
       const connectedUser = await this.prisma.connectedUser.findMany();
 		  for (const User of connectedUser) {
 		  	if(user.id === User.userId) {
-		  		this.server.to(User.socketId).emit("accepted to play", {
+		  		this.server.to(User.socketId).emit("onInviteRequest", {
+            order: "accepted to play",
 		  			inviterI: client.data.user,
-		  			// inviter_socket: socket,
 		  			invited_login: user.login,
 		  		});
 		  	}
@@ -196,19 +196,19 @@ export class GameGateway implements OnModuleInit{
   // @SubscribeMessage('pairPlayers')
   /*async */pairPlayers(/*@ConnectedSocket() client: Socket, @MessageBody() */players: {currentUser: string, invitedUser: string})
   {
-    // await this.lookForGame(client)
     const invitedPlayer = this.getPlayer(players.invitedUser)
     const currentPlayer = this.getPlayer(players.currentUser)
     if (!invitedPlayer || !currentPlayer || currentPlayer.room || invitedPlayer.room)
       return;
-
-    invitedPlayer.socket.emit("go on page")
-    currentPlayer.socket.emit("go on page")
-    this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService))
+    this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService, this.prisma))
   }
 
   @SubscribeMessage('invite_to_play?')
-	async invite_to_play( socket: Socket, user: UserI ) {
+	async invite_to_play( socket: Socket, id: number ) {
+
+    const user = await this.prisma.user.findUnique({
+      where: {id: id}
+    });
 
 		const connectedUser = await this.prisma.connectedUser.findMany();
 		if(this.isOnline(user.login))
@@ -218,15 +218,14 @@ export class GameGateway implements OnModuleInit{
 		}
 		for (const User of connectedUser) {
 			if(user.id === User.userId) {
-        // console.log(user.login + " " + User.socketId)
-				await this.server.to(User.socketId).emit("invited to play", { inviterI: socket.data.user });
+        console.log(user.login + " " + User.socketId)
+				this.server.to(User.socketId).emit("onInviteRequest", { order: "invited to play", inviterI: socket.data.user });
 			}
 
 		}
 	}
 
-
-
+  
 
   @SubscribeMessage('disconnectingClient')
   warnOther(@ConnectedSocket() client: Socket)
@@ -294,7 +293,7 @@ export class GameGateway implements OnModuleInit{
     for (const [socketId, player] of this.connectedPlayers) {
       if (player.socket.id != client.id && player.lookingForPlayer)
       {
-        this.rooms.push(new Room(this.rooms.length ,matchPlayer, player, this.gameService))
+        this.rooms.push(new Room(this.rooms.length ,matchPlayer, player, this.gameService, this.prisma))
         return;
       }
     }
@@ -302,3 +301,12 @@ export class GameGateway implements OnModuleInit{
     matchPlayer.socket.emit('onGameRequest', {order: "playerNotFound"})
   }
 }
+
+// await this.prisma.user.update({
+	// 	where: {
+	// 		login: login,
+	// 	},
+	// 	data: {
+	// 		is_ingame : true
+	// 	}
+	// })

@@ -38,6 +38,7 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 	blockedUserList: UserI[] | undefined;
 	mutedUserList: UserI[] | undefined;
 	banList: UserI[] | undefined;
+	InRoomList: UserI[] | undefined;
 
 	adminUser: boolean;
 	adminCurrent: boolean;
@@ -51,6 +52,8 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 
 	isUserBan: boolean;
 
+	isUserInRoom: boolean;
+
 	Usersub: Subscription;
 	RoomSub: Subscription;
 	AdminSub: Subscription;
@@ -58,6 +61,7 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 	BlockSub: Subscription;
 	MuteSub: Subscription;
 	BanSub: Subscription;
+	InRoomSub: Subscription;
 
 	// SI IL EST PLUS DANS LE SALON TU NE DEVRAIS PLUS POUVOIR LE KICK
 
@@ -125,10 +129,18 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 				this.banList = value;
 				this.isUserBan = this.isBan();
 			});
+
+			// In Room ?
+			this.socket.emit("InRoom?", this.room)
+			this.InRoomSub = this.socket.fromEvent<UserI[] | undefined>("InRoomList").subscribe(value => {
+				this.InRoomList = value;
+				this.isUserInRoom = this.isInRoom();
+			});
 		});
 
 	}
 
+	
 	ngOnDestroy(): void {
 		this.AdminSub.unsubscribe();
 		this.RoomSub.unsubscribe();
@@ -136,11 +148,12 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 		this.MuteSub.unsubscribe();
 		this.BanSub.unsubscribe();
 		this.CreatorSub.unsubscribe();
+		this.InRoomSub.unsubscribe();
 	}
 
 	inviteToPlay()/*invitedUser?: string, currentUser?: string*/
 	{
-		this.socket.emit("invite_to_play?", this.user);
+		this.socket.emit("invite_to_play?", this.user?.id);
 	}
 
 	goToProfile()
@@ -186,6 +199,16 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 				return true;
 		return false;
 	}
+
+	isInRoom(): boolean {
+		if (!this.InRoomList)
+			return false;
+
+		for(const user of this.InRoomList)
+			if (user.id === this.user?.id)
+				return true;
+		return false;
+	}
 	  
 	setAsAdmin() {
 		console.log("setAdmin")
@@ -211,7 +234,6 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 
 	kickUser() {
 		this.socket.emit("kickUser", { user: this.user, room: this.room });
-		this.closeOption();
 	}
 
 	banUser() {

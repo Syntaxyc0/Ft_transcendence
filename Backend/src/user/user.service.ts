@@ -86,8 +86,8 @@ export class UserService
 
 	async GetUserStatus(id: number)
 	{
-		const userconnected = await this.connectedservice.findByUser({id: id})
-		if (userconnected.length === 0)
+		const user = await this.connectedservice.findByUser({id: id})
+		if (user.length === 0)
 			return ({status: "OFFLINE"});
 		const user = await this.prisma.user.findUnique(
 			{
@@ -192,6 +192,15 @@ export class UserService
 			FriendRequestsEmitted : newfriendrequestsemitted
 		}
 	})
+
+	// await this.prisma.user.update({
+	// 	where: {
+	// 		login: login,
+	// 	},
+	// 	data: {
+	// 		is_ingame : true
+	// 	}
+	// })
 	await this.prisma.user.update({
 		where: {
 			login: name,
