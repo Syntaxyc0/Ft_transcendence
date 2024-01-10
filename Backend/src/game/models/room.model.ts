@@ -36,7 +36,7 @@ export class Room{
         this.paddles.push(new Paddle(1, this.multiplayer))
 
 
-        console.log(playerOne.login + " and " + playerTwo.login + " entered room " + roomId)
+        // console.log(playerOne.login + " and " + playerTwo.login + " entered room " + roomId)
         this.multiplayer.gameBoardInit()
     }
 
