@@ -39,6 +39,8 @@ getData(): Observable<any[]> {
 
   getLogin(): string
   {
+    if (!this.login)
+      this.sendRequest("loginRequest")
     return this.login;
   }
 

@@ -16,7 +16,7 @@ export class Room{
 
     isGameRunning: boolean = false
 
-    constructor(roomId: number, playerOne: Player, playerTwo: Player, gameService: GameService){
+    constructor(roomId: number, playerOne: Player, playerTwo: Player, gameService: GameService, private prisma: PrismaService){
 
         this.multiplayer = new MultiplayerService(this, gameService)
 
@@ -61,6 +61,14 @@ export class Room{
     {
         // this.multiplayer.gameRequest({order: "resetBoard"})
         this.multiplayer.stopGame()
+        // this.prisma.user.update({
+		// where: {
+		// 	login: this.players[0].login,
+		// },
+		// data: {
+		// 	is_ingame : true
+		// }
+	    // })
         this.isGameRunning = false
 
         if (this.paddles[0].score > this.paddles[1].score)
