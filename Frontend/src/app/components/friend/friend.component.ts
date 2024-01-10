@@ -37,22 +37,30 @@ export class FriendComponent {
 	@Input() id:number = 0
 	showMenu = false
 	toshow = false
+	status : string = "";
 
 	 name:string = 'undefined';
 	 avatar;
 
 	ngOnInit() {
         this.retrieveFriend();
+		this.getUserStatus();
 	}
 	retrieveFriend() {
 	 this.http.get<any>("http://localhost:3333/users/" + this.id).subscribe(
 		res => {
 			this.name = res['login'];
-		},
-		err => {
 		})
 		this.get_avatar().subscribe (data => {
 			this.createImageFromBlob(data)
+		})
+	}
+
+	getUserStatus()
+	{
+		this.http.get<any>("http://localhost:3333/users/" + this.id + "/getstatus").subscribe(
+		res => {
+			this.status = res['status'];
 		})
 	}
 
