@@ -101,7 +101,6 @@ export class UserService
 		}
 		if (user.is_ingame)
 			return ({status: "IN GAME"});
-
 		return ({status: "ONLINE"});
 		
 

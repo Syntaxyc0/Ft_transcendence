@@ -74,9 +74,10 @@ export class AuthService
             expiresIn: '7d',
             secret: secret
         },);
+		const hashed_token  = await argon.hash(token);
 		await this.prisma.user.update({
 			data: {
-				access_token: token
+				access_token: hashed_token
 			},
 			where: {
 				id: userId,
@@ -153,10 +154,11 @@ export class AuthService
 		})
 		if (!user)
 			return false
-		if (user.access_token != token)
+		const tokenmatch = await argon.verify(user.access_token, token);
+		if (!tokenmatch)
 			return false
 		try {
-		  const payload = this.jwt.verify(user.access_token, {secret: process.env.JWT_SECRET});
+		  const payload = this.jwt.verify(token, {secret: process.env.JWT_SECRET});
 		  if (!payload)
 		  	return false;
 		} catch (e) {
