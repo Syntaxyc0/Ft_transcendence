@@ -4,6 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import {Router, RouterModule } from '@angular/router';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
+import { BACKEND } from 'src/app/env';
 
 @Component({
   selector: 'app-search-user',
@@ -30,9 +31,9 @@ export class SearchUserComponent {
 	
 	searchUser(){
 		this.toggleModal()
-		this.http.get("http://localhost:3333/users/" + this.SearchForm.value.name + '/id').subscribe(
+		this.http.get(BACKEND.URL + "users/" + this.SearchForm.value.name + '/id').subscribe(
 			res => {
-				this.http.get("http://localhost:3333/users/" + localStorage.getItem('id') + '/search').subscribe()
+				this.http.get(BACKEND.URL + "users/" + localStorage.getItem('id') + '/search').subscribe()
 				this.router.navigate(['/user'],  { queryParams: { id: res } })
 			},
             err => {

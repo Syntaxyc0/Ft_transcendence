@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
+import { BACKEND } from 'src/app/env';
 
 
 @Component({
@@ -31,7 +32,7 @@ export class AddFriendComponent {
 	
 	addFriend(){
 		this.toggleModal()
-		this.http.patch("http://localhost:3333/users/" + this.id + "/AddFriend", {userName:this.AddFriendForm.value.name}).subscribe(
+		this.http.patch(BACKEND.URL + "users/" + this.id + "/AddFriend", {userName:this.AddFriendForm.value.name}).subscribe(
 			res => {
 				window.location.reload()
 			},

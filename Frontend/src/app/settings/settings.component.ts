@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { CustomSocket } from '../chat/sockets/custom-socket';
+import { BACKEND } from '../env';
 
 @Component({
   selector: 'app-settings',
@@ -31,7 +32,7 @@ export class SettingsComponent {
 	
 	ngOnInit() {
 	this.id = JSON.parse(localStorage.getItem('id')!)
-	this.http.get<any>('http://localhost:3333/users/' + this.id + '/2faenabled').subscribe(
+	this.http.get<any>(BACKEND.URL + 'users/' + this.id + '/2faenabled').subscribe(
 		res => {
 			if (res)
 				this.selectedVal = 'enable'
@@ -47,19 +48,19 @@ export class SettingsComponent {
 		if (val === 'enable')
 		{
 			this.selectedVal = 'enable'
-			this.http.post<any>('http://localhost:3333/users/' + this.id + '/switch2fa', {activated: true}).subscribe()
+			this.http.post<any>(BACKEND.URL + 'users/' + this.id + '/switch2fa', {activated: true}).subscribe()
 		}
 		else
 		{
 			this.selectedVal = 'disable'
-			this.http.post<any>('http://localhost:3333/users/' + this.id + '/switch2fa', {activated: false}).subscribe()
+			this.http.post<any>(BACKEND.URL + 'users/' + this.id + '/switch2fa', {activated: false}).subscribe()
 		}
 	}
 
 	logout()
 	{
 		this.socket.emit('disconnect_logout')
-		this.http.get('http://localhost:3333/users/' + this.id + '/logout').subscribe()
+		this.http.get(BACKEND.URL +'users/' + this.id + '/logout').subscribe()
 		localStorage.clear()
 		this.router.navigate(['/landing'])
 	}

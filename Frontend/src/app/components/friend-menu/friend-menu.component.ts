@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BACKEND } from 'src/app/env';
 
 
 @Component({
@@ -19,7 +20,7 @@ export class FriendMenuComponent implements OnInit{
 	constructor(public http: HttpClient, private route:ActivatedRoute, private router: Router) {}
 
 	ngOnInit(): void {
-		this.http.get<any>("http://localhost:3333/users/" + this.id).subscribe (
+		this.http.get<any>(BACKEND.URL + "users/" + this.id).subscribe (
 		res => {                                       
 			this.username = res['login'];
 		})
@@ -27,7 +28,7 @@ export class FriendMenuComponent implements OnInit{
 
 	deleteFriend()
 	{
-		this.http.patch('http://localhost:3333/users/' + localStorage.getItem('id') + '/RemoveFriend', {userId: this.id}).subscribe()
+		this.http.patch(BACKEND.URL + 'users/' + localStorage.getItem('id') + '/RemoveFriend', {userId: this.id}).subscribe()
 		{
 			window.location.reload()
 		}

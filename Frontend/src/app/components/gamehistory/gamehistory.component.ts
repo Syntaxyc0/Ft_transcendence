@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { GameElemComponent } from '../game-elem/game-elem.component';
 import { Input } from '@angular/core';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { BACKEND } from 'src/app/env';
 
 @Component({
   selector: 'app-gamehistory',
@@ -19,7 +20,7 @@ export class GamehistoryComponent {
 	GameHistory :number[] = []
 
 	ngOnInit() {
-		this.http.get<number[]>("http://localhost:3333/game/" + this.id + "/GameHistory").subscribe(res => {
+		this.http.get<number[]>(BACKEND.URL + "game/" + this.id + "/GameHistory").subscribe(res => {
 			this.GameHistory = res
 		},
 		err => {

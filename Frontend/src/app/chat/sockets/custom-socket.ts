@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Socket, SocketIoConfig } from 'ngx-socket-io';
 import { tokenGetter } from 'src/app/app.config';
+import { BACKEND } from 'src/app/env';
 
 
 const config: SocketIoConfig = {
-	url: 'http://localhost:3333', options: {
+	url: BACKEND.URL, options: {
 	  extraHeaders: {
 		Authorization: tokenGetter()
 	  }
@@ -19,7 +20,7 @@ export class CustomSocket extends Socket {
 
 	configSocket() {
 		const config: SocketIoConfig = {
-			url: 'http://localhost:3333', options: {
+			url: BACKEND.URL, options: {
 			  extraHeaders: {
 				Authorization: tokenGetter()
 			  }

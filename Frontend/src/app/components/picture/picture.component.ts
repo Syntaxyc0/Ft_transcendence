@@ -3,6 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { Input } from '@angular/core';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
+import { BACKEND } from 'src/app/env';
 
 @Component({
   selector: 'app-picture',
@@ -24,7 +25,7 @@ export class PictureComponent {
         this.retrieveUser();
 	}
 	retrieveUser() {
-	 this.http.get<any>("http://localhost:3333/users/" + this.id).subscribe (
+	 this.http.get<any>(BACKEND.URL + "users/" + this.id).subscribe (
 		res => {
 			this.name = res['login'];
 		},
@@ -50,7 +51,7 @@ export class PictureComponent {
 	 }
 
 	get_avatar() {
-		return this.http.get<Blob>("http://localhost:3333/users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
+		return this.http.get<Blob>(BACKEND.URL + "users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
 	}
 
 	openErrorModal(): void {
