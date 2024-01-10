@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
+import { BACKEND } from '../env';
 
 @Component({
   selector: 'app-landing-page',
@@ -18,7 +19,7 @@ export class LandingPageComponent {
 	redirect_url : string = ""
 	ngOnInit()
 	{
-		this.http.get('http://localhost:3333/auth/geturl').subscribe(
+		this.http.get( BACKEND.URL + 'auth/geturl').subscribe(
 			res => {
 				this.redirect_url = res['url']
 			},

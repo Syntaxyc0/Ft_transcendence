@@ -11,6 +11,7 @@ import { PictureComponent } from '../components/picture/picture.component';
 import { FriendrequestComponent } from '../components/friendrequest/friendrequest.component';
 import { RequestSentComponent } from '../components/request-sent/request-sent.component';
 import { FooterBarComponent } from '../components/footer-bar/footer-bar.component';
+import { BACKEND } from '../env';
 
 @Component({
   selector: 'app-private-profile',
@@ -32,7 +33,7 @@ export class PrivateProfileComponent {
 	ngOnInit()
 	{
 		this.id = JSON.parse(localStorage.getItem('id')!)
-		this.http.get<number>('http://localhost:3333/users/' + this.id ).subscribe(
+		this.http.get<number>(BACKEND.URL + 'users/' + this.id ).subscribe(
 			res => {
 				this.elo = res['elo']
 				this.played = res['gameHistory'].length
@@ -52,7 +53,7 @@ export class PrivateProfileComponent {
 
 	getuserElo()
 	{
-		this.http.get<number>('http://localhost:3333/users/' + this.id + '/getelo').subscribe(
+		this.http.get<number>(BACKEND.URL + 'users/' + this.id + '/getelo').subscribe(
 			res => {
 				this.elo = res
 			},

@@ -10,6 +10,7 @@ import { GamehistoryComponent } from '../components/gamehistory/gamehistory.comp
 import { PictureComponent } from '../components/picture/picture.component';
 import { FriendrequestComponent } from '../components/friendrequest/friendrequest.component';
 import { RequestSentComponent } from '../components/request-sent/request-sent.component';
+import { BACKEND } from '../env';
 
 @Component({
   selector: 'app-requests',
@@ -30,16 +31,16 @@ export class RequestsComponent {
 	{
 		this.id = JSON.parse(localStorage.getItem('id')!)
 		this.getuserElo()
-		this.http.get<number[]>("http://localhost:3333/users/" + this.id + "/friendrequestsreceived").subscribe(res => {
+		this.http.get<number[]>(BACKEND.URL + "users/" + this.id + "/friendrequestsreceived").subscribe(res => {
 			this.friendrequestsreceived = res;
 		})	
-		this.http.get<number[]>("http://localhost:3333/users/" + this.id + "/friendrequestssent").subscribe(res => {
+		this.http.get<number[]>(BACKEND.URL + "users/" + this.id + "/friendrequestssent").subscribe(res => {
 			this.friendrequestssent = res;
 		})	
 	}
 	getuserElo()
 	{
-		this.http.get<number>('http://localhost:3333/users/' + this.id + '/getelo').subscribe(
+		this.http.get<number>(BACKEND.URL + 'users/' + this.id + '/getelo').subscribe(
 			res => {
 				this.elo = res
 			},

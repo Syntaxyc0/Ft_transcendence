@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { CustomSocket } from '../chat/sockets/custom-socket';
 import { FooterBarComponent } from '../components/footer-bar/footer-bar.component';
 import { ErrorModalComponent } from '../components/error-modal/error-modal.component';
+import { BACKEND } from '../env';
 
 
 @Component({
@@ -31,11 +32,11 @@ export class SigninComponent {
 	errorMessage:string =""
 
     signin(): void {
-		this.http.post<any>('http://localhost:3333/auth/signin', {login: this.login.value, password:this.password.value}).subscribe(
+		this.http.post<any>(BACKEND.URL + 'auth/signin', {login: this.login.value, password:this.password.value}).subscribe(
 				res => {
 					localStorage.setItem('access_token', res['access_token']);
 					localStorage.setItem('id', JSON.stringify(res['id']));
-					this.http.get<any>('http://localhost:3333/users/' + res['id'] + '/2faenabled').subscribe( res => {
+					this.http.get<any>(BACKEND.URL + 'users/' + res['id'] + '/2faenabled').subscribe( res => {
 						if (res === false)
 						{
 							localStorage.setItem('is_authenticated', 'true');

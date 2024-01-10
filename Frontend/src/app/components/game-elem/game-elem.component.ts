@@ -4,6 +4,7 @@ import { Input } from '@angular/core';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { ProfilePictureComponent } from '../profile-picture/profile-picture.component';
 import { PictureComponent } from '../picture/picture.component';
+import { BACKEND } from 'src/app/env';
 
 @Component({
   selector: 'app-game-elem',
@@ -28,7 +29,7 @@ export class GameElemComponent {
 	won: boolean = false
 	
 	ngOnInit() {
-		this.http.get<GameInfo>('http://localhost:3333/game/' + this.Gameid + '/info/').subscribe(
+		this.http.get<GameInfo>(BACKEND.URL + 'game/' + this.Gameid + '/info/').subscribe(
             res => {
 				this.gameinfo = res;
 				if (this.gameinfo.winnerId == this.Userid)

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CustomSocket } from '../chat/sockets/custom-socket';
+import { BACKEND } from '../env';
 
 @Component({
   selector: 'app-redirect',
@@ -22,12 +23,12 @@ export class RedirectComponent {
 			this.code = params['code'];
 		})
     try {
-			this.http.post("http://localhost:3333/auth/42redirect", {code: this.code}).subscribe(
+			this.http.post(BACKEND.URL + "auth/42redirect", {code: this.code}).subscribe(
 				response => {
           localStorage.setItem('access_token', response['token']['access_token'])
           localStorage.setItem('id', response['token']['id'])
 		  this.id = response['token']['id']
-          this.http.get<any>('http://localhost:3333/users/' + this.id + '/2faenabled').subscribe( res => {
+          this.http.get<any>(BACKEND.URL + 'users/' + this.id + '/2faenabled').subscribe( res => {
 			  		if (response['isalreadyregistered'] === true)
 					{
 						if (res === true)

@@ -6,6 +6,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CustomValidators } from '../helpers/custom-validators';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ErrorModalComponent } from '../components/error-modal/error-modal.component';
+import { BACKEND } from '../env';
 
 @Component({
   selector: 'app-edit-page',
@@ -38,7 +39,7 @@ export class EditPageComponent {
 
 	Edit(): void {
 		console.log(this.id)
-		this.http.patch<any>('http://localhost:3333/users/' + this.id + '/ChangeNick', {name: this.Nickname.value} ).subscribe(
+		this.http.patch<any>(BACKEND.URL + 'users/' + this.id + '/ChangeNick', {name: this.Nickname.value} ).subscribe(
 			res => {
 				localStorage.setItem('is_authenticated', 'true');
 				this.router.navigate(["/home"]);
@@ -73,7 +74,7 @@ export class EditPageComponent {
 		}
    
 	   get_avatar() {
-		   return this.http.get<Blob>("http://localhost:3333/users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
+		   return this.http.get<Blob>(BACKEND.URL + "users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
 	   }
    
 	   selectedFile: File
@@ -81,7 +82,7 @@ export class EditPageComponent {
 	   onFileChanged(event) {
 		 this.selectedFile = event.target.files[0]
    
-		 const url = "http://localhost:3333/users/" + this.id + "/upload";
+		 const url = BACKEND.URL + "users/" + this.id + "/upload";
 		 
 		   const formData = new FormData();
 		   formData.append('file', this.selectedFile);
