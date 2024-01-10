@@ -15,9 +15,8 @@ import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
 })
 export class FriendMenuComponent implements OnInit{
 	username: string;
-	@Input() id
-	@Input() name
-	user;
+	@Input() id: number
+	@Input() name: string
 
 	constructor(public http: HttpClient,
 				private route:ActivatedRoute,
@@ -26,7 +25,10 @@ export class FriendMenuComponent implements OnInit{
 				) {}
 
 	ngOnInit(): void {
-		
+		this.socket.emit("findUser", this.id);
+		this.socket.fromEvent("userFound").subscribe(() =>{
+
+		});
 
 		this.http.get<any>(BACKEND.URL + "users/" + this.id).subscribe (
 		res => {                                       
@@ -45,8 +47,8 @@ export class FriendMenuComponent implements OnInit{
 
 	inviteToPlay()/*invitedUser?: string, currentUser?: string*/
 	{
-		console.log(this.user)
-		this.socket.emit("invite_to_play?", this.user);
+		// console.
+		this.socket.emit("invite_to_play?", this.id);
 	}
 
 	sendMessage() {
