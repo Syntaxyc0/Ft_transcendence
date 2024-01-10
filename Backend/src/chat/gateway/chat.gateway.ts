@@ -15,6 +15,7 @@ import { RoomI } from '../model/room.interface';
 import { JoinedRoomI } from '../model/joinedRoom.interface';
 import { RoomService } from '../service/room.service';
 import * as argon from 'argon2'
+import { UserService } from 'src/user/user.service';
 
 
 @WebSocketGateway({ cors: { origin: [process.env.BACKEND_IP , process.env.FRONTEND_IP] } })
@@ -29,7 +30,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private roomService: RoomService,
 		private connectedUserService: ConnectedUserService,
 		private joinedRoomService: JoinedRoomService,
-		private messageService: MessageService) { }
+		private messageService: MessageService,
+		private userService: UserService,
+		) { }
 
 	async onModuleInit() {
 		await this.connectedUserService.deleteAll();
@@ -49,6 +52,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				socket.data.user = user;
 
 				await this.connectedUserService.create({ socketId: socket.id, user });
+				
+
+				const connectedUser = await this.prisma.connectedUser.findMany();
+				for(const user of connectedUser)
+					this.server.to(user.socketId).emit('status', connectedUser);
 
 				return this.server.to(socket.id).emit('roomsI', await this.allowedRooms(user.id));
 			}
@@ -60,6 +68,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 
 	async handleDisconnect(socket: Socket) {
+
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		for(const user of connectedUser)
+			this.server.to(user.socketId).emit('status', connectedUser);
+
 		await this.connectedUserService.deleteBySocketId(socket.id);
 		socket.disconnect();
 	}
@@ -700,4 +713,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			socket.emit('MessageToUser', new_room);
 		}, 200);
 	}
+
+	@SubscribeMessage('getStatus')
+	async getStatus(socket: Socket, id: number) {
+		const status = await this.userService.GetUserStatus(id);
+		console.log(status.status);
+		socket.emit("status", status.status);
+	}
+
 }

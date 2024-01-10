@@ -1,8 +1,11 @@
-import { Component, Input, Renderer2, ElementRef,ViewChild } from '@angular/core';
+import { Component, Input, Renderer2, ElementRef,ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FriendMenuComponent } from '../friend-menu/friend-menu.component';
 import { BACKEND } from 'src/app/env';
+import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
+import { Subscription } from 'rxjs';
+import { UserI } from 'src/app/chat/model/user.interface';
 
 @Component({
   selector: 'app-friend',
@@ -11,10 +14,13 @@ import { BACKEND } from 'src/app/env';
   templateUrl: './friend.component.html',
   styleUrls: ['./friend.component.scss']
 })
-export class FriendComponent {
+export class FriendComponent implements OnInit, OnDestroy{
 	@ViewChild('menu') menu: ElementRef;
 
-	constructor(public http: HttpClient, private renderer: Renderer2) {
+	constructor(public http: HttpClient,
+				private renderer: Renderer2,
+				private socket: CustomSocket
+				) {
 		
 		this.renderer.listen('window', 'click',(e:Event)=>{
 		if(e.target!==this.menu.nativeElement)
@@ -43,10 +49,30 @@ export class FriendComponent {
 	 name:string = 'undefined';
 	 avatar;
 
+	connectedUser: UserI[];
+
+	 subStatus: Subscription;
+
 	ngOnInit() {
         this.retrieveFriend();
 		this.getUserStatus();
+
+		this.socket.emit("getStatus", this.id);
+		this.subStatus = this.socket.fromEvent<string>("status").subscribe(value => {
+			this.status = value;
+			console.log(value);
+		});
 	}
+
+	ngOnDestroy(): void {
+		this.subStatus.unsubscribe();
+	}
+
+	CurrentConnected() {
+		for (const user of this.connectedUser)
+			if (user.id ===)
+	}
+
 	retrieveFriend() {
 	 this.http.get<any>(BACKEND.URL + "users/" + this.id).subscribe(
 		res => {

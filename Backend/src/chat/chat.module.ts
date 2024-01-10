@@ -10,10 +10,11 @@ import { ConnectedUserService } from './service/connectedUser.service';
 import { JoinedRoomService } from './service/joined-room.service';
 import { MessageService } from './service/message.service';
 import { MailService } from 'src/mail/mail.service';
+import { UserService } from 'src/user/user.service';
 
 @Module({
 	imports: [ AuthModule, UserModule, JwtModule, HttpModule],
-	providers: [ChatGateway, RoomService, AuthService, ConnectedUserService, JoinedRoomService, MessageService, MailService]
+	providers: [ChatGateway, RoomService, AuthService, ConnectedUserService, JoinedRoomService, MessageService, MailService, UserService]
 })
 export class ChatModule {
 }

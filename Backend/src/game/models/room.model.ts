@@ -33,6 +33,8 @@ export class Room{
                     is_ingame : true
                 }
             })
+
+			
             this.players[i].lookingForPlayer = false
             this.players[i].room = this
             this.players[i].status = true;

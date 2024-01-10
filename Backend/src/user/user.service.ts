@@ -84,6 +84,8 @@ export class UserService
 		})
 	}
 
+
+	
 	async GetUserStatus(id: number)
 	{
 		const userconnected = await this.connectedservice.findByUser({id: id})
@@ -102,9 +104,6 @@ export class UserService
 		if (user.is_ingame)
 			return ({status: "IN GAME"});
 		return ({status: "ONLINE"});
-		
-
-
 	}
 
 	async GetUserFriendlist(uid: number)

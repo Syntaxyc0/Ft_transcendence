@@ -154,12 +154,19 @@ export class GameGateway implements OnModuleInit{
     this.disconnectRoom(client.id)
   }
 
-  disconnectRoom(clientId: string){
+  async disconnectRoom(clientId: string){
     if (!this.connectedPlayers.get(clientId))
       return;
     const targetRoom = this.connectedPlayers.get(clientId).room;
     if (targetRoom)
     {
+		for (let i = 0; i < 2; i++)
+		{
+			const connectedUser = await this.prisma.connectedUser.findMany();
+			for(const user of connectedUser)
+				this.server.to(user.socketId).emit('status', "ONLINE");
+		}
+
       console.log("Destroying Room " + targetRoom.id)
       targetRoom.destroyRoom()
       this.rooms.splice(targetRoom.id, 1);
@@ -194,12 +201,17 @@ export class GameGateway implements OnModuleInit{
   }
 
   // @SubscribeMessage('pairPlayers')
-  /*async */pairPlayers(/*@ConnectedSocket() client: Socket, @MessageBody() */players: {currentUser: string, invitedUser: string})
+  async pairPlayers(/*@ConnectedSocket() client: Socket, @MessageBody() */players: {currentUser: string, invitedUser: string})
   {
     const invitedPlayer = this.getPlayer(players.invitedUser)
     const currentPlayer = this.getPlayer(players.currentUser)
     if (!invitedPlayer || !currentPlayer || currentPlayer.room || invitedPlayer.room)
       return;
+
+	const connectedUser = await this.prisma.connectedUser.findMany();
+	for(const user of connectedUser)
+		this.server.to(user.socketId).emit('status', "IN GAME");
+
     this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService, this.prisma))
   }
 
@@ -286,13 +298,18 @@ export class GameGateway implements OnModuleInit{
   }
 
   @SubscribeMessage('multiplayerRequest')
-  searchMultiplayer(@ConnectedSocket() client: Socket) {
+  async searchMultiplayer(@ConnectedSocket() client: Socket) {
     const matchPlayer = this.connectedPlayers.get(client.id)
     if (!matchPlayer || matchPlayer.room != undefined)
       return;
     for (const [socketId, player] of this.connectedPlayers) {
       if (player.socket.id != client.id && player.lookingForPlayer)
       {
+
+		const connectedUser = await this.prisma.connectedUser.findMany();
+				for(const user of connectedUser)
+					this.server.to(user.socketId).emit('status', "IN GAME");
+
         this.rooms.push(new Room(this.rooms.length ,matchPlayer, player, this.gameService, this.prisma))
         return;
       }
