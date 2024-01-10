@@ -134,6 +134,7 @@ export const HEIGHT = 640
 				this.context.fillText(`If this is not the case, click on multiplayer`, WIDTH/4, HEIGHT/4);
 			break;
 			case "setGameBoard":
+				this.player.inGamePlayer()
 				this.matchmaking = false
 				this.isOnline = true
 				this.draw()

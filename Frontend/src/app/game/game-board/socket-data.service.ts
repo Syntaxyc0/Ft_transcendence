@@ -58,6 +58,11 @@ getData(): Observable<any[]> {
     this.socket.emit(order);
   }
 
+  inGamePlayer()
+  {
+    this.socket.emit("inGamePlayer", this.getLogin())
+  }
+
   newPaddlePosition(paddle: {y: number, side: number})
   {
     this.socket.emit("newPaddlePosition", paddle)
