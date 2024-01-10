@@ -108,7 +108,6 @@ export class GameGateway implements OnModuleInit{
 		  	if(user.id === User.userId) {
 		  		this.server.to(User.socketId).emit("accepted to play", {
 		  			inviterI: client.data.user,
-		  			// inviter_socket: socket,
 		  			invited_login: user.login,
 		  		});
 		  	}
@@ -196,14 +195,10 @@ export class GameGateway implements OnModuleInit{
   // @SubscribeMessage('pairPlayers')
   /*async */pairPlayers(/*@ConnectedSocket() client: Socket, @MessageBody() */players: {currentUser: string, invitedUser: string})
   {
-    // await this.lookForGame(client)
     const invitedPlayer = this.getPlayer(players.invitedUser)
     const currentPlayer = this.getPlayer(players.currentUser)
     if (!invitedPlayer || !currentPlayer || currentPlayer.room || invitedPlayer.room)
       return;
-
-    invitedPlayer.socket.emit("go on page")
-    currentPlayer.socket.emit("go on page")
     this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService, this.prisma))
   }
 
@@ -218,8 +213,8 @@ export class GameGateway implements OnModuleInit{
 		}
 		for (const User of connectedUser) {
 			if(user.id === User.userId) {
-        // console.log(user.login + " " + User.socketId)
-				await this.server.to(User.socketId).emit("invited to play", { inviterI: socket.data.user });
+        console.log(user.login + " " + User.socketId)
+				this.server.to(User.socketId).emit("onInviteRequest", { order: "invited to play", inviterI: socket.data.user });
 			}
 
 		}
