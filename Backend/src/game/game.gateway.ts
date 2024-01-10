@@ -106,7 +106,8 @@ export class GameGateway implements OnModuleInit{
       const connectedUser = await this.prisma.connectedUser.findMany();
 		  for (const User of connectedUser) {
 		  	if(user.id === User.userId) {
-		  		this.server.to(User.socketId).emit("accepted to play", {
+		  		this.server.to(User.socketId).emit("onInviteRequest", {
+            order: "accepted to play",
 		  			inviterI: client.data.user,
 		  			invited_login: user.login,
 		  		});
@@ -203,7 +204,11 @@ export class GameGateway implements OnModuleInit{
   }
 
   @SubscribeMessage('invite_to_play?')
-	async invite_to_play( socket: Socket, user: UserI ) {
+	async invite_to_play( socket: Socket, id: number ) {
+
+    const user = await this.prisma.user.findUnique({
+      where: {id: id}
+    });
 
 		const connectedUser = await this.prisma.connectedUser.findMany();
 		if(this.isOnline(user.login))
@@ -220,8 +225,7 @@ export class GameGateway implements OnModuleInit{
 		}
 	}
 
-
-
+  
 
   @SubscribeMessage('disconnectingClient')
   warnOther(@ConnectedSocket() client: Socket)

@@ -55,6 +55,7 @@ export class HeaderbarComponent implements OnInit, OnDestroy{
 
 	handleOrder(order:string, payload:any)
 	{
+		console.log(payload)
 		switch(order){
 
 			case "invited to play":
