@@ -76,7 +76,7 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 		  });
 
 		this.socket.fromEvent("kicked").subscribe(() => {
-			location.reload();
+			this.selectedRoom = null;
 		});
 
 		this.invitedToPlaySubscription = this.socket.fromEvent("invited to play").subscribe(async (value: any) => {

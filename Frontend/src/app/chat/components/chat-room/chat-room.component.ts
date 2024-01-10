@@ -126,10 +126,15 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 	ngOnChanges(changes: SimpleChanges) {
 		if (this.chatRoom) {
 
-			// Admin ?
-			this.getAdminArray().subscribe(value => {
+			// Admin ?			
+			this.socket.emit("getAdminList", this.chatRoom);
+			this.socket.fromEvent("isAdmin").subscribe((value) => {
 				this.adminArray = value;
-				this.adminCurrent = this.isAdmin(this.currentId) 
+				this.adminCurrent = this.isAdmin(this.currentId);
+			});
+
+			this.socket.fromEvent<RoomI>("passwordUpdate").subscribe((value) => {
+				this.chatRoom = value
 			});
 
 			this.chatService.joinRoom(this.chatRoom);

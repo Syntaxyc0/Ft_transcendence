@@ -168,28 +168,25 @@ export class OptionUserComponent implements OnInit{
 	}
 	  
 	setAsAdmin() {
+		console.log("setAdmin")
 		this.socket.emit("setAsAdmin", { user: this.user, room: this.room });
-		this.closeOption();
 	}
 
 	unsetAsAdmin() {
+		console.log("setAdmin")
 		this.socket.emit("unsetAsAdmin", { user: this.user, room: this.room });
-		this.closeOption();
 	}
 
 	blockUser() {
 		this.socket.emit("blockUser", this.user);
-		this.closeOption();
 	}
 
 	unblockUser() {
 		this.socket.emit("unblockUser", this.user);
-		this.closeOption();
 	}
 
 	muteUser() {
 		this.socket.emit("muteUser", { user: this.user, room: this.room });
-		this.closeOption();
 	}
 
 	kickUser() {
@@ -199,12 +196,10 @@ export class OptionUserComponent implements OnInit{
 
 	banUser() {
 		this.socket.emit("banUser", { user: this.user, room: this.room });
-		this.closeOption();
 	}
 
 	unbanUser() {
 		this.socket.emit("unbanUser", { user: this.user, room: this.room });
-		this.closeOption();
 	} 
 
 	isBan(): boolean {
