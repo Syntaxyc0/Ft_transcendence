@@ -98,6 +98,8 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 				if (result) {
 					this.dialog.closeAll()
 					this.socket.emit('checkAndAccept', inviterI)
+					this.router.navigate(['/game'])
+
 				} else {
 					this.dialog.closeAll()
 					this.socket.emit("refuseGame", inviterI);
@@ -107,7 +109,7 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 
 
 
-		this.socket.fromEvent("accepted to play").subscribe(async (value:any)=>{
+		this.socket.fromEvent("accepted to play").subscribe((value:any)=>{
 			this.socket.emit("checkAndLaunch", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
 			this.router.navigate(['/game'])
 		})
@@ -118,7 +120,7 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 			});
 		});
 		
-		this.socket.fromEvent("go on page").subscribe(async (value:any)=>{
+		this.socket.fromEvent("go on page").subscribe((value:any)=>{
 			this.router.navigate(['/game'])
 		})
 

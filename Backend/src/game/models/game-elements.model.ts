@@ -7,6 +7,7 @@ export class Paddle{
 
 	height: number = 200;
 	width: number = 25;
+	randomWanted : boolean = false;
 
 	x!: number;
 	y!: number;
@@ -54,7 +55,12 @@ export class Ball{
 	
     reset()
 	{
-		this.speed = 20;
+		let random = 1
+		if (this.multiplayer.random)
+		{
+			random += Math.random() % 10;
+		}
+		this.speed = 20 * random;
 		this.x = WIDTH / 2;
 		this.y = HEIGHT / 2;
 		this.angle = Math.random() * 360;
