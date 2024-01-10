@@ -16,7 +16,7 @@
 				<div class="rooms">
 					<mat-selection-list hideSingleSelectionIndicator [multiple]="false" (selectionChange)="onSelectRoom($event)">
 						<mat-list-option *ngFor="let room of (room$ | async)" [value]="room">
-							Name: {{room.name}}, ID: {{room.id}}
+							Name: {{room.name}}
 							<mat-divider></mat-divider>
 						</mat-list-option>
 					</mat-selection-list>

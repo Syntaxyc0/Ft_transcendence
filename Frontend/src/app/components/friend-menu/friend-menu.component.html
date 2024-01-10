@@ -3,7 +3,7 @@
 		<a  href="/user/?id={{id}}" class="flex hover:bg-gray-100 py-1 px-2 rounded hover:underline hover:underline-offset-2 cursor-pointer">
 			View profile
 		</a>
-		<div class="flex hover:bg-gray-100 py-1 px-2 rounded hover:underline hover:underline-offset-2 cursor-pointer">
+		<div (click)="sendMessage()" class="flex hover:bg-gray-100 py-1 px-2 rounded hover:underline hover:underline-offset-2 cursor-pointer">
 			Send message
 		</div>
 		<div (click)="inviteToPlay()" class="flex hover:bg-gray-100 py-1 px-2 rounded hover:underline hover:underline-offset-2 cursor-pointer">

@@ -18,8 +18,11 @@ export class FriendMenuComponent implements OnInit{
 	@Input() id: number
 	@Input() name: string
 
-	constructor(private socket: CustomSocket,
-		public http: HttpClient, private route:ActivatedRoute, private router: Router) {}
+	constructor(public http: HttpClient,
+				private route:ActivatedRoute,
+				private router: Router,
+				private socket: CustomSocket,
+				) {}
 
 	ngOnInit(): void {
 		this.socket.emit("findUser", this.id);
@@ -46,6 +49,11 @@ export class FriendMenuComponent implements OnInit{
 	{
 		// console.
 		this.socket.emit("invite_to_play?", this.id);
+	}
+
+	sendMessage() {
+		this.socket.emit("mpUser", this.id);
+		this.router.navigate(['chat']);
 	}
 
 }
