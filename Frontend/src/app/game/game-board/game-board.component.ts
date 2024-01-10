@@ -250,8 +250,8 @@ export const HEIGHT = 640
 	{
 		if (!this.isGameRunning)
 			return
-		// const timeStamp = Date.now();
-		// const secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
+		if (!this.userPaddle.login)
+			this.userPaddle.login = this.player.getLogin()
 		let y = this.lerp(this.userPaddle.y, this.userPaddle.targetY, 0.2)
 		let deltaY = y - this.userPaddle.y
 		if (deltaY)
@@ -264,7 +264,6 @@ export const HEIGHT = 640
 
 		  });
 		this.movementQueue = [];
-		// this.oldTimeStamp = timeStamp
 		this.draw();
 		requestAnimationFrame(this.gameLoop);
 

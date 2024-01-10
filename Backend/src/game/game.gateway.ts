@@ -204,7 +204,7 @@ export class GameGateway implements OnModuleInit{
 
     invitedPlayer.socket.emit("go on page")
     currentPlayer.socket.emit("go on page")
-    this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService))
+    this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService, this.prisma))
   }
 
   @SubscribeMessage('invite_to_play?')
@@ -294,7 +294,7 @@ export class GameGateway implements OnModuleInit{
     for (const [socketId, player] of this.connectedPlayers) {
       if (player.socket.id != client.id && player.lookingForPlayer)
       {
-        this.rooms.push(new Room(this.rooms.length ,matchPlayer, player, this.gameService))
+        this.rooms.push(new Room(this.rooms.length ,matchPlayer, player, this.gameService, this.prisma))
         return;
       }
     }
@@ -302,3 +302,12 @@ export class GameGateway implements OnModuleInit{
     matchPlayer.socket.emit('onGameRequest', {order: "playerNotFound"})
   }
 }
+
+// await this.prisma.user.update({
+	// 	where: {
+	// 		login: login,
+	// 	},
+	// 	data: {
+	// 		is_ingame : true
+	// 	}
+	// })

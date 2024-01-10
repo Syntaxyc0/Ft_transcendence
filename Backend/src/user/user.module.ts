@@ -16,7 +16,7 @@ import { HttpModule, HttpService } from '@nestjs/axios';
 @Module({
   imports: [MailModule, HttpModule],
   controllers: [UserController],
-  providers: [UserService, MailService, ConnectedUserService, ChatGateway, AuthService, RoomService, JoinedRoomService, MessageService, JwtService]
+  providers: [UserService, MailService, ConnectedUserService, AuthService, RoomService, JoinedRoomService, MessageService, JwtService]
 })
 export class UserModule {
 	

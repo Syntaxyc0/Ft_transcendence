@@ -180,6 +180,15 @@ export class UserService
 			FriendRequestsEmitted : newfriendrequestsemitted
 		}
 	})
+
+	// await this.prisma.user.update({
+	// 	where: {
+	// 		login: login,
+	// 	},
+	// 	data: {
+	// 		is_ingame : true
+	// 	}
+	// })
 	await this.prisma.user.update({
 		where: {
 			login: name,
