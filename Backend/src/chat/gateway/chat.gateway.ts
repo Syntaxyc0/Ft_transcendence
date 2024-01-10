@@ -664,7 +664,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 
 		if (existingRoom) {
-			await socket.emit('MessageToUser', existingRoom);
+			setTimeout(() => {
+				socket.emit('MessageToUser', existingRoom);
+			}, 200);
 			return;
 		}
 
@@ -692,6 +694,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 		}
 
-		await socket.emit('MessageToUser', new_room);
+		socket.emit('MessageToUser', new_room);
 	}
 }

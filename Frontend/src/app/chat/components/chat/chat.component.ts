@@ -52,7 +52,7 @@ import { BACKEND } from 'src/app/env';
 export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	
 	room$: Observable<RoomI[]> = this.chatService.getRooms();
-	selectedRoom = null;
+	selectedRoom: RoomI | null = null;
 	userList :object[] = []
 	login;
 	option: boolean;
@@ -138,11 +138,11 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 		});
 
 		this.socket.fromEvent<RoomI>("MessageToUser").subscribe((value) => {
-			console.log(value.name);
-			this.selectedRoom;
+				console.log("MP");
+				this.selectedRoom = value;
 		});
 	}
-
+	
 	ngOnDestroy(): void {
 			// Unsubscribe to avoid memory leaks
 		this.invitedToPlaySubscription.unsubscribe();
@@ -185,7 +185,7 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	}
 
 	onSelectRoom(event: MatSelectionListChange) {
-		console.log(event.source.selectedOptions.selected[0].value);
+		console.log(typeof event.source.selectedOptions.selected[0].value);
 		this.selectedRoom = event.source.selectedOptions.selected[0].value;
 	}
 
