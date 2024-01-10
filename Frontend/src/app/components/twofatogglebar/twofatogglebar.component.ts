@@ -2,6 +2,7 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import {MatButtonToggle, MatButtonToggleModule} from '@angular/material/button-toggle'
+import { BACKEND } from 'src/app/env';
 
 @Component({
   selector: 'app-twofatogglebar',
@@ -17,7 +18,7 @@ export class TwofatogglebarComponent {
   selectedVal: string = 'disable'
 
 	ngOnInit() {
-		this.http.get<any>('http://localhost:3333/users/' + this.id + '/2faenabled').subscribe(
+		this.http.get<any>(BACKEND.URL + 'users/' + this.id + '/2faenabled').subscribe(
 			res => {
 				if (res)
 					this.selectedVal = 'enable'
@@ -33,12 +34,12 @@ export class TwofatogglebarComponent {
     if (val === 'enable')
 	{
 		this.selectedVal = 'enable'
-		this.http.post<any>('http://localhost:3333/users/' + this.id + '/switch2fa', {activated: true}).subscribe()
+		this.http.post<any>(BACKEND.URL + 'users/' + this.id + '/switch2fa', {activated: true}).subscribe()
 	}
     else
 	{
 		this.selectedVal = 'disable'
-		this.http.post<any>('http://localhost:3333/users/' + this.id + '/switch2fa', {activated: false}).subscribe()
+		this.http.post<any>(BACKEND.URL + 'users/' + this.id + '/switch2fa', {activated: false}).subscribe()
 	}
   }
 

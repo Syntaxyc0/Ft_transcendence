@@ -134,6 +134,7 @@ export const HEIGHT = 640
 				this.context.fillText(`If this is not the case, click on multiplayer`, WIDTH/4, HEIGHT/4);
 			break;
 			case "setGameBoard":
+				this.player.inGamePlayer()
 				this.matchmaking = false
 				this.isOnline = true
 				this.draw()
@@ -364,17 +365,6 @@ export const HEIGHT = 640
 		this.showRules = false;
 	  }
 
-	//   retrieveUser() {
-	// 	const id = JSON.parse(localStorage.getItem('id')!);
-
-	// 	this.http.get<any>("http://localhost:3333/users/" + id).subscribe (
-	// 	   res => {
-	// 		   this.login = res['login'];
-	// 	   },
-	// 	   err => {
-	// 		   alert("user doesn't exist");
-	// 	   })
-	// }
   }
 
   

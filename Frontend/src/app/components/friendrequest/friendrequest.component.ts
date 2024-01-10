@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
+import { BACKEND } from 'src/app/env';
 
 @Component({
   selector: 'app-friendrequest',
@@ -24,7 +25,7 @@ export class FriendrequestComponent {
         this.retrieveFriend();
 	}
 	retrieveFriend() {
-	 this.http.get<any>("http://localhost:3333/users/" + this.Id).subscribe(
+	 this.http.get<any>(BACKEND.URL + "users/" + this.Id).subscribe(
 		res => {
 			this.name = res['login'];
 		},
@@ -49,13 +50,13 @@ export class FriendrequestComponent {
 	 }
 
 	get_avatar() {
-		return this.http.get<Blob>("http://localhost:3333/users/" + this.Id + "/avatar", { responseType: 'Blob' as 'json' })
+		return this.http.get<Blob>(BACKEND.URL + "users/" + this.Id + "/avatar", { responseType: 'Blob' as 'json' })
 	}
 
 
 	accept()
 	{
-		this.http.patch("http://localhost:3333/users/" + localStorage.getItem('id') + "/AcceptRequest", {id: this.Id}).subscribe(
+		this.http.patch(BACKEND.URL + "users/" + localStorage.getItem('id') + "/AcceptRequest", {id: this.Id}).subscribe(
 			res => {
 				window.location.reload()
 			},
@@ -68,7 +69,7 @@ export class FriendrequestComponent {
 		
 	deny()
 	{
-		this.http.patch("http://localhost:3333/users/" + localStorage.getItem('id') + "/RefuseRequest", {id: this.Id}).subscribe(
+		this.http.patch(BACKEND.URL + "users/" + localStorage.getItem('id') + "/RefuseRequest", {id: this.Id}).subscribe(
 			res => {
 				window.location.reload()
 			},

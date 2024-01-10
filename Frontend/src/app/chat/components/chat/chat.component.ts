@@ -24,6 +24,7 @@ import { invite_to_playComponent } from '../invite_to_play/invite_to_play.compon
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HostListener } from '@angular/core';
+import { BACKEND } from 'src/app/env';
 
 
 @Component({
@@ -153,7 +154,7 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	retrieveUser() {
 		const id = JSON.parse(localStorage.getItem('id')!);
 
-		this.http.get<any>("http://localhost:3333/users/" + id).subscribe (
+		this.http.get<any>(BACKEND.URL + "users/" + id).subscribe (
 		   res => {
 			   this.login = res['login'];
 		   },

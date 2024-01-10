@@ -5,6 +5,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ErrorModalComponent } from '../components/error-modal/error-modal.component';
+import { BACKEND } from '../env';
 
 
 @Component({
@@ -26,7 +27,7 @@ errorMessage:string =""
 
 ngOnInit() {
 	this.id = JSON.parse(localStorage.getItem('id')!);
-	this.http.get('http://localhost:3333/auth/' + this.id + '/SendMail').subscribe()
+	this.http.get(BACKEND.URL + 'auth/' + this.id + '/SendMail').subscribe()
 }
 
 get	code(): FormControl
@@ -36,7 +37,7 @@ get	code(): FormControl
 
 validate()
 {
-	this.http.post('http://localhost:3333/users/' + this.id + '/verify2facode', {code: this.code.value} ).subscribe(
+	this.http.post(BACKEND.URL + 'users/' + this.id + '/verify2facode', {code: this.code.value} ).subscribe(
 		res => {
 				localStorage.setItem('is_authenticated', 'true');
 				this.router.navigate(['/home'])

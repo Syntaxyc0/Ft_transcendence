@@ -2,6 +2,7 @@ import { Component, Input, Renderer2, ElementRef,ViewChild } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FriendMenuComponent } from '../friend-menu/friend-menu.component';
+import { BACKEND } from 'src/app/env';
 
 @Component({
   selector: 'app-friend',
@@ -47,7 +48,7 @@ export class FriendComponent {
 		this.getUserStatus();
 	}
 	retrieveFriend() {
-	 this.http.get<any>("http://localhost:3333/users/" + this.id).subscribe(
+	 this.http.get<any>(BACKEND.URL + "users/" + this.id).subscribe(
 		res => {
 			this.name = res['login'];
 		})
@@ -58,7 +59,7 @@ export class FriendComponent {
 
 	getUserStatus()
 	{
-		this.http.get<any>("http://localhost:3333/users/" + this.id + "/getstatus").subscribe(
+		this.http.get<any>(BACKEND.URL + "users/" + this.id + "/getstatus").subscribe(
 		res => {
 			this.status = res['status'];
 		})
@@ -76,7 +77,7 @@ export class FriendComponent {
 	 }
 
 	get_avatar() {
-		return this.http.get<Blob>("http://localhost:3333/users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
+		return this.http.get<Blob>(BACKEND.URL + "users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
 	}
 
 	onRightClick(event) {

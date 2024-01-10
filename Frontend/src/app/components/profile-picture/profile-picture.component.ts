@@ -8,6 +8,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CustomValidators } from 'src/app/helpers/custom-validators';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
+import { BACKEND } from 'src/app/env';
 
 @Component({
 	selector: 'app-profile-picture',
@@ -37,7 +38,7 @@ export class ProfilePictureComponent {
 	}
 
 	retrieveUser() {
-	 this.http.get<any>("http://localhost:3333/users/" + this.id).subscribe (
+	 this.http.get<any>(BACKEND.URL + "users/" + this.id).subscribe (
 		res => {
 			this.name = res['login'];
 		},
@@ -60,7 +61,7 @@ export class ProfilePictureComponent {
 	 }
 
 	get_avatar() {
-		return this.http.get<Blob>("http://localhost:3333/users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
+		return this.http.get<Blob>(BACKEND.URL + "users/" + this.id + "/avatar", { responseType: 'Blob' as 'json' })
 	}
 
 	get	Nickname(): FormControl
@@ -73,7 +74,7 @@ export class ProfilePictureComponent {
 	onFileChanged(event) {
 	  this.selectedFile = event.target.files[0]
 
-	  const url = "http://localhost:3333/users/" + this.id + "/upload";
+	  const url = BACKEND.URL + "users/" + this.id + "/upload";
 	  
 		const formData = new FormData();
 		formData.append('file', this.selectedFile);
@@ -93,7 +94,7 @@ export class ProfilePictureComponent {
 	
 	editName(){
 		this.toggleModal()
-		this.http.patch("http://localhost:3333/users/" + this.id + "/editName", {userName:this.editNameForm.value.Nickname}).subscribe(
+		this.http.patch(BACKEND.URL + "users/" + this.id + "/editName", {userName:this.editNameForm.value.Nickname}).subscribe(
 			res => {
 				window.location.reload()
 			},

@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { RouterModule, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { ErrorModalComponent } from '../components/error-modal/error-modal.component';
+import { BACKEND } from '../env';
 
 @Component({
   selector: 'app-signup',
@@ -30,7 +31,7 @@ export class SignupComponent {
 	errorMessage:string =""
 
 	signup(): void{
-			this.http.post<any>('http://localhost:3333/auth/signup', {email: this.mail.value, password:this.password.value, confirm_password:this.confirm_password.value}).subscribe(
+			this.http.post<any>(BACKEND.URL + 'auth/signup', {email: this.mail.value, password:this.password.value, confirm_password:this.confirm_password.value}).subscribe(
 				res => {
 					this.id = res.id;
 					localStorage.setItem('access_token', res["access_token"]);

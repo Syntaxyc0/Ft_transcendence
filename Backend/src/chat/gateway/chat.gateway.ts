@@ -15,7 +15,7 @@ import { RoomI } from '../model/room.interface';
 import { JoinedRoomI } from '../model/joinedRoom.interface';
 import { RoomService } from '../service/room.service';
 
-@WebSocketGateway({ cors: { origin: ['http://localhost:3333', 'http://localhost:4200'] } })
+@WebSocketGateway({ cors: { origin: [process.env.BACKEND_IP , process.env.FRONTEND_IP] } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@WebSocketServer()

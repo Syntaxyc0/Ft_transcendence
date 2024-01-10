@@ -9,6 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 import { GamehistoryComponent } from '../components/gamehistory/gamehistory.component';
 import { PictureComponent } from '../components/picture/picture.component';
 import { FooterBarComponent } from '../components/footer-bar/footer-bar.component';
+import { BACKEND } from '../env';
 
 @Component({
   selector: 'app-profile',
@@ -36,7 +37,7 @@ export class ProfileComponent {
 	}
 	getuserElo()
 	{
-		this.http.get<number>('http://localhost:3333/users/' + this.id + '/getelo').subscribe(
+		this.http.get<number>(BACKEND.URL + 'users/' + this.id + '/getelo').subscribe(
 			res => {
 				this.elo = res
 			},

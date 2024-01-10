@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { UserI } from 'src/app/chat/model/user.interface';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { RoomI } from '../model/room.interface';
+import { BACKEND } from 'src/app/env';
 
 
 
@@ -29,7 +30,7 @@ export class UserService {
 	//    *********   //
 
 	findByLogin(login: string): Observable<UserI[]> {
-		this.users$ = this.http.get<UserI[]>(`http://localhost:3333/users/find-by-login/${login}`)		
+		this.users$ = this.http.get<UserI[]>(BACKEND.URL + `users/find-by-login/${login}`)		
 		return this.users$;
 	}
 	
