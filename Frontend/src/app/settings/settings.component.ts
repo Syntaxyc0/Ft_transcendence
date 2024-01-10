@@ -8,22 +8,22 @@ import { Input } from '@angular/core';
 import { ProfilePictureComponent } from '../components/profile-picture/profile-picture.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LogoutButtonComponent } from '../components/logout-button/logout-button.component';
 import { TwofatogglebarComponent } from '../components/twofatogglebar/twofatogglebar.component';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { CustomSocket } from '../chat/sockets/custom-socket';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, HomeComponent, HeaderbarComponent, AddFriendComponent, GamehistoryComponent, ProfilePictureComponent, HttpClientModule, LogoutButtonComponent, TwofatogglebarComponent, MatButtonToggleModule, MatIconModule, MatMenuModule],
+  imports: [CommonModule, HomeComponent, HeaderbarComponent, AddFriendComponent, GamehistoryComponent, ProfilePictureComponent, HttpClientModule, TwofatogglebarComponent, MatButtonToggleModule, MatIconModule, MatMenuModule],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent {
-	constructor(private readonly router: Router, public http: HttpClient) {}
+	constructor(private readonly router: Router, public http: HttpClient, private socket: CustomSocket) {}
 
 	id:number = 0
 	selectedVal: string = 'disable'
@@ -58,6 +58,7 @@ export class SettingsComponent {
 
 	logout()
 	{
+		this.socket.emit('disconnect_logout')
 		this.http.get('http://localhost:3333/users/' + this.id + '/logout').subscribe()
 		localStorage.clear()
 		this.router.navigate(['/landing'])

@@ -40,15 +40,8 @@ export class UserController {
 	}
 
 
-	//Modify user status
-	@Patch(':uid/status')
-    updateUserStatus(@Param('uid', ParseIntPipe) uid: number, @Body() status:	string)
-	{
-		return this.userService.updateUserStatus(uid, status);
-	}
-
 	//get user status with its ID
-	@Get(':uid/status')
+	@Get(':uid/getstatus')
     GetUserStatus(@Param('uid', ParseIntPipe) uid: number)
 	{
 		return this.userService.GetUserStatus(uid);

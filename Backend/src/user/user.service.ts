@@ -7,6 +7,7 @@ import { UserI } from "src/chat/model/user.interface";
 import * as argon from 'argon2'
 import { MailService } from "src/mail/mail.service";
 import { UUID } from "typeorm/driver/mongodb/bson.typings";
+import { ConnectedUserService } from "src/chat/service/connectedUser.service";
 
 var path = require('path');
 const fs = require("fs");
@@ -15,7 +16,7 @@ const fs = require("fs");
 @Injectable()
 export class UserService
 {
-	constructor(private prisma: PrismaService, private mail: MailService) {}
+	constructor(private prisma: PrismaService, private mail: MailService, private connectedservice: ConnectedUserService) {}
 
 	async getUserFromId(id: number) {
         const user = await this.prisma.user.findUnique(
@@ -43,26 +44,6 @@ export class UserService
 			throw new NotFoundException("User not found")
     	}
 		return user.id
-	}
-
-	async updateUserStatus(id: number, @Body() status)
-	{
-		const user = await this.prisma.user.findUnique({
-			where: {
-				id: id,
-			}
-		})
-		if (!user) {
-            throw new NotFoundException('User not found')
-        }
-		await this.prisma.user.update({
-				data: {
-					userStatus: status['status'] ,
-				},
-				where: {
-					id: id,
-				}
-			})
 	}
 
 	async ChangeNick(uid:number, name:string)
@@ -105,17 +86,13 @@ export class UserService
 
 	async GetUserStatus(id: number)
 	{
-		const user = await this.prisma.user.findUnique(
-			{
-				where: {
-					id: id
-				},
-			},
-		)
-		if (!user) {
-            throw new NotFoundException('User not found')
-        }
-		return user.userStatus
+		const user = await this.connectedservice.findByUser({id: id})
+		if (user.length === 0)
+			return ({status: "OFFLINE"});
+		return ({status: "ONLINE"});
+		
+
+
 	}
 
 	async GetUserFriendlist(uid: number)
