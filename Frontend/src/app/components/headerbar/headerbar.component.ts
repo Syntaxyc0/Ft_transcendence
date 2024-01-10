@@ -10,6 +10,7 @@ import { ContentObserver } from '@angular/cdk/observers';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { invite_to_playComponent } from 'src/app/chat/components/invite_to_play/invite_to_play.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
@@ -26,6 +27,8 @@ export class HeaderbarComponent implements OnInit, OnDestroy{
 		private http: HttpClient,
 		public dialog: MatDialog,
 		private router: Router,
+		public snackbar: MatSnackBar,
+
 		) {}
 
 	dataSubscription: Subscription
@@ -45,10 +48,10 @@ export class HeaderbarComponent implements OnInit, OnDestroy{
 	}
 
 	ngOnDestroy(): void {
-		console.log("destroy")
+		// console.log("destroy")
 		if (this.dataSubscription)
 		{
-			console.log("success")
+			// console.log("success")
 			this.dataSubscription.unsubscribe();
 		}
 	}
@@ -87,6 +90,23 @@ export class HeaderbarComponent implements OnInit, OnDestroy{
 				case "accepted to play":
 					this.socket.emit("checkAndLaunch", {currentUser: payload.inviterI.login, invitedUser: payload.invited_login})
 					this.router.navigate(['/game'])
+				break;
+
+				case "refuse to play":
+					this.snackbar.open(`${payload.login} has refused to play with you`, 'Close' ,{
+									duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+								});
+				break;
+
+				case "player in game":
+					this.snackbar.open(`${payload.login} is in game`, 'Close' ,{
+									duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+								});
+				break;
+				case "player offline":
+					this.snackbar.open(`${payload.login} is offline`, 'Close' ,{
+									duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+								});
 				break;
 		}
 		

@@ -116,26 +116,26 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 			});
 		});
 
-		this.subAccept = this.socket.fromEvent("accepted to play").subscribe((value:any)=>{
-			this.socket.emit("checkAndLaunch", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
-			this.router.navigate(['/game'])
-		});
+		// this.subAccept = this.socket.fromEvent("accepted to play").subscribe((value:any)=>{
+		// 	this.socket.emit("checkAndLaunch", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
+		// 	this.router.navigate(['/game'])
+		// });
 
-		this.subRefuse = this.socket.fromEvent("refuse to play").subscribe((value) => {
-			this.snackbar.open(`${value} has refused to play with you`, 'Close' ,{
-				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
-			});
-		});
+		// this.subRefuse = this.socket.fromEvent("refuse to play").subscribe((value) => {
+		// 	this.snackbar.open(`${value} has refused to play with you`, 'Close' ,{
+		// 		duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+		// 	});
+		// });
 		
-		this.subGoOn = this.socket.fromEvent("go on page").subscribe((value:any)=>{
-			this.router.navigate(['/game'])
-		});
+		// this.subGoOn = this.socket.fromEvent("go on page").subscribe((value:any)=>{
+		// 	this.router.navigate(['/game'])
+		// });
 
-		this.subInGame = this.socket.fromEvent("player in game").subscribe((value) => {
-			this.snackbar.open(`${value} is in game`, 'Close' ,{
-				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
-			});
-		});
+		// this.subInGame = this.socket.fromEvent("player in game").subscribe((value) => {
+		// 	this.snackbar.open(`${value} is in game`, 'Close' ,{
+		// 		duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+		// 	});
+		// });
 
 		this.socket.fromEvent<RoomI>("MessageToUser").subscribe((value) => {
 				console.log("MP");
@@ -148,10 +148,10 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 		this.invitedToPlaySubscription.unsubscribe();
 		this.subOption.unsubscribe;
 		this.subKick.unsubscribe;
-		this.subAccept.unsubscribe;
-		this.subRefuse.unsubscribe;
-		this.subGoOn.unsubscribe;
-		this.subInGame.unsubscribe;
+		// this.subAccept.unsubscribe;
+		// this.subRefuse.unsubscribe;
+		// this.subGoOn.unsubscribe;
+		// this.subInGame.unsubscribe;
 	}
 
 	@HostListener('document:visibilitychange', ['$event'])
