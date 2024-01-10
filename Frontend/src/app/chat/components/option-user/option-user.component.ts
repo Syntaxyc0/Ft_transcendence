@@ -63,8 +63,6 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 	BanSub: Subscription;
 	InRoomSub: Subscription;
 
-	// SI IL EST PLUS DANS LE SALON TU NE DEVRAIS PLUS POUVOIR LE KICK
-
   constructor(	private userService: UserService,
 				private socket: CustomSocket,
 				private socketService: SocketService,
@@ -142,12 +140,13 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 
 	
 	ngOnDestroy(): void {
+		this.Usersub.unsubscribe();
 		this.AdminSub.unsubscribe();
 		this.RoomSub.unsubscribe();
+		this.CreatorSub.unsubscribe();
 		this.BlockSub.unsubscribe();
 		this.MuteSub.unsubscribe();
 		this.BanSub.unsubscribe();
-		this.CreatorSub.unsubscribe();
 		this.InRoomSub.unsubscribe();
 	}
 

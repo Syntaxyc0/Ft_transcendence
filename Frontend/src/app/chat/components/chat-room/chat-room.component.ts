@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable, combineLatest, map, startWith, tap } from 'rxjs';
+import { Observable, Subscription, combineLatest, map, startWith, tap } from 'rxjs';
 import { RoomI } from 'src/app/chat/model/room.interface';
 import { MessageI } from '../../model/message.interface';
 import { ChatService } from '../../services/chat.service';
@@ -65,6 +65,12 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
   isCurrentMuted: boolean = this.isMuted();
   adminArray;
   adminCurrent;
+
+  subMute: Subscription;
+  subMuteTrue: Subscription;
+  subMuteFalse: Subscription;
+  subAdmin: Subscription;
+  subPass: Subscription;
   
   messages$: Observable<MessageI[]> = combineLatest([
 	this.chatService.getMessage(), 
@@ -103,13 +109,13 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 		this.userService.changeRoom(this.chatRoom);
 
 		// Muted ?
-		this.socket.emit("MutedUsers", this.chatRoom);
+		this.subMute = this.socket.emit("MutedUsers", this.chatRoom);
 		this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
 			this.mutedUserList = value;
 			this.isCurrentMuted = this.isMuted();
 		});
 
-		this.socket.fromEvent<UserI[] | undefined>("mutedUserTrue").subscribe(value =>{
+		this.subMuteTrue = this.socket.fromEvent<UserI[] | undefined>("mutedUserTrue").subscribe(value =>{
 			this.mutedUserList = value;
 			this.isCurrentMuted = true;
 			this.snackbar.open(`You have been muted`, 'Close' ,{
@@ -117,7 +123,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 			});
 		});
 
-		this.socket.fromEvent<UserI[] | undefined>("mutedUserFalse").subscribe(value =>{
+		this.subMuteFalse = this.socket.fromEvent<UserI[] | undefined>("mutedUserFalse").subscribe(value =>{
 			this.mutedUserList = value;
 			this.isCurrentMuted = false;
 		});
@@ -128,12 +134,12 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 
 			// Admin ?			
 			this.socket.emit("getAdminList", this.chatRoom);
-			this.socket.fromEvent("isAdmin").subscribe((value) => {
+			this.subAdmin = this.socket.fromEvent("isAdmin").subscribe((value) => {
 				this.adminArray = value;
 				this.adminCurrent = this.isAdmin(this.currentId);
 			});
 
-			this.socket.fromEvent<RoomI>("passwordUpdate").subscribe((value) => {
+			this.subPass = this.socket.fromEvent<RoomI>("passwordUpdate").subscribe((value) => {
 				this.chatRoom = value
 			});
 
@@ -153,6 +159,11 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 	ngOnDestroy() {
 		this.chatService.leaveRoom(this.chatRoom);
 		this.userService.changeOption(false, undefined);
+		this.subMute.unsubscribe();
+		this.subMuteFalse.unsubscribe();
+		this.subMuteTrue.unsubscribe();
+		this.subAdmin.unsubscribe();
+		this.subPass.unsubscribe();
 	}
 
 	sendMessage() {

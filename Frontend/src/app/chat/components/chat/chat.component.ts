@@ -138,7 +138,6 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 		});
 
 		this.socket.fromEvent<RoomI>("MessageToUser").subscribe((value) => {
-				console.log("MP");
 				this.selectedRoom = value;
 		});
 	}

@@ -1,10 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { SocketService } from '../../services/socket.service';
 import { CommonModule } from '@angular/common';
 import { MessageI } from '../../model/message.interface';
 import { UserService } from '../../services/user.service';
 import { UserI } from '../../model/user.interface';
 import { CustomSocket } from '../../sockets/custom-socket';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chat-message',
@@ -13,11 +14,13 @@ import { CustomSocket } from '../../sockets/custom-socket';
   imports: [ CommonModule ],
   styleUrls: ['./chat-message.component.scss'],
 })
-export class ChatMessageComponent {
+export class ChatMessageComponent implements OnInit, OnDestroy{
 
 	@Input() message: MessageI;
 	id;
 	blockedUserList: UserI[] | undefined;
+
+	subBlock: Subscription;
 
 	constructor(private socketService: SocketService, 
 				private socket: CustomSocket,
@@ -27,10 +30,14 @@ export class ChatMessageComponent {
 		this.id = JSON.parse(localStorage.getItem('id')!);
 
 		// BlockedUser ?
-		this.socket.emit("blockedUsers");
+		this.subBlock = this.socket.emit("blockedUsers");
 		this.socket.fromEvent<UserI[] | undefined>("blockedUsersList").subscribe(value =>{
 			this.blockedUserList = value;
 		});
+	}
+
+	ngOnDestroy(): void {
+		this.subBlock.unsubscribe();
 	}
 
 	openOption(user_: UserI | undefined) {

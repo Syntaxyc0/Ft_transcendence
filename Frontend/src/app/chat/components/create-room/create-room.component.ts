@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormGroup, FormControl, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { UserI } from 'src/app/chat/model/user.interface';
 import { ChatService } from '../../services/chat.service';
@@ -14,7 +14,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { RouterModule } from '@angular/router';
 import { SocketService } from '../../services/socket.service';
-import { Observable, take } from 'rxjs';
+import { Observable, Subscription, take } from 'rxjs';
 import { CustomSocket } from '../../sockets/custom-socket';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -26,7 +26,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './create-room.component.html',
   styleUrls: ['./create-room.component.scss']
 })
-export class CreateRoomComponent implements OnInit {
+export class CreateRoomComponent implements OnInit, OnDestroy {
 
 	form: FormGroup = new FormGroup({
 		name: new FormControl(null, [Validators.required]),
@@ -38,7 +38,8 @@ export class CreateRoomComponent implements OnInit {
 	});
 	currentUser$: Observable<UserI> = this.socketService.user;
 	
-	
+	subExist: Subscription;
+
 	constructor(private chatService: ChatService,
 				private router: Router,
 				private socketService: SocketService,
@@ -52,12 +53,16 @@ export class CreateRoomComponent implements OnInit {
 			console.log('isPass:', this.form.get('isPass')?.value);
 		});
 
-		this.socket.fromEvent<boolean>("roomExisting").subscribe((value) => {
+		this.subExist = this.socket.fromEvent<boolean>("roomExisting").subscribe((value) => {
 			if (value)
 				this.snackbar.open(`Room ${this.name.value} already exists`, 'Close' ,{
 					duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
 				});
 		});
+	}
+
+	ngOnDestroy(): void {
+		this.subExist.unsubscribe();
 	}
 
 	create() {

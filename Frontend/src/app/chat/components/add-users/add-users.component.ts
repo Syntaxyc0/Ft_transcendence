@@ -1,7 +1,7 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { UserI } from 'src/app/chat/model/user.interface';
 import { FormControl } from '@angular/forms';
-import { Observable, debounceTime, distinctUntilChanged, of, switchMap, take, tap } from 'rxjs';
+import { Observable, Subscription, debounceTime, distinctUntilChanged, of, switchMap, take, tap } from 'rxjs';
 import { UserService } from 'src/app/chat/services/user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -37,10 +37,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './add-users.component.html',
   styleUrls: ['./add-users.component.scss'],
 })
-export class AddUsersComponent implements OnInit{
+export class AddUsersComponent implements OnInit, OnDestroy{
 
 	room: RoomI;
 	UsersRoom: UserI[];
+
+	subBan: Subscription;
+	subUserRoom: Subscription;
 
 	searchLogin = new FormControl();
 	filteredUsers: UserI[] = [];
@@ -61,14 +64,14 @@ export class AddUsersComponent implements OnInit{
 	ngOnInit() : void {
 		this.currentUserId = JSON.parse(localStorage.getItem('id')!);
 
-		this.socket.emit("getBanList", this.room);
+		this.subBan = this.socket.emit("getBanList", this.room);
 		this.socket.fromEvent<UserI[] | undefined>("banList").subscribe(value => {
 			this.banList = value;
 		});
 
 		this.socket.emit("getUsersRoom", this.room);
 
-		this.socket.fromEvent<UserI[]>("UsersRoom").subscribe(value => {
+		this.subUserRoom = this.socket.fromEvent<UserI[]>("UsersRoom").subscribe(value => {
 			this.UsersRoom = value;
 			
 
@@ -91,6 +94,11 @@ export class AddUsersComponent implements OnInit{
 			).subscribe();
 		});
 
+	}
+
+	ngOnDestroy(): void {
+		this.subBan.unsubscribe();
+		this.subUserRoom.unsubscribe();
 	}
 
 	addUserToRoom() {

@@ -657,7 +657,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			where: { id: userId }
 		});
 
-		const name_ = "Mp " + socket.data.user.login + " " + user.login;
+		const name_ = [ socket.data.user.login, user.login ].sort().join(" ");
 
 		const existingRoom = await this.prisma.room.findUnique({
 			where: { name: name_ },
@@ -694,6 +694,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 		}
 
-		socket.emit('MessageToUser', new_room);
+		setTimeout(() => {
+			socket.emit('MessageToUser', new_room);
+		}, 200);
 	}
 }
