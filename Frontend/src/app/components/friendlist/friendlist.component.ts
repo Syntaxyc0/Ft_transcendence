@@ -4,6 +4,7 @@ import { FriendComponent } from '../friend/friend.component';
 import { AddFriendComponent } from '../add-friend/add-friend.component';
 import { SearchUserComponent } from '../search-user/search-user.component';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { BACKEND } from 'src/app/env';
 
 @Component({
   selector: 'app-friendlist',
@@ -19,7 +20,7 @@ export class FriendlistComponent {
 	friendList :number[] = []
 
 	ngOnInit() {
-		this.http.get<number[]>("http://localhost:3333/users/" + this.id + "/friendlist").subscribe(res => {
+		this.http.get<number[]>(BACKEND.URL + "users/" + this.id + "/friendlist").subscribe(res => {
 			this.friendList = res;
 	})
 	

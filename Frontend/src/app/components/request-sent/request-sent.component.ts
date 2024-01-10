@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
+import { BACKEND } from 'src/app/env';
 
 @Component({
   selector: 'app-request-sent',
@@ -24,7 +25,7 @@ export class RequestSentComponent {
         this.retrieveFriend();
 	}
 	retrieveFriend() {
-	 this.http.get<any>("http://localhost:3333/users/" + this.Id).subscribe(
+	 this.http.get<any>(BACKEND.URL + "users/" + this.Id).subscribe(
 		res => {
 			this.name = res['login'];
 		},
@@ -47,12 +48,12 @@ export class RequestSentComponent {
 	 }
 
 	get_avatar() {
-		return this.http.get<Blob>("http://localhost:3333/users/" + this.Id + "/avatar", { responseType: 'Blob' as 'json' })
+		return this.http.get<Blob>(BACKEND.URL + "users/" + this.Id + "/avatar", { responseType: 'Blob' as 'json' })
 	}
 
 	cancel()
 	{
-		this.http.patch("http://localhost:3333/users/" + localStorage.getItem('id') + "/CancelRequest", {username: this.name}).subscribe(
+		this.http.patch(BACKEND.URL + "users/" + localStorage.getItem('id') + "/CancelRequest", {username: this.name}).subscribe(
 			res => {
 				window.location.reload()
 			},

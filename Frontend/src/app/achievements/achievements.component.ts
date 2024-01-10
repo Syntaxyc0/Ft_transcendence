@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderbarComponent } from '../components/headerbar/headerbar.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { BACKEND } from '../env';
 
 @Component({
   selector: 'app-achievements',
@@ -33,7 +34,7 @@ export class AchievementsComponent {
 	ngOnInit()
 	{
 		this.id = JSON.parse(localStorage.getItem('id')!)
-		this.http.get('http://localhost:3333/users/' + this.id + '/achievements').subscribe(
+		this.http.get(BACKEND.URL + 'users/' + this.id + '/achievements').subscribe(
 			res => {
 				this.accomplishments = [
 					{ title: '42 student', instructions:'Log in with the 42 api', currentScore: res[0], paliers: [0, 0, 1] },

@@ -15,7 +15,6 @@ export class SocketDataService{
 
 	constructor(private socket: CustomSocket) {}
 
-  // private baseUrl = 'http://localhost:3333';
 
   private login!: string;
 

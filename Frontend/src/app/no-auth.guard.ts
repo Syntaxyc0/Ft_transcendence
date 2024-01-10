@@ -7,6 +7,7 @@ import {
 } from '@angular/router';
 
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { BACKEND } from './env';
 
 @Injectable({
   providedIn: 'root',
@@ -24,11 +25,11 @@ export class NoAuthGuard implements CanActivate {
   }
 
   check_token(token) {
-    return this.http.post("http://localhost:3333/auth/check", {token})
+    return this.http.post(BACKEND.URL + "auth/check", {token})
 	}
 
   check_2fastatus(id)
   {
-    return this.http.get("http://localhost:3333/auth/" + id + "/check2fa")
+    return this.http.get(BACKEND.URL + "auth/" + id + "/check2fa")
   }
 }

@@ -14,7 +14,7 @@ import { pbkdf2 } from 'crypto';
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:4200'],
+    origin: [process.env.FRONTEND_IP],
   }
 })
 export class GameGateway implements OnModuleInit{
