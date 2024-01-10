@@ -18,6 +18,9 @@ export class FriendMenuComponent implements OnInit{
 	@Input() id: number
 	@Input() name: string
 
+	currentId = JSON.parse(localStorage.getItem('id')!)
+
+
 	constructor(public http: HttpClient,
 				private route:ActivatedRoute,
 				private router: Router,
@@ -47,8 +50,7 @@ export class FriendMenuComponent implements OnInit{
 
 	inviteToPlay()/*invitedUser?: string, currentUser?: string*/
 	{
-		// console.
-		this.socket.emit("invite_to_play?", this.id);
+		this.socket.emit("invite_to_play?", {id: this.id, currentId: this.currentId});
 	}
 
 	sendMessage() {

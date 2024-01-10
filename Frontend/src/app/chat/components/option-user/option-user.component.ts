@@ -153,7 +153,7 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 
 	inviteToPlay()/*invitedUser?: string, currentUser?: string*/
 	{
-		this.socket.emit("invite_to_play?", this.user?.id);
+		this.socket.emit("invite_to_play?", {id: this.user?.id, currentId: this.current_user?.id});
 	}
 
 	goToProfile()

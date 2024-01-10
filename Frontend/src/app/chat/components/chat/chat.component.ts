@@ -88,55 +88,6 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 			this.selectedRoom = null;
 		});
 
-		this.invitedToPlaySubscription = this.socket.fromEvent("invited to play").subscribe(async (value: any) => {
-
-			const { inviterI } = value;
-			if(!this.isVisible())
-			{
-				this.socket.emit("notInChat");
-				this.dialog.closeAll();
-				return;
-			}
-			console.log("invited" + this.isVisible())
-
-			const dialogRef = this.dialog.open(invite_to_playComponent, {
-				width: '300px',
-				data: { login: inviterI.login }
-			});
-			dialogRef.afterClosed().subscribe(result => {
-				if (result) {
-					this.dialog.closeAll()
-					this.socket.emit('checkAndAccept', inviterI)
-					this.router.navigate(['/game'])
-
-				} else {
-					this.dialog.closeAll()
-					this.socket.emit("refuseGame", inviterI);
-				}
-			});
-		});
-
-		// this.subAccept = this.socket.fromEvent("accepted to play").subscribe((value:any)=>{
-		// 	this.socket.emit("checkAndLaunch", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
-		// 	this.router.navigate(['/game'])
-		// });
-
-		// this.subRefuse = this.socket.fromEvent("refuse to play").subscribe((value) => {
-		// 	this.snackbar.open(`${value} has refused to play with you`, 'Close' ,{
-		// 		duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
-		// 	});
-		// });
-		
-		// this.subGoOn = this.socket.fromEvent("go on page").subscribe((value:any)=>{
-		// 	this.router.navigate(['/game'])
-		// });
-
-		// this.subInGame = this.socket.fromEvent("player in game").subscribe((value) => {
-		// 	this.snackbar.open(`${value} is in game`, 'Close' ,{
-		// 		duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
-		// 	});
-		// });
-
 		this.socket.fromEvent<RoomI>("MessageToUser").subscribe((value) => {
 				console.log("MP");
 				this.selectedRoom = value;
@@ -145,28 +96,11 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	
 	ngOnDestroy(): void {
 			// Unsubscribe to avoid memory leaks
-		this.invitedToPlaySubscription.unsubscribe();
-		this.subOption.unsubscribe;
-		this.subKick.unsubscribe;
-		// this.subAccept.unsubscribe;
-		// this.subRefuse.unsubscribe;
-		// this.subGoOn.unsubscribe;
-		// this.subInGame.unsubscribe;
+		if (this.subOption)
+			this.subOption.unsubscribe;
+		if (this.subKick)
+			this.subKick.unsubscribe;
 	}
-
-	@HostListener('document:visibilitychange', ['$event'])
-	onVisibilityChange(event: Event): void {
-		if(!this.isVisible())
-			this.dialog.closeAll()
-	 }
-
-	 isVisible(): boolean
-	 {
-		if (document.visibilityState === 'visible') 
-			return true;
-		else 
-			return false;
-	 }
 
 	retrieveUser() {
 		const id = JSON.parse(localStorage.getItem('id')!);

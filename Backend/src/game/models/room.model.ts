@@ -25,15 +25,6 @@ export class Room{
         this.players.push(playerTwo)
         for (let i: number = 0; i < 2; i++)
         {
-            // this.prisma.user.update({
-            //     where: {
-            //         login: this.players[i].login,
-            //     },
-                
-            //     data: {
-            //         is_ingame : true
-            //     }
-            // })
             this.players[i].lookingForPlayer = false
             this.players[i].room = this
             this.players[i].status = true;

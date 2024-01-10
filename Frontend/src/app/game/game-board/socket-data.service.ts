@@ -49,6 +49,7 @@ getData(): Observable<any[]> {
     this.socket.emit("disconnectingClient")
   }
 
+  
   gameMode(side: number, wanted: boolean)
   {
     this.socket.emit("randomWanted", {side: side, wanted: wanted});

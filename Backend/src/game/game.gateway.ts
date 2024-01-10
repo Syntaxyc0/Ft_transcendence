@@ -77,6 +77,7 @@ export class GameGateway implements OnModuleInit{
 
   playerExists(newPlayer: Player)
   {
+    try{
     if (!newPlayer || !newPlayer.login)
       return;
     this.connectedPlayers.forEach((player, index) => {
@@ -95,12 +96,30 @@ export class GameGateway implements OnModuleInit{
         newPlayer.socket.emit('onGameRequest', {order: "multiWindow"})
         this.connectedPlayers.delete(newPlayer.socket.id)
       }
-    })
+    })}
+    catch {
+      console.log("player not initialized")
+      return;
+    }
   }
+
+@SubscribeMessage('closeAll')
+async closeAllDialogs(socket: Socket, id: number)
+{
+  const connectedUser = await this.prisma.connectedUser.findMany();
+  for (const User of connectedUser) {
+    if(id === User.userId) {
+      this.server.to(User.socketId).emit("onInviteRequest", {
+        order: "closeAllDialogs"
+      });
+    }
+  }
+}
 
   @SubscribeMessage('checkAndAccept')
   checkAndAccept(@ConnectedSocket() client : Socket, @MessageBody() user: UserI)
   {
+
     setTimeout( async() => {
       await this.lookForGame(client)
       const connectedUser = await this.prisma.connectedUser.findMany();
@@ -204,23 +223,33 @@ export class GameGateway implements OnModuleInit{
   }
 
   @SubscribeMessage('invite_to_play?')
-	async invite_to_play( socket: Socket, id: number ) {
+	async invite_to_play( socket: Socket, ids: { id: number, currentId: number}) {
     const user = await this.prisma.user.findUnique({
-      where: {id: id}
+      where: {id: ids.id}
     });
 
 		const connectedUser = await this.prisma.connectedUser.findMany();
-    const status = await this.userService.GetUserStatus(id)
-    if (status.status == "OFFLINE")
+    const currentStatus = await this.userService.GetUserStatus(ids.currentId)
+
+    if(currentStatus.status == "IN GAME")
+    {
+      socket.emit("onInviteRequest", {order: "you are game"})
+      return;
+    }
+
+    const invitedStatus = await this.userService.GetUserStatus(ids.id)
+    if (invitedStatus.status == "OFFLINE")
     {
       socket.emit("onInviteRequest", {order: "player offline", login: user.login})
       return;
     }
-    else if (status.status == "IN GAME")
+
+    else if (invitedStatus.status == "IN GAME")
     {
       socket.emit("onInviteRequest", {order: "player in game", login: user.login})
       return;
     }
+
 
 		for (const User of connectedUser) {
 			if(user.id === User.userId) {
