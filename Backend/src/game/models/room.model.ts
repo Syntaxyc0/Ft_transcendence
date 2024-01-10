@@ -25,6 +25,14 @@ export class Room{
         this.players.push(playerTwo)
         for (let i: number = 0; i < 2; i++)
         {
+            this.prisma.user.update({
+                where: {
+                    login: this.players[i].login,
+                },
+                data: {
+                    is_ingame : true
+                }
+            })
             this.players[i].lookingForPlayer = false
             this.players[i].room = this
             this.players[i].status = true;
@@ -61,14 +69,6 @@ export class Room{
     {
         // this.multiplayer.gameRequest({order: "resetBoard"})
         this.multiplayer.stopGame()
-        // this.prisma.user.update({
-		// where: {
-		// 	login: this.players[0].login,
-		// },
-		// data: {
-		// 	is_ingame : true
-		// }
-	    // })
         this.isGameRunning = false
 
         if (this.paddles[0].score > this.paddles[1].score)
@@ -79,6 +79,14 @@ export class Room{
         for (let i: number = 0; i < 2; i++)
         {
             this.players[i].room = undefined
+            this.prisma.user.update({
+                where: {
+                    login: this.players[i].login,
+                },
+                data: {
+                    is_ingame : false
+                }
+                })
         }
     }
     

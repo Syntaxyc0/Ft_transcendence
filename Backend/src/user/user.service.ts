@@ -86,9 +86,21 @@ export class UserService
 
 	async GetUserStatus(id: number)
 	{
-		const user = await this.connectedservice.findByUser({id: id})
-		if (user.length === 0)
+		const userconnected = await this.connectedservice.findByUser({id: id})
+		if (userconnected.length === 0)
 			return ({status: "OFFLINE"});
+		const user = await this.prisma.user.findUnique(
+			{
+				where: {
+					id: id
+				},
+			})
+		if (!user)
+		{
+			throw new NotFoundException('User not found')
+		}
+		if (user.is_ingame)
+			return ({status: "IN GAME"});
 		return ({status: "ONLINE"});
 		
 
