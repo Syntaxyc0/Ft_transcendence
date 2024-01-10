@@ -112,19 +112,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const createdRoom = await this.prisma.room.create({
 				data: {
 					...roomInput,
-					users: {
-						connect: usersArray,
-					},
-					creator: {
-						connect: {
-							id: user.id
-						},
-					},
-					admin: {
-						connect: {
-							id: user.id
-						},
-					},
+					users: { connect: usersArray },
+					creator: { connect: { id: user.id	} },
+					admin: { connect: { id: user.id } },
 				},
 				include : { users: true }
 			});
@@ -658,5 +648,50 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 
 		return await socket.emit('InRoomList', room_.users);
+	}
+
+	@SubscribeMessage('mpUser')
+	async mpUser( socket: Socket, userId: number ) {
+
+		const user = await this.prisma.user.findUnique({
+			where: { id: userId }
+		});
+
+		const name_ = "Mp " + socket.data.user.login + " " + user.login;
+
+		const existingRoom = await this.prisma.room.findUnique({
+			where: { name: name_ },
+		});
+
+		if (existingRoom) {
+			await socket.emit('MessageToUser', existingRoom);
+			return;
+		}
+
+		const new_room = await this.prisma.room.create({
+			data: {
+				users: {connect: [
+					{id: userId}, 
+					{id: socket.data.user.id } ]},
+				creator: { connect: { id: socket.data.user.id } },
+				admin: { connect: { id: socket.data.user.id } },
+				name: name_,
+				password: null,
+				public: false,
+				isPass: false,
+			},
+			include: { users: true },
+		});
+
+
+		for (const user of new_room.users) {
+
+			const connected_users: ConnectedUser[] = await this.connectedUserService.findByUser( { id: user.id } );
+			for (const connection of connected_users) {
+				await this.server.to(connection.socketId).emit('roomsI', await this.allowedRooms(connection.userId));
+			}
+		}
+
+		await socket.emit('MessageToUser', new_room);
 	}
 }
