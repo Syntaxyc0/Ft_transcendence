@@ -421,19 +421,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const { user, room } = data;
 
-		const room_ = await this.prisma.room.findUnique({
-			where: { id: room.id },
-		});
-
-
 		// delete user_ from the current room
-		await this.prisma.room.update({
-			where: { id: room_.id },
+		const room_ = await this.prisma.room.update({
+			where: { id: room.id },
 			data: {
 			  users: { disconnect: { id: user.id } },
 			},
+			include: { users: true },
 		});
 		
+		await socket.emit('InRoomList', room_.users);
+
 		const connectedUser = await this.prisma.connectedUser.findMany();
 		for (const User of connectedUser) {
 			if (User.userId === user.id) {
@@ -447,20 +445,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async AddUser(socket: Socket, data: { user: UserI, room: RoomI }) {
 
 		const { user, room } = data;
-
-		const room_ = await this.prisma.room.findUnique({
-			where: { id: room.id },
-		});
 		
 		// add user_ from the current room
-		await this.prisma.room.update({
-			where: { id: room_.id },
+		const room_ = await this.prisma.room.update({
+			where: { id: room.id },
 			data: {
 				users: { connect: { id: user.id } },
 			},
+			include: {users: true}
 		});
 		
-		
+		await socket.emit('InRoomList', room_.users);
+
 		const connectedUser = await this.prisma.connectedUser.findMany();
 		for (const User of connectedUser) {
 			if (User.userId === user.id) {
@@ -551,7 +547,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		return await socket.emit('banList', room_.BanUsers);
 	}
-
+	
 	@SubscribeMessage('acceptGame')
 	async acceptGame( socket: Socket, user: UserI ) 
 	{
@@ -651,5 +647,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const rooms = [...publicRooms, ...userRooms]
 
 		return rooms;
+	}
+
+	@SubscribeMessage('InRoom?')
+	async InRoom( socket: Socket, room: RoomI ) {
+
+		const room_ = await this.prisma.room.findUnique({
+			where: { id: room.id },
+			include: { users: true },
+		});
+
+		return await socket.emit('InRoomList', room_.users);
 	}
 }
