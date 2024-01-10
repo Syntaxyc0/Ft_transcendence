@@ -12,11 +12,13 @@ import { JoinedRoomService } from 'src/chat/service/joined-room.service';
 import { MessageService } from 'src/chat/service/message.service';
 import { JwtService } from '@nestjs/jwt';
 import { HttpModule, HttpService } from '@nestjs/axios';
+import { GameGateway } from 'src/game/game.gateway';
+import { GameService } from 'src/game/game.service';
 
 @Module({
   imports: [MailModule, HttpModule],
   controllers: [UserController],
-  providers: [UserService, MailService, ConnectedUserService, ChatGateway, AuthService, RoomService, JoinedRoomService, MessageService, JwtService]
+  providers: [UserService, MailService, ConnectedUserService, AuthService, RoomService, JoinedRoomService, MessageService, JwtService]
 })
 export class UserModule {
 	
