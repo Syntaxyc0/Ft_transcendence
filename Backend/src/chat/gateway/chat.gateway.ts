@@ -14,6 +14,8 @@ import { MessageI } from '../model/message.interface';
 import { RoomI } from '../model/room.interface';
 import { JoinedRoomI } from '../model/joinedRoom.interface';
 import { RoomService } from '../service/room.service';
+import * as argon from 'argon2'
+
 
 @WebSocketGateway({ cors: { origin: [process.env.BACKEND_IP , process.env.FRONTEND_IP] } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -130,21 +132,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			
 // La room est public
 		} else {
-			const { users, ...roomDataWithoutUsers } = roomInput;
+			const { users, password, ...roomDataWithoutUsers } = roomInput;
+
+			let hashpass;
+
+			if (password){
+				hashpass = await argon.hash(password)
+			} else {
+				hashpass = null;
+			}
 
 			const createdRoom = await this.prisma.room.create({
 				data: {
 					...roomDataWithoutUsers,
 					creator: {
-						connect: {
-							id: user.id
-						},
-					},
-					admin: {
-						connect: {
-							id: user.id
-						},
-					},
+						connect: {	id: user.id	} },
+					admin: { connect: { id: user.id } },
+					password: hashpass,
 				},
 			});
 
@@ -541,13 +545,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('acceptGame')
 	async acceptGame( socket: Socket, user: UserI ) 
 	{
-		// console.log("game accepted")
 		const connectedUser = await this.prisma.connectedUser.findMany();
 		for (const User of connectedUser) {
 			if(user.id === User.userId) {
 				await this.server.to(User.socketId).emit("accepted to play", {
 					inviterI: socket.data.user,
-					// inviter_socket: socket,
 					invited_login: user.login,
 				});
 			}
@@ -575,7 +577,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			where: { id: room.id },
 		});
 		
-		if (pass === room_.password) 
+		if (await argon.verify(room_.password, pass)) 
 			socket.emit("PassResponse", true); 
 		else
 			socket.emit("PassResponse", false);

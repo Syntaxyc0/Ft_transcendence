@@ -109,8 +109,8 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 		this.userService.changeRoom(this.chatRoom);
 
 		// Muted ?
-		this.subMute = this.socket.emit("MutedUsers", this.chatRoom);
-		this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
+		this.socket.emit("MutedUsers", this.chatRoom);
+		this.subMute = this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
 			this.mutedUserList = value;
 			this.isCurrentMuted = this.isMuted();
 		});
@@ -127,6 +127,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 			this.mutedUserList = value;
 			this.isCurrentMuted = false;
 		});
+		// **** 
 	}
 
 	ngOnChanges(changes: SimpleChanges) {
@@ -139,6 +140,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 				this.adminCurrent = this.isAdmin(this.currentId);
 			});
 
+			// Password ?
 			this.subPass = this.socket.fromEvent<RoomI>("passwordUpdate").subscribe((value) => {
 				this.chatRoom = value
 			});
