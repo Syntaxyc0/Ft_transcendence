@@ -58,6 +58,12 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	option: boolean;
 
 	invitedToPlaySubscription: Subscription;
+	subOption: Subscription;
+	subKick: Subscription;
+	subAccept: Subscription;
+	subRefuse: Subscription;
+	subGoOn: Subscription;
+	subInGame: Subscription;
 
 
 	constructor(
@@ -72,11 +78,12 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 
 	ngOnInit(): void {
 		this.retrieveUser();
-		this.userService.option$.subscribe(value => {
+
+		this.subOption = this.userService.option$.subscribe(value => {
 			this.option = value;
 		  });
 
-		this.socket.fromEvent("kicked").subscribe(() => {
+		this.subKick = this.socket.fromEvent("kicked").subscribe(() => {
 			this.selectedRoom = null;
 		});
 
@@ -108,24 +115,22 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 			});
 		})
 
-
-
-		this.socket.fromEvent("accepted to play").subscribe((value:any)=>{
+		this.subAccept = this.socket.fromEvent("accepted to play").subscribe((value:any)=>{
 			this.socket.emit("checkAndLaunch", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
 			this.router.navigate(['/game'])
 		})
 
-		this.socket.fromEvent("refuse to play").subscribe((value) => {
+		this.subRefuse = this.socket.fromEvent("refuse to play").subscribe((value) => {
 			this.snackbar.open(`${value} has refused to play with you`, 'Close' ,{
 				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
 			});
 		});
 		
-		this.socket.fromEvent("go on page").subscribe((value:any)=>{
+		this.subGoOn = this.socket.fromEvent("go on page").subscribe((value:any)=>{
 			this.router.navigate(['/game'])
 		})
 
-		this.socket.fromEvent("player in game").subscribe((value) => {
+		this.subInGame = this.socket.fromEvent("player in game").subscribe((value) => {
 			this.snackbar.open(`${value} is in game`, 'Close' ,{
 				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
 			});
@@ -135,6 +140,12 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	ngOnDestroy(): void {
 			// Unsubscribe to avoid memory leaks
 		this.invitedToPlaySubscription.unsubscribe();
+		this.subOption.unsubscribe;
+		this.subKick.unsubscribe;
+		this.subAccept.unsubscribe;
+		this.subRefuse.unsubscribe;
+		this.subGoOn.unsubscribe;
+		this.subInGame.unsubscribe;
 	}
 
 	@HostListener('document:visibilitychange', ['$event'])

@@ -129,6 +129,7 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 
 	}
 
+	
 	ngOnDestroy(): void {
 		this.AdminSub.unsubscribe();
 		this.RoomSub.unsubscribe();
