@@ -28,7 +28,6 @@ export class GameGateway implements OnModuleInit{
   constructor(private prisma: PrismaService, private authService: AuthService, private userService: UserService, private gameService: GameService) {}
 
   onModuleInit(){
-    console.log("Server up")
     this.server.on('connection', async (socket) => {
       await this.connection(socket)
 
@@ -91,6 +90,7 @@ export class GameGateway implements OnModuleInit{
         player.socket.emit('onGameRequest', {order: "multiWindow"})
         this.connectedPlayers.delete(index)
       }
+
       else if(player.status === true)
       {
         newPlayer.socket.emit('onGameRequest', {order: "multiWindow"})
@@ -179,7 +179,7 @@ async closeAllDialogs(socket: Socket, id: number)
     const targetRoom = this.connectedPlayers.get(clientId).room;
     if (targetRoom)
     {
-      console.log("Destroying Room " + targetRoom.id)
+      // console.log("Destroying Room " + targetRoom.id)
       targetRoom.destroyRoom()
       this.rooms.splice(targetRoom.id, 1);
     }
@@ -283,7 +283,7 @@ async closeAllDialogs(socket: Socket, id: number)
     const player = this.connectedPlayers.get(client.id)
     if (!player)
       return
-    console.log(player.login + " has disconnected");
+    // console.log(player.login + " has disconnected");
     player.connected = false;
     player.status = false;
     player.lookingForPlayer = false

@@ -32,7 +32,6 @@ export class HeaderbarComponent implements OnInit, OnDestroy{
 		) {}
 
 	dataSubscription: Subscription
-	invitedSubscription: Subscription
 	id;
 	login: string;
 
@@ -51,11 +50,8 @@ export class HeaderbarComponent implements OnInit, OnDestroy{
 	}
 
 	ngOnDestroy(): void {
-		// console.log("destroy")
 		if (this.dataSubscription)
-		{
 			this.dataSubscription.unsubscribe();
-		}
 	}
 
 	handleOrder(order:string, payload:any)

@@ -133,7 +133,7 @@ export class AddUsersComponent implements OnInit{
 	isBan(id: number | undefined): boolean {
 		if (!this.banList )
 		{
-			console.log("here");
+			// console.log("here");
 			return false;
 		}
 

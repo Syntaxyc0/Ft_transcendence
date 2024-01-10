@@ -49,7 +49,7 @@ export class ChatService {
 	}
 
 	disconnect() {
-		console.log('Disconnect');
+		// console.log('Disconnect');
 		this.socket.disconnect();
 	}
 }

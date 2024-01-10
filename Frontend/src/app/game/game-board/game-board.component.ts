@@ -60,8 +60,6 @@ export const HEIGHT = 640
 	movementQueue: { deltaX: number; deltaY: number, angle: number}[] = [];
 
 	ngOnInit() {
-		// this.retrieveUser();
-		// console.log(this.login)
 		this.context = this.gameCanvas.nativeElement.getContext('2d');
 
         this.paddles.push(new Paddle(this.context))
@@ -76,7 +74,6 @@ export const HEIGHT = 640
 		});
 
 		this.player.sendRequest("gameExists")
-		console.log("onInit")
 		this.gameLoop = this.gameLoop.bind(this);
 		requestAnimationFrame(this.gameLoop);
 	}
@@ -84,7 +81,8 @@ export const HEIGHT = 640
 	ngOnDestroy(): void {
 
 		this.disconnect()
-		this.dataSubscription.unsubscribe()
+		if (this.dataSubscription)
+			this.dataSubscription.unsubscribe()
 	}
 
 	handleOrder(order:string, payload:any)
@@ -164,7 +162,6 @@ export const HEIGHT = 640
 				this.disconnect()
 			break;
 			case "gameModeChange":
-				console.log(this.randomMode)
 				this.randomMode = payload.status
 			break;
 			case "otherWantMode":
@@ -198,7 +195,6 @@ export const HEIGHT = 640
 	{
 		if(!this.isOnline)
 			return;
-		// console.log(this.requestRandom)
 		this.player.gameMode(this.userPaddle.side, !this.randomMode)
 	}
 
@@ -354,7 +350,6 @@ export const HEIGHT = 640
 	}
 
 	showPongRules() {
-		console.log(this.showRules)
 		this.showRules = true;
 	  }
 	  

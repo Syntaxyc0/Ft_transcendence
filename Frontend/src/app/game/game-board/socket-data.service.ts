@@ -25,7 +25,7 @@ getData(): Observable<any[]> {
     this.sendRequest("loginRequest")
 
     this.socket.on('connect', () => {
-      console.log("Connected");
+      // console.log("Connected");
     });
     this.socket.on('login', (login: string) => {
       this.login = login

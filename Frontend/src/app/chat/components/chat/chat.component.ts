@@ -60,10 +60,6 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	invitedToPlaySubscription: Subscription;
 	subOption: Subscription;
 	subKick: Subscription;
-	subAccept: Subscription;
-	subRefuse: Subscription;
-	subGoOn: Subscription;
-	subInGame: Subscription;
 	subMP: Subscription;
 
 
@@ -89,7 +85,6 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 		});
 
 		this.socket.fromEvent<RoomI>("MessageToUser").subscribe((value) => {
-				console.log("MP");
 				this.selectedRoom = value;
 		});
 	}
@@ -119,7 +114,7 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	}
 
 	onSelectRoom(event: MatSelectionListChange) {
-		console.log(typeof event.source.selectedOptions.selected[0].value);
+		// console.log(typeof event.source.selectedOptions.selected[0].value);
 		this.selectedRoom = event.source.selectedOptions.selected[0].value;
 	}
 
