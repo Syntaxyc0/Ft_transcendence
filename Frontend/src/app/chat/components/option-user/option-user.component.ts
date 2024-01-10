@@ -51,6 +51,8 @@ export class OptionUserComponent implements OnInit{
 
 	isUserBan: boolean;
 
+	// SI IL EST PLUS DANS LE SALON TU NE DEVRAIS PLUS POUVOIR LE KICK
+
   constructor(	private userService: UserService,
 				private socket: CustomSocket,
 				private socketService: SocketService,
