@@ -77,6 +77,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.disconnect();
 	}
 
+	@SubscribeMessage('disconnect_logout')
+	async disconnectOnLogout(socket: Socket)
+	{
+		await this.handleDisconnect(socket)
+	}	
+
+
 	@SubscribeMessage('createRoom')
 	async onCreateRoom(socket: Socket, roomInput: Prisma.RoomCreateInput): Promise<Room> {
 
