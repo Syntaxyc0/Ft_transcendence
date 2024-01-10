@@ -3,7 +3,6 @@
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
-import { PageI } from 'src/chat/model/page.interface';
 import { Prisma, User, Room, ConnectedUser, Message } from '@prisma/client'; 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UnauthorizedException } from '@nestjs/common';
@@ -15,7 +14,6 @@ import { MessageI } from '../model/message.interface';
 import { RoomI } from '../model/room.interface';
 import { JoinedRoomI } from '../model/joinedRoom.interface';
 import { RoomService } from '../service/room.service';
-import { GameGateway } from 'src/game/game.gateway';
 
 @WebSocketGateway({ cors: { origin: ['http://localhost:3333', 'http://localhost:4200'] } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -78,10 +76,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('createRoom')
 	async onCreateRoom(socket: Socket, roomInput: Prisma.RoomCreateInput): Promise<Room> {
+		console.log("requete");
 
 		if (!socket.data.user) {
 			throw new UnauthorizedException();
 		}
+
+		const existingRoom = await this.prisma.room.findUnique({
+			where: { name: roomInput.name }
+		});
+
+		if (existingRoom) {
+			socket.emit("roomExisting", true);
+			return; 
+		}
+
+		socket.emit("roomExisting", false);
 
 		const user = await this.prisma.user.findUnique({
 			where: { id: socket.data.user.id },

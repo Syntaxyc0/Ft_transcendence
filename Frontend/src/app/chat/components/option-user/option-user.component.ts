@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SocketService } from '../../services/socket.service';
-import { Observable, take } from 'rxjs';
+import { Observable, Subscription, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { MatCardModule } from '@angular/material/card';
@@ -28,7 +28,7 @@ import { invite_to_playComponent } from '../invite_to_play/invite_to_play.compon
 			],
   styleUrls: ['./option-user.component.scss']
 })
-export class OptionUserComponent implements OnInit{
+export class OptionUserComponent implements OnInit, OnDestroy{
 
 	user: UserI | undefined;
 	room: RoomI | undefined;
@@ -51,6 +51,14 @@ export class OptionUserComponent implements OnInit{
 
 	isUserBan: boolean;
 
+	Usersub: Subscription;
+	RoomSub: Subscription;
+	AdminSub: Subscription;
+	CreatorSub: Subscription;
+	BlockSub: Subscription;
+	MuteSub: Subscription;
+	BanSub: Subscription;
+
 	// SI IL EST PLUS DANS LE SALON TU NE DEVRAIS PLUS POUVOIR LE KICK
 
   constructor(	private userService: UserService,
@@ -67,16 +75,16 @@ export class OptionUserComponent implements OnInit{
 		});
 
 		// User on click ? 
-		this.userService.user$.subscribe(value => {
+		this.Usersub = this.userService.user$.subscribe(value => {
 			this.user = value;
 
 			// Current room ?
-			this.userService.room$.subscribe(value => {
+			this.RoomSub = this.userService.room$.subscribe(value => {
 				this.room = value;
 			});
 
 			// Admin ?
-			this.getAdminArray().subscribe(value => {
+			this.AdminSub = this.getAdminArray().subscribe(value => {
 				this.adminArray = value;
 				this.adminUser = this.isAdmin(this.user);
 				this.adminCurrent = this.isAdmin(this.current_user) 
@@ -84,7 +92,7 @@ export class OptionUserComponent implements OnInit{
 
 			// Creator ?
 			this.socket.emit("getCreatorId", this.room);  
-			this.socket.fromEvent("creatorId").subscribe(value => {
+			this.CreatorSub = this.socket.fromEvent("creatorId").subscribe(value => {
 				if(this.user?.id === value) {
 					this.isUserCreator = true;
 				} else {
@@ -99,25 +107,35 @@ export class OptionUserComponent implements OnInit{
 
 			// BlockedUser ?
 			this.socket.emit("blockedUsers");
-			this.socket.fromEvent<UserI[] | undefined>("blockedUsersList").subscribe(value =>{
+			this.BlockSub = this.socket.fromEvent<UserI[] | undefined>("blockedUsersList").subscribe(value =>{
 				this.blockedUserList = value;
 				this.isUserBlocked = this.isBlocked();
 			});
 			
 			// Muted ?
 			this.socket.emit("MutedUsers", this.room);
-			this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
+			this.MuteSub = this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
 				this.mutedUserList = value;
 				this.isUserMuted = this.isMuted();
 			});
 
+			// Ban ?
 			this.socket.emit("getBanList", this.room);
-			this.socket.fromEvent<UserI[] | undefined>("banList").subscribe(value =>{
+			this.BanSub = this.socket.fromEvent<UserI[] | undefined>("banList").subscribe(value =>{
 				this.banList = value;
 				this.isUserBan = this.isBan();
 			});
 		});
 
+	}
+
+	ngOnDestroy(): void {
+		this.AdminSub.unsubscribe();
+		this.RoomSub.unsubscribe();
+		this.BlockSub.unsubscribe();
+		this.MuteSub.unsubscribe();
+		this.BanSub.unsubscribe();
+		this.CreatorSub.unsubscribe();
 	}
 
 	inviteToPlay()/*invitedUser?: string, currentUser?: string*/

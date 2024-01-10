@@ -16,6 +16,7 @@ import { RouterModule } from '@angular/router';
 import { SocketService } from '../../services/socket.service';
 import { Observable, take } from 'rxjs';
 import { CustomSocket } from '../../sockets/custom-socket';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
@@ -38,12 +39,23 @@ export class CreateRoomComponent implements OnInit {
 	currentUser$: Observable<UserI> = this.socketService.user;
 	
 	
-	constructor(private chatService: ChatService, private router: Router, private activateRoute: ActivatedRoute, private socketService: SocketService, private socket: CustomSocket) {}
+	constructor(private chatService: ChatService,
+				private router: Router,
+				private socketService: SocketService,
+				private socket: CustomSocket,
+				private snackbar: MatSnackBar) {}
 	
 	ngOnInit() {
+
 		this.form.get('password')?.valueChanges.subscribe((password) => {
 			this.form.patchValue({ isPass: !!password });
 			console.log('isPass:', this.form.get('isPass')?.value);
+		});
+
+		this.socket.fromEvent<boolean>("roomExisting").subscribe((value) => {
+			this.snackbar.open(`Room ${this.name.value} already exist`, 'Close' ,{
+				duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+			});
 		});
 	}
 
@@ -86,7 +98,7 @@ export class CreateRoomComponent implements OnInit {
 		if (indexToRemove !== -1) {
 		  usersArray.removeAt(indexToRemove);
 		}
-	  }
+	}
 
 	get name(): FormControl {
 		return this.form.get('name') as FormControl;
@@ -106,5 +118,5 @@ export class CreateRoomComponent implements OnInit {
 
 	goToDashboard() {
 		this.router.navigate(['chat']);
-	} 
+	}
 }
