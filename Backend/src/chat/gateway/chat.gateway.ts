@@ -433,14 +433,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			include: { users: true },
 		});
 		
-		await socket.emit('InRoomList', room_.users);
-
 		const connectedUser = await this.prisma.connectedUser.findMany();
 		for (const User of connectedUser) {
 			if (User.userId === user.id) {
 				await this.server.to(User.socketId).emit('roomsI', await this.allowedRooms(User.userId));
 				await this.server.to(User.socketId).emit('kicked');
 			}
+			await this.server.to(User.socketId).emit('InRoomList', room_);
 		}
 	}
 
@@ -458,13 +457,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			include: {users: true}
 		});
 		
-		await socket.emit('InRoomList', room_.users);
-
 		const connectedUser = await this.prisma.connectedUser.findMany();
 		for (const User of connectedUser) {
 			if (User.userId === user.id) {
 				await this.server.to(User.socketId).emit("roomsI", await this.allowedRooms(User.userId));
 			}
+			await this.server.to(User.socketId).emit('InRoomList', room_);
 		}
 	}
 
@@ -507,8 +505,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					if(users.id === User.userId) {
 						await this.server.to(User.socketId).emit('roomsI', await this.allowedRooms(User.userId));
 					}
-					await this.server.to(User.socketId).emit("banList", room_);
-			}
+				}
+			await this.server.to(User.socketId).emit("banList", room_);
 		}
 	}
 
@@ -662,8 +660,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			where: { id: room.id },
 			include: { users: true },
 		});
-
-		return await socket.emit('InRoomList', room_.users);
+		
+		return await socket.emit('InRoomList', room_);
 	}
 
 	@SubscribeMessage('mpUser')
@@ -691,7 +689,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 						 	{ id: socket.data.user.id } ]},
 					},
 				});
-
+				
 				socket.emit('MessageToUser', existingRoom);
 				socket.emit('roomsI', await this.allowedRooms(socket.data.user.id));
 			}, 200);

@@ -64,9 +64,9 @@ export class AddUsersComponent implements OnInit, OnDestroy{
 	ngOnInit() : void {
 		this.currentUserId = JSON.parse(localStorage.getItem('id')!);
 
-		this.subBan = this.socket.emit("getBanList", this.room);
-		this.socket.fromEvent<UserI[] | undefined>("banList").subscribe(value => {
-			this.banList = value;
+		this.socket.emit("getBanList", this.room);
+		this.subBan = this.socket.fromEvent<RoomI>("banList").subscribe(value => {
+			this.banList = value.BanUsers;
 		});
 
 		this.socket.emit("getUsersRoom", this.room);
