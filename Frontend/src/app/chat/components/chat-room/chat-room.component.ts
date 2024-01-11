@@ -105,7 +105,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 
 	ngOnInit(): void {
 		this.currentId = JSON.parse(localStorage.getItem('id')!);
-		
+
 		this.userService.changeRoom(this.chatRoom);
 
 		// Muted ?
@@ -131,7 +131,11 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 	}
 
 	ngOnChanges(changes: SimpleChanges) {
+		
 		if (this.chatRoom) {
+			
+			this.chatService.joinRoom(this.chatRoom);
+			this.userService.changeRoom(this.chatRoom);
 
 			// Admin ?			
 			this.socket.emit("getAdminList", this.chatRoom);
@@ -145,9 +149,6 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 				this.chatRoom = value
 			});
 
-			this.chatService.joinRoom(this.chatRoom);
-			this.userService.changeRoom(this.chatRoom);
-			this.userService.changeOption(false, undefined);
     	}
 
 		if (this.chatRoom.isPass)

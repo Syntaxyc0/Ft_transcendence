@@ -90,7 +90,6 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	}
 	
 	ngOnDestroy(): void {
-			// Unsubscribe to avoid memory leaks
 		if (this.subOption)
 			this.subOption.unsubscribe;
 		if (this.subKick)
@@ -116,8 +115,8 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 	}
 
 	onSelectRoom(event: MatSelectionListChange) {
-		// console.log(typeof event.source.selectedOptions.selected[0].value);
-		this.selectedRoom = event.source.selectedOptions.selected[0].value;
+			this.userService.changeOption(false, undefined);
+			this.selectedRoom = event.source.selectedOptions.selected[0].value;
 	}
 
 	LaunchCreateRoom() {
