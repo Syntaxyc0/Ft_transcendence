@@ -111,10 +111,4 @@ export class AuthController
 	async getJoinedRoom() {
 		return await this.prismaService.joinedRoom.findMany();
 	}
-
-	@Get('InGame')
-	async getInGame() {
-		return await this.prismaService.userInGame.findMany();
-	}
-
 }
