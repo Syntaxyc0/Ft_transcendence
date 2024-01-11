@@ -12,7 +12,11 @@
 		</mat-list-item>
 
 		<mat-list-item>
-			<button mat-raised-button extended color=primary (click)="goToProfile()"><strong>profile</strong></button>
+			<button mat-raised-button extended color=primary (click)="goToProfile()"><mat-icon style="margin-left: 5px;">account_box</mat-icon></button>
+		</mat-list-item>
+
+		<mat-list-item>
+			<button mat-raised-button extended color=primary (click)="directMessage()"><mat-icon style="margin-left: 5px;">sms</mat-icon></button>
 		</mat-list-item>
 
 		<mat-list-item *ngIf="!isUserBlocked">
