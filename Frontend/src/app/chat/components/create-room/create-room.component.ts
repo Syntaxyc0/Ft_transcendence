@@ -50,7 +50,7 @@ export class CreateRoomComponent implements OnInit, OnDestroy {
 
 		this.form.get('password')?.valueChanges.subscribe((password) => {
 			this.form.patchValue({ isPass: !!password });
-			console.log('isPass:', this.form.get('isPass')?.value);
+			// console.log('isPass:', this.form.get('isPass')?.value);
 		});
 
 		this.subExist = this.socket.fromEvent<boolean>("roomExisting").subscribe((value) => {

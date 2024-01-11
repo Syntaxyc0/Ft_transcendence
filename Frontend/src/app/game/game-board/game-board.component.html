@@ -5,7 +5,7 @@
 	<div class = grid>
 		<button (click)="multiplayerRequest()"> Multiplayer </button>
 		<button (click)="disconnect()"> Disconnect </button>
-		<button (click)="log()"> Log </button>
+		<!-- <button (click)="log()"> Log </button> -->
 		<button [style.background]="getColor()" (click)="changeColor()"> Color </button>
 		<button [style.background]="colorTab[1]" *ngIf = "isOnline && !randomMode" (click)="activateRandom()"> Random OFF</button>
 		<button [style.background]="colorTab[2]" *ngIf = "isOnline && randomMode" (click)="activateRandom()"> Random ON</button>

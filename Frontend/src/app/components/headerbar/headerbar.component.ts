@@ -10,6 +10,7 @@ import { ContentObserver } from '@angular/cdk/observers';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { invite_to_playComponent } from 'src/app/chat/components/invite_to_play/invite_to_play.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
@@ -26,15 +27,19 @@ export class HeaderbarComponent implements OnInit, OnDestroy{
 		private http: HttpClient,
 		public dialog: MatDialog,
 		private router: Router,
+		public snackbar: MatSnackBar,
+
 		) {}
 
 	dataSubscription: Subscription
-	invitedSubscription: Subscription
-	id: number = 0;
+	id;
 	login: string;
+
+	currentId: number;
 
 	ngOnInit()
 	{
+		// this.currentId = JSON.parse(localStorage.getItem('id')!)
 		this.retrieveUser();
 		this.getId();
 		this.dataSubscription = this.socket.fromEvent("onInviteRequest").subscribe((payload: any) =>{
@@ -45,82 +50,67 @@ export class HeaderbarComponent implements OnInit, OnDestroy{
 	}
 
 	ngOnDestroy(): void {
-		console.log("destroy")
 		if (this.dataSubscription)
-		{
-			console.log("success")
 			this.dataSubscription.unsubscribe();
-		}
 	}
 
 	handleOrder(order:string, payload:any)
 	{
-		console.log(payload)
 		switch(order){
+			case "closeAllDialogs":
+				this.dialog.closeAll()
+			break;
 
 			case "invited to play":
 				const inviterI = payload.inviterI;
-				if(!this.isVisible())
-				{
-					this.socket.emit("notInChat");
-					this.dialog.closeAll();
-					return;
-				}
 
 				const dialogRef = this.dialog.open(invite_to_playComponent, {
 					width: '300px',
 					data: { login: inviterI.login }
 				});
 				dialogRef.afterClosed().subscribe(result => {
-					if (result) {
-						this.dialog.closeAll()
+					if (result == 1) {
+						this.socket.emit('closeAll', this.id)
 						this.socket.emit('checkAndAccept', inviterI)
 						this.router.navigate(['/game'])
 
 
-					} else {
-						this.dialog.closeAll()
+					} else if (result == -1){
+						this.socket.emit('closeAll', this.id)
 						this.socket.emit("refuseGame", inviterI);
+
 					}
+					this.socket.emit('closeAll', this.id)
 				});
+				break;
+				case "you are game":
+					this.snackbar.open(`You already have a game started.`, 'Close' ,{
+						duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+					});
 				break;
 				case "accepted to play":
 					this.socket.emit("checkAndLaunch", {currentUser: payload.inviterI.login, invitedUser: payload.invited_login})
 					this.router.navigate(['/game'])
 				break;
+
+				case "refuse to play":
+					this.snackbar.open(`${payload.login} has refused to play with you`, 'Close' ,{
+									duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+								});
+				break;
+
+				case "player in game":
+					this.snackbar.open(`${payload.login} is in game`, 'Close' ,{
+									duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+								});
+				break;
+				case "player offline":
+					this.snackbar.open(`${payload.login} is offline`, 'Close' ,{
+									duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
+								});
+				break;
 		}
 		
-	}
-
-
-// 	this.socket.fromEvent("accepted to play").subscribe((value:any)=>{
-// 		this.socket.emit("checkAndLaunch", {currentUser: value.inviterI.login, /*inviterSocket: inviter_socket,*/ invitedUser: value.invited_login})
-// 		this.router.navigate(['/game'])
-// 	})
-
-// 	this.socket.fromEvent("refuse to play").subscribe((value) => {
-// 		this.snackbar.open(`${value} has refused to play with you`, 'Close' ,{
-// 			duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
-// 		});
-// 	});
-	
-// 	this.socket.fromEvent("go on page").subscribe((value:any)=>{
-// 		this.router.navigate(['/game'])
-// 	})
-
-// 	this.socket.fromEvent("player in game").subscribe((value) => {
-// 		this.snackbar.open(`${value} is in game`, 'Close' ,{
-// 			duration: 3000, horizontalPosition: 'right', verticalPosition: 'top'
-// 		});
-// 	})
-// }
-
-	isVisible(): boolean
-	{
-	   if (document.visibilityState === 'visible') 
-		   return true;
-	   else 
-		   return false;
 	}
 
 	getId()

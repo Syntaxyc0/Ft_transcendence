@@ -105,10 +105,22 @@ export class MultiplayerService{
 
 
 
-    gameBoardInit()
+    async gameBoardInit()
     {
         if (!this.room) {
             return;
+        }
+        for (let i: number = 0; i < 2; i++)
+        {
+            await this.room.prisma.user.update({
+                where: {
+                   login: this.room.players[i].login,
+                },
+            
+                data: {
+                    is_ingame : true
+                }
+            })
         }
         this.room.players[0].socket.emit('onGameRequest', {order: 'usersPaddle', side: 0, login: this.room.players[1].login})
         this.room.players[1].socket.emit('onGameRequest', {order: 'usersPaddle', side: 1, login: this.room.players[0].login})

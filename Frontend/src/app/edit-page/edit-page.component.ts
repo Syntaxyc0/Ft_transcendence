@@ -38,7 +38,7 @@ export class EditPageComponent {
 	}
 
 	Edit(): void {
-		console.log(this.id)
+		// console.log(this.id)
 		this.http.patch<any>(BACKEND.URL + 'users/' + this.id + '/ChangeNick', {name: this.Nickname.value} ).subscribe(
 			res => {
 				localStorage.setItem('is_authenticated', 'true');

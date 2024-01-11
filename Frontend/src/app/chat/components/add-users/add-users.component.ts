@@ -141,7 +141,7 @@ export class AddUsersComponent implements OnInit, OnDestroy{
 	isBan(id: number | undefined): boolean {
 		if (!this.banList )
 		{
-			console.log("here");
+			// console.log("here");
 			return false;
 		}
 

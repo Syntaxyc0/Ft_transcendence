@@ -4,9 +4,6 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FriendMenuComponent } from '../friend-menu/friend-menu.component';
 import { BACKEND } from 'src/app/env';
 import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
-import { Subscription } from 'rxjs';
-import { ConnectedUserI } from 'src/app/chat/model/connectedUser.interface';
-import { InGameUserI } from 'src/app/chat/model/InGameUser.interface';
 
 @Component({
   selector: 'app-friend',
@@ -18,10 +15,7 @@ import { InGameUserI } from 'src/app/chat/model/InGameUser.interface';
 export class FriendComponent implements OnInit, OnDestroy{
 	@ViewChild('menu') menu: ElementRef;
 
-	constructor(public http: HttpClient,
-				private renderer: Renderer2,
-				private socket: CustomSocket
-				) {
+	constructor(private socket: CustomSocket, public http: HttpClient, private renderer: Renderer2) {
 		
 		this.renderer.listen('window', 'click',(e:Event)=>{
 		if(e.target!==this.menu.nativeElement)
@@ -117,6 +111,8 @@ export class FriendComponent implements OnInit, OnDestroy{
 	}
 
 	onRightClick(event) {
+		this.socket.emit("whatStatus", this.id);
+
 		event.preventDefault()
 		if (!this.showMenu)
 		{

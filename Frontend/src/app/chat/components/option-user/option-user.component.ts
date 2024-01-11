@@ -140,19 +140,25 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 
 	
 	ngOnDestroy(): void {
-		this.Usersub.unsubscribe();
-		this.AdminSub.unsubscribe();
-		this.RoomSub.unsubscribe();
-		this.CreatorSub.unsubscribe();
-		this.BlockSub.unsubscribe();
-		this.MuteSub.unsubscribe();
-		this.BanSub.unsubscribe();
-		this.InRoomSub.unsubscribe();
+		if (this.AdminSub)
+			this.AdminSub.unsubscribe();
+		if (this.RoomSub)
+			this.RoomSub.unsubscribe();
+		if (this.BlockSub)
+			this.BlockSub.unsubscribe();
+		if (this.MuteSub)
+			this.MuteSub.unsubscribe();
+		if (this.BanSub)
+			this.BanSub.unsubscribe();
+		if (this.CreatorSub)
+			this.CreatorSub.unsubscribe();
+		if (this.InRoomSub)
+			this.InRoomSub.unsubscribe();
 	}
 
 	inviteToPlay()/*invitedUser?: string, currentUser?: string*/
 	{
-		this.socket.emit("invite_to_play?", this.user?.id);
+		this.socket.emit("invite_to_play?", {id: this.user?.id, currentId: this.current_user?.id});
 	}
 
 	goToProfile()
@@ -210,12 +216,12 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 	}
 	  
 	setAsAdmin() {
-		console.log("setAdmin")
+		// console.log("setAdmin")
 		this.socket.emit("setAsAdmin", { user: this.user, room: this.room });
 	}
 
 	unsetAsAdmin() {
-		console.log("setAdmin")
+		// console.log("setAdmin")
 		this.socket.emit("unsetAsAdmin", { user: this.user, room: this.room });
 	}
 

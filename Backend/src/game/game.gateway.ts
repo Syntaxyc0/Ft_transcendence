@@ -28,7 +28,6 @@ export class GameGateway implements OnModuleInit{
   constructor(private prisma: PrismaService, private authService: AuthService, private userService: UserService, private gameService: GameService) {}
 
   onModuleInit(){
-    console.log("Server up")
     this.server.on('connection', async (socket) => {
       await this.connection(socket)
 
@@ -77,6 +76,7 @@ export class GameGateway implements OnModuleInit{
 
   playerExists(newPlayer: Player)
   {
+    try{
     if (!newPlayer || !newPlayer.login)
       return;
     this.connectedPlayers.forEach((player, index) => {
@@ -90,17 +90,36 @@ export class GameGateway implements OnModuleInit{
         player.socket.emit('onGameRequest', {order: "multiWindow"})
         this.connectedPlayers.delete(index)
       }
+
       else if(player.status === true)
       {
         newPlayer.socket.emit('onGameRequest', {order: "multiWindow"})
         this.connectedPlayers.delete(newPlayer.socket.id)
       }
-    })
+    })}
+    catch {
+      console.log("player not initialized")
+      return;
+    }
   }
+
+@SubscribeMessage('closeAll')
+async closeAllDialogs(socket: Socket, id: number)
+{
+  const connectedUser = await this.prisma.connectedUser.findMany();
+  for (const User of connectedUser) {
+    if(id === User.userId) {
+      this.server.to(User.socketId).emit("onInviteRequest", {
+        order: "closeAllDialogs"
+      });
+    }
+  }
+}
 
   @SubscribeMessage('checkAndAccept')
   checkAndAccept(@ConnectedSocket() client : Socket, @MessageBody() user: UserI)
   {
+
     setTimeout( async() => {
       await this.lookForGame(client)
       const connectedUser = await this.prisma.connectedUser.findMany();
@@ -160,7 +179,7 @@ export class GameGateway implements OnModuleInit{
     const targetRoom = this.connectedPlayers.get(clientId).room;
     if (targetRoom)
     {
-      console.log("Destroying Room " + targetRoom.id)
+      // console.log("Destroying Room " + targetRoom.id)
       targetRoom.destroyRoom()
       this.rooms.splice(targetRoom.id, 1);
     }
@@ -207,27 +226,64 @@ export class GameGateway implements OnModuleInit{
 
 
   @SubscribeMessage('invite_to_play?')
-	async invite_to_play( socket: Socket, id: number ) {
-
+	async invite_to_play( socket: Socket, ids: { id: number, currentId: number}) {
     const user = await this.prisma.user.findUnique({
-      where: {id: id}
+      where: {id: ids.id}
     });
 
 		const connectedUser = await this.prisma.connectedUser.findMany();
-		if(this.isOnline(user.login))
-		{
-			socket.emit("player in game", user.login)
-			return;
-		}
+    const currentStatus = await this.userService.GetUserStatus(ids.currentId)
+
+    if(currentStatus.status == "IN GAME")
+    {
+      socket.emit("onInviteRequest", {order: "you are game"})
+      return;
+    }
+
+    const invitedStatus = await this.userService.GetUserStatus(ids.id)
+    if (invitedStatus.status == "OFFLINE")
+    {
+      socket.emit("onInviteRequest", {order: "player offline", login: user.login})
+      return;
+    }
+
+    else if (invitedStatus.status == "IN GAME")
+    {
+      socket.emit("onInviteRequest", {order: "player in game", login: user.login})
+      return;
+    }
+
+
 		for (const User of connectedUser) {
 			if(user.id === User.userId) {
-        console.log(user.login + " " + User.socketId)
+        // console.log(user.login + " " + User.socketId)
 				this.server.to(User.socketId).emit("onInviteRequest", { order: "invited to play", inviterI: socket.data.user });
 			}
 
 		}
 	}
 
+  @SubscribeMessage("whatStatus")
+  async whatStatus(socket: Socket, id: number)
+  {
+
+    // const user = await this.prisma.user.findUnique({
+    //   where: {id: id}
+    // });
+    const currentStatus = await this.userService.GetUserStatus(id)
+    socket.emit("sendStatus", currentStatus.status)
+  }
+
+  @SubscribeMessage('refuseGame')
+	async refuseGame( socket: Socket, user: UserI ) {
+
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		for (const User of connectedUser)
+			if(user.id === User.userId)
+			  this.server.to(User.socketId).emit("onInviteRequest", {order: "refuse to play", login: socket.data.user.login})
+
+				
+	}
   
 
   @SubscribeMessage('disconnectingClient')
@@ -241,7 +297,7 @@ export class GameGateway implements OnModuleInit{
     const player = this.connectedPlayers.get(client.id)
     if (!player)
       return
-    console.log(player.login + " has disconnected");
+    // console.log(player.login + " has disconnected");
     player.connected = false;
     player.status = false;
     player.lookingForPlayer = false
