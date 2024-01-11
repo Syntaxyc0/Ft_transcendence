@@ -38,7 +38,6 @@ export class EditPageComponent {
 	}
 
 	Edit(): void {
-		// console.log(this.id)
 		this.http.patch<any>(BACKEND.URL + 'users/' + this.id + '/ChangeNick', {name: this.Nickname.value} ).subscribe(
 			res => {
 				localStorage.setItem('is_authenticated', 'true');
@@ -88,7 +87,10 @@ export class EditPageComponent {
 		   formData.append('file', this.selectedFile);
 		 
 		   this.http.post<any>(url, formData).subscribe({
-			 next: (data: any) => window.location.reload(),
+			 next: (data: any) => this.router.navigateByUrl('/Home',{skipLocationChange:true}).then(()=>{
+				this.router.navigate([window.location.pathname]).then(()=>{
+				})
+			}),
 			 error: (error: any) => {
 				this.errorMessage = error.error.message
 				this.openErrorModal();

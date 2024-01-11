@@ -4,6 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
 import { BACKEND } from 'src/app/env';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -15,7 +16,7 @@ import { BACKEND } from 'src/app/env';
 })
 export class AddFriendComponent {
 
-	constructor(public http: HttpClient) {};
+	constructor(public http: HttpClient, private router: Router) {};
 
 	public AddFriendForm = new FormGroup({
 		name: new FormControl(null, [Validators.required])
@@ -34,7 +35,10 @@ export class AddFriendComponent {
 		this.toggleModal()
 		this.http.patch(BACKEND.URL + "users/" + this.id + "/AddFriend", {userName:this.AddFriendForm.value.name}).subscribe(
 			res => {
-				window.location.reload()
+				this.router.navigateByUrl('/Home',{skipLocationChange:true}).then(()=>{
+					this.router.navigate([window.location.pathname]).then(()=>{
+					})
+				})
 			},
             err => {
 				this.errorMessage = err.error.message

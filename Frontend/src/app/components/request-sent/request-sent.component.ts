@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
 import { BACKEND } from 'src/app/env';
+import { Route, Router } from '@angular/router';
 
 @Component({
   selector: 'app-request-sent',
@@ -13,7 +14,7 @@ import { BACKEND } from 'src/app/env';
 })
 export class RequestSentComponent {
 
-	constructor(public http: HttpClient) {}
+	constructor(public http: HttpClient, private router: Router) {}
 	@Input() Id:number = 0;
 	name:string = "";
 	avatar;
@@ -55,7 +56,10 @@ export class RequestSentComponent {
 	{
 		this.http.patch(BACKEND.URL + "users/" + localStorage.getItem('id') + "/CancelRequest", {username: this.name}).subscribe(
 			res => {
-				window.location.reload()
+				this.router.navigateByUrl('/Home',{skipLocationChange:true}).then(()=>{
+					this.router.navigate([window.location.pathname]).then(()=>{
+					})
+				})
 			},
             err => {
 				this.errorMessage = err.error.message

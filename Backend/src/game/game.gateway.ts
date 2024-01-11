@@ -45,7 +45,8 @@ export class GameGateway implements OnModuleInit{
             const user: UserI = await this.prisma.user.findUnique({
                 where: { id: decodedToken.sub },
             });
-      
+      if (user === null)
+			return 
       this.connectedPlayers.set(socket.id, new Player(socket, user.login))
   }
 

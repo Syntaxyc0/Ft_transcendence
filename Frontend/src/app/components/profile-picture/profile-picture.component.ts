@@ -80,7 +80,10 @@ export class ProfilePictureComponent {
 		formData.append('file', this.selectedFile);
 	  
 		this.http.post<any>(url, formData).subscribe({
-		  next: (data: any) => window.location.reload(),
+		  next: (data: any) => this.router.navigateByUrl('/Home',{skipLocationChange:true}).then(()=>{
+			this.router.navigate([window.location.pathname]).then(()=>{
+			})
+		}),
 		  error: (error: any) => {
 			this.errorMessage = error.error.message
 			this.openErrorModal();}
@@ -96,7 +99,10 @@ export class ProfilePictureComponent {
 		this.toggleModal()
 		this.http.patch(BACKEND.URL + "users/" + this.id + "/editName", {userName:this.editNameForm.value.Nickname}).subscribe(
 			res => {
-				window.location.reload()
+				this.router.navigateByUrl('/Home',{skipLocationChange:true}).then(()=>{
+					this.router.navigate([window.location.pathname]).then(()=>{
+					})
+				})
 			},
             err => {
 				this.errorMessage = err.error.message

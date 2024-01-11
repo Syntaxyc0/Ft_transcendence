@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ErrorModalComponent } from '../error-modal/error-modal.component';
 import { BACKEND } from 'src/app/env';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-friendrequest',
@@ -13,7 +14,7 @@ import { BACKEND } from 'src/app/env';
 })
 export class FriendrequestComponent {
 
-	constructor(public http: HttpClient) {}
+	constructor(public http: HttpClient, private router: Router) {}
 	@Input() Id:number = 0;
 	showError:boolean = false;
 	errorMessage:string =""
@@ -58,7 +59,10 @@ export class FriendrequestComponent {
 	{
 		this.http.patch(BACKEND.URL + "users/" + localStorage.getItem('id') + "/AcceptRequest", {id: this.Id}).subscribe(
 			res => {
-				window.location.reload()
+				this.router.navigateByUrl('/Home',{skipLocationChange:true}).then(()=>{
+					this.router.navigate([window.location.pathname]).then(()=>{
+					})
+				})
 			},
             err => {
 				this.errorMessage = err.error.message
@@ -71,7 +75,10 @@ export class FriendrequestComponent {
 	{
 		this.http.patch(BACKEND.URL + "users/" + localStorage.getItem('id') + "/RefuseRequest", {id: this.Id}).subscribe(
 			res => {
-				window.location.reload()
+				this.router.navigateByUrl('/Home',{skipLocationChange:true}).then(()=>{
+					this.router.navigate([window.location.pathname]).then(()=>{
+					})
+				})
 			},
 			err => {
 				this.errorMessage = err.error.message

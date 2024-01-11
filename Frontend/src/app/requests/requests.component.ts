@@ -30,23 +30,11 @@ export class RequestsComponent {
 	ngOnInit()
 	{
 		this.id = JSON.parse(localStorage.getItem('id')!)
-		this.getuserElo()
 		this.http.get<number[]>(BACKEND.URL + "users/" + this.id + "/friendrequestsreceived").subscribe(res => {
 			this.friendrequestsreceived = res;
 		})	
 		this.http.get<number[]>(BACKEND.URL + "users/" + this.id + "/friendrequestssent").subscribe(res => {
 			this.friendrequestssent = res;
 		})	
-	}
-	getuserElo()
-	{
-		this.http.get<number>(BACKEND.URL + 'users/' + this.id + '/getelo').subscribe(
-			res => {
-				this.elo = res
-			},
-			err => {
-				console.log(err)
-			}
-		)
 	}
 }

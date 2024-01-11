@@ -54,12 +54,6 @@ export const routes: Routes = [{
 	loadComponent:    () => import('./home/home.component').then(m => m.HomeComponent),
 },
 {
-	path:    'settings',
-	title:	'Settings',
-	canActivate: [AuthGuard],
-    loadComponent:    () => import('./settings/settings.component').then(m => m.SettingsComponent),
-},
-{
 	path:    'user',
 	title:	'Profile',
 	canActivate: [AuthGuard],
