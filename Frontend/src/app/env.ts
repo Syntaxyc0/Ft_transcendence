@@ -1,3 +1,3 @@
 export const BACKEND = {
-    URL: 'http://localhost:3333/'
+    URL: 'http://10.24.8.4:3333/'
   };
