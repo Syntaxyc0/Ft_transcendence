@@ -188,6 +188,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('addMessage')
 	async onAddMessage(socket: Socket, message: MessageI) {
 		const { id, ...messageWithoutId } = message;
+		if (message.text === null)
+			return
 		const createdMessage = await this.prisma.message.create({
 			data: {
 				...messageWithoutId,

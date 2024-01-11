@@ -40,7 +40,10 @@ export class FriendMenuComponent implements OnInit{
 	{
 		this.http.patch(BACKEND.URL + 'users/' + localStorage.getItem('id') + '/RemoveFriend', {userId: this.id}).subscribe()
 		{
-			window.location.reload()
+			this.router.navigateByUrl('/Home',{skipLocationChange:true}).then(()=>{
+				this.router.navigate([window.location.pathname]).then(()=>{
+				})
+			})
 		}
 	}
 

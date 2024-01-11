@@ -42,7 +42,7 @@ export class AchievementsComponent {
 					{ title: 'Quitter', instructions:'Use the logout button', currentScore: res[2], paliers: [1, 3, 5] },
 					{ title: 'Talkative', instructions:'Send messages', currentScore: res[3], paliers: [10, 50, 100] },
 					{ title: 'Harasser', instructions:'Add friends', currentScore: res[4], paliers: [1, 3, 5] },
-					{ title: 'Popular', instructions:'Have friends', currentScore: res[5], paliers: [1, 3, 5] },
+					{ title: 'Popular', instructions:'Have friends', currentScore: res[5], paliers: [1, 2, 3] },
 					{ title: 'Bipolar', instructions:'Remove friends', currentScore: res[6], paliers: [1, 2, 5] },
 					{ title: 'Schizophrenic', instructions:'Change name', currentScore: res[7], paliers: [1, 2, 4] },
 					{ title: 'Lunatic', instructions:'Change picture', currentScore: res[8], paliers: [1, 2, 4] },
