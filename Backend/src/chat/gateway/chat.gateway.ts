@@ -666,58 +666,69 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('mpUser')
 	async mpUser( socket: Socket, userId: number ) {
-
+		
 		const user = await this.prisma.user.findUnique({
 			where: { id: userId }
 		});
-
+		
 		const name_ = [ socket.data.user.login, user.login ].sort().join(" ");
-
+		
+		
+		
 		const existingRoom = await this.prisma.room.findUnique({
 			where: { name: name_ },
 		});
-
+		
 		if (existingRoom) {
 			setTimeout(async() => {
-
-				await this.prisma.room.update({
+				
+				const existingR =  await this.prisma.room.update({
 					where: { id: existingRoom.id },
 					data: {
-					  users: { 
-						connect: [
-							{ id: user.id },
-						 	{ id: socket.data.user.id } ]},
-					},
-				});
+						users: { 
+							connect: [
+								{ id: user.id },
+								{ id: socket.data.user.id } ]},
+								BanUsers: { disconnect: { id: socket.data.user.id }}
+							},
+							include: { users: true }
+						});
+						
+					socket.emit('MessageToUser', existingRoom);
+					socket.emit('roomsI', await this.allowedRooms(socket.data.user.id));
+					const connectedUsers = await this.prisma.connectedUser.findMany();
+					for (const connectUser of connectedUsers) {
+						for (const user of existingR.users) {
+							this.server.to(connectUser.socketId).emit('banList', existingR);
+						}
+					}
+
+					}, 200);
+					return;
+				}
 				
-				socket.emit('MessageToUser', existingRoom);
-				socket.emit('roomsI', await this.allowedRooms(socket.data.user.id));
-			}, 200);
-			return;
-		}
-
-		const new_room = await this.prisma.room.create({
-			data: {
-				users: {connect: [
-					{id: userId}, 
-					{id: socket.data.user.id } ]},
-				creator: { connect: { id: socket.data.user.id } },
-				admin: { connect: { id: socket.data.user.id } },
-				name: name_,
-				password: null,
-				public: false,
-				isPass: false,
-			},
-			include: { users: true },
-		});
-
-
-		for (const user of new_room.users) {
-
-			const connected_users: ConnectedUser[] = await this.connectedUserService.findByUser( { id: user.id } );
-			for (const connection of connected_users) {
-				await this.server.to(connection.socketId).emit('roomsI', await this.allowedRooms(connection.userId));
-			}
+				const new_room = await this.prisma.room.create({
+					data: {
+						users: {connect: [
+							{id: userId}, 
+							{id: socket.data.user.id } ]},
+							creator: { connect: { id: socket.data.user.id } },
+							admin: { connect: { id: socket.data.user.id } },
+							name: name_,
+							password: null,
+							public: false,
+							isPass: false,
+						},
+						include: { users: true },
+					});
+					
+					
+					for (const user of new_room.users) {
+						
+						const connected_users: ConnectedUser[] = await this.connectedUserService.findByUser( { id: user.id } );
+						for (const connection of connected_users) {
+							await this.server.to(connection.socketId).emit('roomsI', await this.allowedRooms(connection.userId));
+						}
 		}
 
 		setTimeout(() => {
