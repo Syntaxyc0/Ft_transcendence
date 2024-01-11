@@ -260,4 +260,9 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 				return true;
 		return false;
 	}
+
+	directMessage() {
+		this.socket.emit("mpUser", this.user?.id);
+		this.closeOption();
+	}
 }
