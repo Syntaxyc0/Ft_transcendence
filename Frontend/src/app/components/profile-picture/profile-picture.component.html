@@ -6,7 +6,7 @@
 		<section *ngIf="name" class="font-courgette text-4xl">
 			{{name}} 
 		</section>
-		<svg (click)="toggleModal()" class="cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><g fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 16l-1 4l4-1L19.586 7.414a2 2 0 0 0 0-2.828l-.172-.172a2 2 0 0 0-2.828 0L5 16Z"/><path fill="currentColor" d="m5 16l-1 4l4-1L18 9l-3-3L5 16Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 6l3 3m-5 11h8"/></g></svg>
+		<!-- <svg (click)="toggleModal()" class="cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><g fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 16l-1 4l4-1L19.586 7.414a2 2 0 0 0 0-2.828l-.172-.172a2 2 0 0 0-2.828 0L5 16Z"/><path fill="currentColor" d="m5 16l-1 4l4-1L18 9l-3-3L5 16Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 6l3 3m-5 11h8"/></g></svg>
 		<form [formGroup]="editNameForm" (submit)="editName()">
 
 			<div *ngIf="showModal" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex">
@@ -44,7 +44,7 @@
 			  </div>
 			</div>
 			<div *ngIf="showModal" class="opacity-25 fixed inset-0 z-40 bg-black"></div>
-		  </form>
+		  </form> -->
 		  
 	</div>
 </div>

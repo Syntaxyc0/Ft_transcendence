@@ -44,7 +44,7 @@ export class AchievementsComponent {
 					{ title: 'Harasser', instructions:'Add friends', currentScore: res[4], paliers: [1, 3, 5] },
 					{ title: 'Popular', instructions:'Have friends', currentScore: res[5], paliers: [1, 2, 3] },
 					{ title: 'Bipolar', instructions:'Remove friends', currentScore: res[6], paliers: [1, 2, 5] },
-					{ title: 'Schizophrenic', instructions:'Change name', currentScore: res[7], paliers: [1, 2, 4] },
+					{ title: 'Going negative', instructions:'Get a negative elo', currentScore: res[7], paliers: [0, 0, 1] },
 					{ title: 'Lunatic', instructions:'Change picture', currentScore: res[8], paliers: [1, 2, 4] },
 					{ title: 'Stalker', instructions:'Search for profiles', currentScore: res[9], paliers: [1, 5, 10] },
 					{ title: 'Addicted', instructions:'Play Games', currentScore: res[10], paliers: [1, 10, 20] },
