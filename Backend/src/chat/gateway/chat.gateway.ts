@@ -90,7 +90,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('createRoom')
 	async onCreateRoom(socket: Socket, roomInput: Prisma.RoomCreateInput): Promise<Room> {
-		console.log("requete");
 
 		if (!socket.data.user) {
 			throw new UnauthorizedException();
