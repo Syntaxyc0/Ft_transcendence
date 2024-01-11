@@ -4,6 +4,8 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FriendMenuComponent } from '../friend-menu/friend-menu.component';
 import { BACKEND } from 'src/app/env';
 import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
+import { Subscription } from 'rxjs';
+import { ConnectedUserI } from 'src/app/chat/model/connectedUser.interface';
 
 @Component({
   selector: 'app-friend',
@@ -45,10 +47,8 @@ export class FriendComponent implements OnInit, OnDestroy{
 	avatar;
 
 	connectedUserList: ConnectedUserI[] | undefined;
-	InGameUserList: InGameUserI[] | undefined;
 
 	subStatus: Subscription;
-	subInGame: Subscription;
 
 	ngOnInit() {
         this.retrieveFriend();
