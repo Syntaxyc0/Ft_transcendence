@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FriendMenuComponent } from '../friend-menu/friend-menu.component';
 import { BACKEND } from 'src/app/env';
+import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
 
 @Component({
   selector: 'app-friend',
@@ -14,7 +15,7 @@ import { BACKEND } from 'src/app/env';
 export class FriendComponent {
 	@ViewChild('menu') menu: ElementRef;
 
-	constructor(public http: HttpClient, private renderer: Renderer2) {
+	constructor(private socket: CustomSocket, public http: HttpClient, private renderer: Renderer2) {
 		
 		this.renderer.listen('window', 'click',(e:Event)=>{
 		if(e.target!==this.menu.nativeElement)
@@ -81,6 +82,8 @@ export class FriendComponent {
 	}
 
 	onRightClick(event) {
+		this.socket.emit("whatStatus", this.id);
+
 		event.preventDefault()
 		if (!this.showMenu)
 		{

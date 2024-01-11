@@ -1,9 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BACKEND } from 'src/app/env';
 import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -13,13 +14,15 @@ import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
   templateUrl: './friend-menu.component.html',
   styleUrls: ['./friend-menu.component.scss']
 })
-export class FriendMenuComponent implements OnInit{
+export class FriendMenuComponent implements OnInit, OnDestroy{
 	username: string;
 	@Input() id: number
 	@Input() name: string
+	statusSubscription : Subscription
 
-	currentId = JSON.parse(localStorage.getItem('id')!)
+	currentId = JSON.parse(localStorage.getItem('id')!);
 
+	status: string;
 
 	constructor(public http: HttpClient,
 				private route:ActivatedRoute,
@@ -28,6 +31,12 @@ export class FriendMenuComponent implements OnInit{
 				) {}
 
 	ngOnInit(): void {
+
+		this.statusSubscription = this.socket.fromEvent("sendStatus").subscribe((payload: any) =>{
+			this.status = payload
+			
+		});
+		// this.socket.emit("whatStatus", this.currentId);
 		this.socket.emit("findUser", this.id);
 		this.socket.fromEvent("userFound").subscribe(() =>{
 
@@ -37,6 +46,13 @@ export class FriendMenuComponent implements OnInit{
 		res => {                                       
 			this.username = res['login'];
 		})
+
+		
+	}
+
+	ngOnDestroy(): void {
+		if(this.statusSubscription)
+			this.statusSubscription.unsubscribe()
 	}
 
 	deleteFriend()

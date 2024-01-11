@@ -260,6 +260,17 @@ async closeAllDialogs(socket: Socket, id: number)
 		}
 	}
 
+  @SubscribeMessage("whatStatus")
+  async whatStatus(socket: Socket, id: number)
+  {
+
+    // const user = await this.prisma.user.findUnique({
+    //   where: {id: id}
+    // });
+    const currentStatus = await this.userService.GetUserStatus(id)
+    socket.emit("sendStatus", currentStatus.status)
+  }
+
   @SubscribeMessage('refuseGame')
 	async refuseGame( socket: Socket, user: UserI ) {
 
