@@ -811,7 +811,10 @@ export class UserService
 		res.push(user.friends_added);
 		res.push(user.friendList.length);
 		res.push(user.friends_removed);
-		res.push(user.name_changed);
+		if (user.elo <= 0)
+			res.push(1);
+		else
+			res.push(0);
 		res.push(user.picture_changed);
 		res.push(user.profiles_searched);
 		res.push(user.gameHistory.length);
@@ -821,7 +824,7 @@ export class UserService
 		res.push(user.refused_count);
 
 		let counter = 0;
-		let master = [1,1,5,100,5,5,5,4,4,10,20,10,10,5,5];
+		let master = [1,1,5,100,5,5,5,1,4,10,20,10,10,5,5];
 		for (let i=0; i <= 14; i++)
 		{
 			if (res[i] >= master[i])
