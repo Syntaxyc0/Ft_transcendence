@@ -84,7 +84,7 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 			this.selectedRoom = null;
 		});
 
-		this.socket.fromEvent<RoomI>("MessageToUser").subscribe((value) => {
+		this.subMP = this.socket.fromEvent<RoomI>("MessageToUser").subscribe((value) => {
 				this.selectedRoom = value;
 		});
 	}
@@ -95,6 +95,8 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy{
 			this.subOption.unsubscribe;
 		if (this.subKick)
 			this.subKick.unsubscribe;
+		if (this.subMP)
+			this.subMP.unsubscribe;
 	}
 
 	retrieveUser() {

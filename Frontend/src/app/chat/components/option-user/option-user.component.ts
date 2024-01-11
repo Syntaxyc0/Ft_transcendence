@@ -140,6 +140,8 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 
 	
 	ngOnDestroy(): void {
+		if(this.Usersub)
+			this.Usersub.unsubscribe();
 		if (this.AdminSub)
 			this.AdminSub.unsubscribe();
 		if (this.RoomSub)
@@ -147,11 +149,11 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 		if (this.BlockSub)
 			this.BlockSub.unsubscribe();
 		if (this.MuteSub)
-			this.MuteSub.unsubscribe();
-		if (this.BanSub)
-			this.BanSub.unsubscribe();
+		this.MuteSub.unsubscribe();
 		if (this.CreatorSub)
 			this.CreatorSub.unsubscribe();
+		if (this.BanSub)
+			this.BanSub.unsubscribe();
 		if (this.InRoomSub)
 			this.InRoomSub.unsubscribe();
 	}

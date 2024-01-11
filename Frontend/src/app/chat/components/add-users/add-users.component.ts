@@ -99,6 +99,8 @@ export class AddUsersComponent implements OnInit, OnDestroy{
 	ngOnDestroy(): void {
 		this.subBan.unsubscribe();
 		this.subUserRoom.unsubscribe();
+		if (this.subUserRoom)
+			this.subUserRoom.unsubscribe();
 	}
 
 	addUserToRoom() {

@@ -62,7 +62,8 @@ export class CreateRoomComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-		this.subExist.unsubscribe();
+		if (this.subExist)
+			this.subExist.unsubscribe();
 	}
 
 	create() {

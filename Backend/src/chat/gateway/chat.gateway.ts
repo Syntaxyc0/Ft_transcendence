@@ -53,7 +53,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				
 				// status
 					const connectedUser = await this.prisma.connectedUser.findMany();
-					const InGameUser = await this.prisma.userInGame.findMany();
 					for(const user of connectedUser)
 						this.server.to(user.socketId).emit('status', connectedUser);
 				// 
@@ -71,7 +70,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		await this.connectedUserService.deleteBySocketId(socket.id);
 
 		const connectedUser = await this.prisma.connectedUser.findMany();
-		const InGameUser = await this.prisma.userInGame.findMany();
 		for(const user of connectedUser)
 			this.server.to(user.socketId).emit('status', connectedUser );
 

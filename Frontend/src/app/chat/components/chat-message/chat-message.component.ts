@@ -30,14 +30,15 @@ export class ChatMessageComponent implements OnInit, OnDestroy{
 		this.id = JSON.parse(localStorage.getItem('id')!);
 
 		// BlockedUser ?
-		this.subBlock = this.socket.emit("blockedUsers");
-		this.socket.fromEvent<UserI[] | undefined>("blockedUsersList").subscribe(value =>{
+		this.socket.emit("blockedUsers");
+		this.subBlock = this.socket.fromEvent<UserI[] | undefined>("blockedUsersList").subscribe(value =>{
 			this.blockedUserList = value;
 		});
 	}
 
 	ngOnDestroy(): void {
-		this.subBlock.unsubscribe();
+		if (this.subBlock)
+			this.subBlock.unsubscribe();
 	}
 
 	openOption(user_: UserI | undefined) {
