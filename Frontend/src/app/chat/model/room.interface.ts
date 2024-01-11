@@ -12,4 +12,5 @@ export interface RoomI {
 	isPass: boolean;
 	mutedUsers: UserI[];
 	admin: UserI[];
+	BanUsers: UserI[];
 }

@@ -507,10 +507,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					if(users.id === User.userId) {
 						await this.server.to(User.socketId).emit('roomsI', await this.allowedRooms(User.userId));
 					}
-					await this.server.to(User.socketId).emit("banList", room_.BanUsers);
+					await this.server.to(User.socketId).emit("banList", room_);
 			}
 		}
-		socket.emit("banList", room_.BanUsers);
 	}
 
 	@SubscribeMessage('unbanUser')
@@ -538,11 +537,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				for(const users of room_.users)
 					if(users.id === User.userId) {
 						await this.server.to(User.socketId).emit('roomsI', await this.allowedRooms(User.userId));
-						await this.server.to(User.socketId).emit("banList", room_.BanUsers);
 					}
+					await this.server.to(User.socketId).emit("banList", room_);
 			}
 		}
-		socket.emit("banList", room_.BanUsers);
 	}
 
 	@SubscribeMessage('getBanList')
@@ -553,7 +551,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			include: { BanUsers: true },
 		});
 
-		return await socket.emit('banList', room_.BanUsers);
+		return await socket.emit('banList', room_);
 	}
 	
 	@SubscribeMessage('acceptGame')

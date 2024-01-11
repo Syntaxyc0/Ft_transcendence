@@ -127,9 +127,11 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 
 			// Ban ?
 			this.socket.emit("getBanList", this.room);
-			this.BanSub = this.socket.fromEvent<UserI[] | undefined>("banList").subscribe(value =>{
-				this.banList = value;
-				this.isUserBan = this.isBan();
+			this.BanSub = this.socket.fromEvent<RoomI>("banList").subscribe(value =>{
+				if(this.room == value.id) {
+					this.banList = value.BanUsers;
+					this.isUserBan = this.isBan();
+				}
 			});
 
 			// In Room ?
