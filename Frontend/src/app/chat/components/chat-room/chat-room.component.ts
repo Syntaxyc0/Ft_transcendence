@@ -110,22 +110,28 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 
 		// Muted ?
 		this.socket.emit("MutedUsers", this.chatRoom);
-		this.subMute = this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
-			this.mutedUserList = value;
-			this.isCurrentMuted = this.isMuted();
+		this.subMute = this.socket.fromEvent<RoomI>("mutedUsersList").subscribe(value =>{
+			if (this.chatRoom.id === value.id) {
+				this.mutedUserList = value.mutedUsers;
+				this.isCurrentMuted = this.isMuted();
+			}
 		});
 
-		this.subMuteTrue = this.socket.fromEvent<UserI[] | undefined>("mutedUserTrue").subscribe(value =>{
-			this.mutedUserList = value;
-			this.isCurrentMuted = true;
-			this.snackbar.open(`You have been muted`, 'Close' ,{
-				duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
-			});
+		this.subMuteTrue = this.socket.fromEvent<RoomI>("mutedUserTrue").subscribe(value =>{
+			if (this.chatRoom.id === value.id) {
+				this.mutedUserList = value.mutedUsers;
+				this.isCurrentMuted = true;
+				this.snackbar.open(`You have been muted`, 'Close' ,{
+					duration: 2000, horizontalPosition: 'right', verticalPosition: 'top'
+				});
+			}
 		});
 
-		this.subMuteFalse = this.socket.fromEvent<UserI[] | undefined>("mutedUserFalse").subscribe(value =>{
-			this.mutedUserList = value;
-			this.isCurrentMuted = false;
+		this.subMuteFalse = this.socket.fromEvent<RoomI>("mutedUserFalse").subscribe(value =>{
+			if (this.chatRoom.id === value.id) {
+				this.mutedUserList = value.mutedUsers;
+				this.isCurrentMuted = false;
+			}
 		});
 		// **** 
 	}
@@ -139,9 +145,20 @@ export class ChatRoomComponent implements OnInit, OnChanges, OnDestroy, AfterVie
 
 			// Admin ?			
 			this.socket.emit("getAdminList", this.chatRoom);
-			this.subAdmin = this.socket.fromEvent("isAdmin").subscribe((value) => {
-				this.adminArray = value;
-				this.adminCurrent = this.isAdmin(this.currentId);
+			this.subAdmin = this.socket.fromEvent<RoomI>("isAdmin").subscribe((value) => {
+				if(value.id === this.chatRoom.id) {
+					this.adminArray = value.admin;
+					this.adminCurrent = this.isAdmin(this.currentId);
+				}
+			});
+
+			// Mute	?
+			this.socket.emit("MutedUsers", this.chatRoom);
+			this.subMute = this.socket.fromEvent<RoomI>("mutedUsersList").subscribe(value =>{
+				if (this.chatRoom.id === value.id) {
+					this.mutedUserList = value.mutedUsers;
+					this.isCurrentMuted = this.isMuted();
+				}
 			});
 
 			// Password ?

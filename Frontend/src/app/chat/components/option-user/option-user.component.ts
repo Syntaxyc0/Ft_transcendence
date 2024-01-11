@@ -87,9 +87,11 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 
 			// Admin ?
 			this.AdminSub = this.getAdminArray().subscribe(value => {
-				this.adminArray = value;
-				this.adminUser = this.isAdmin(this.user);
-				this.adminCurrent = this.isAdmin(this.current_user) 
+				if (value.id == this.room?.id) {
+					this.adminArray = value.admin;
+					this.adminUser = this.isAdmin(this.user);
+					this.adminCurrent = this.isAdmin(this.current_user) 
+				}
 			});
 
 			// Creator ?
@@ -116,9 +118,11 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 			
 			// Muted ?
 			this.socket.emit("MutedUsers", this.room);
-			this.MuteSub = this.socket.fromEvent<UserI[] | undefined>("mutedUsersList").subscribe(value =>{
-				this.mutedUserList = value;
-				this.isUserMuted = this.isMuted();
+			this.MuteSub = this.socket.fromEvent<RoomI>("mutedUsersList").subscribe(value =>{
+				if (this.room?.id === value.id) {
+					this.mutedUserList = value.mutedUsers;
+					this.isUserMuted = this.isMuted();
+				}
 			});
 
 			// Ban ?
@@ -168,7 +172,7 @@ export class OptionUserComponent implements OnInit, OnDestroy{
 		this.router.navigate(['/user'], { queryParams: { id: this.user?.id } })
 	}
 
-	getAdminArray(): Observable<UserI[]> {
+	getAdminArray(): Observable<RoomI> {
 		this.socket.emit("getAdminList", this.room);
 		return this.socket.fromEvent("isAdmin");
 	}

@@ -10,4 +10,6 @@ export interface RoomI {
 	public: boolean;
 	creator: UserI;
 	isPass: boolean;
+	mutedUsers: UserI[];
+	admin: UserI[];
 }
