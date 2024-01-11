@@ -9,6 +9,7 @@ clean: stop
 	docker system prune -af
 
 fclean: clean
+	docker volume rm $(shell docker volume ls -q)	
 	docker volume rm -f $(CURRENT_DIR)_backend
 	docker volume rm -f $(CURRENT_DIR)_frontend
 	
