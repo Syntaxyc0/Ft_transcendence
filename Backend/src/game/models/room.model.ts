@@ -60,6 +60,7 @@ export class Room{
     async destroyRoom()
     {
         // this.multiplayer.gameRequest({order: "resetBoard"})
+		// console.log("destroyRoom")
         this.multiplayer.stopGame()
         this.isGameRunning = false
 

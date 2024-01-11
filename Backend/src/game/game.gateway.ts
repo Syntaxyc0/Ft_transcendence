@@ -171,6 +171,7 @@ async closeAllDialogs(socket: Socket, id: number)
   @SubscribeMessage('gameOver')
   gameOver(@ConnectedSocket() client:Socket)
   {
+	// console.log('gameOver')
     this.disconnectRoom(client.id)
   }
 
@@ -180,8 +181,10 @@ async closeAllDialogs(socket: Socket, id: number)
     const targetRoom = this.connectedPlayers.get(clientId).room;
     if (targetRoom)
     {
-      // console.log("Destroying Room " + targetRoom.id)
-      targetRoom.destroyRoom()
+		for (let i: number = 0; i < 2; i++)
+            targetRoom.players[i].room = undefined
+    //   console.log(clientId + " destroying Room " + targetRoom.id)
+      await targetRoom.destroyRoom()
       this.rooms.splice(targetRoom.id, 1);
     }
   }

@@ -158,7 +158,9 @@ export const HEIGHT = 640
 				this.draw()
 				this.context.fillText(`${this.paddles[payload.side].login} WINS`, WIDTH / 2 * payload.side + WIDTH / 6, HEIGHT / 2);
 				this.context.fillText(`${this.paddles[payload.side * -1 + 1].login} LOSES`, WIDTH / 2 * (payload.side * -1 + 1) + WIDTH / 6, HEIGHT / 2)
-				this.player.sendRequest("gameOver")
+				setTimeout( () => {
+					this.player.sendRequest("gameOver")
+				}, 100 * this.userPaddle.side)
 				this.disconnect()
 			break;
 			case "gameModeChange":
