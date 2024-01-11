@@ -1,5 +1,3 @@
-// import { UnauthorizedException } from '@nestjs/common';
-
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
@@ -53,11 +51,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 				await this.connectedUserService.create({ socketId: socket.id, user });
 				
-
-				const connectedUser = await this.prisma.connectedUser.findMany();
-				for(const user of connectedUser)
-					this.server.to(user.socketId).emit('status', connectedUser);
-
+				// status
+					const connectedUser = await this.prisma.connectedUser.findMany();
+					const InGameUser = await this.prisma.userInGame.findMany();
+					for(const user of connectedUser)
+						this.server.to(user.socketId).emit('status', connectedUser);
+				// 
 				return this.server.to(socket.id).emit('roomsI', await this.allowedRooms(user.id));
 			}
 		} catch {
@@ -69,11 +68,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	async handleDisconnect(socket: Socket) {
 
-		const connectedUser = await this.prisma.connectedUser.findMany();
-		for(const user of connectedUser)
-			this.server.to(user.socketId).emit('status', connectedUser);
-
 		await this.connectedUserService.deleteBySocketId(socket.id);
+
+		const connectedUser = await this.prisma.connectedUser.findMany();
+		const InGameUser = await this.prisma.userInGame.findMany();
+		for(const user of connectedUser)
+			this.server.to(user.socketId).emit('status', connectedUser );
+
 		socket.disconnect();
 	}
 
@@ -716,9 +717,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('getStatus')
 	async getStatus(socket: Socket, id: number) {
-		const status = await this.userService.GetUserStatus(id);
-		console.log(status.status);
-		socket.emit("status", status.status);
+
+		const connected_users = await this.prisma.connectedUser.findMany();
+		socket.emit("status", connected_users);
 	}
 
 }

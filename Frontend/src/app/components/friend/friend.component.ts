@@ -5,7 +5,8 @@ import { FriendMenuComponent } from '../friend-menu/friend-menu.component';
 import { BACKEND } from 'src/app/env';
 import { CustomSocket } from 'src/app/chat/sockets/custom-socket';
 import { Subscription } from 'rxjs';
-import { UserI } from 'src/app/chat/model/user.interface';
+import { ConnectedUserI } from 'src/app/chat/model/connectedUser.interface';
+import { InGameUserI } from 'src/app/chat/model/InGameUser.interface';
 
 @Component({
   selector: 'app-friend',
@@ -44,34 +45,43 @@ export class FriendComponent implements OnInit, OnDestroy{
 	@Input() id:number = 0
 	showMenu = false
 	toshow = false
-	status : string = "";
+	status: string;
 
-	 name:string = 'undefined';
-	 avatar;
+	name:string = 'undefined';
+	avatar;
 
-	connectedUser: UserI[];
+	connectedUserList: ConnectedUserI[] | undefined;
+	InGameUserList: InGameUserI[] | undefined;
 
-	 subStatus: Subscription;
+	subStatus: Subscription;
+	subInGame: Subscription;
 
 	ngOnInit() {
         this.retrieveFriend();
 		this.getUserStatus();
 
 		this.socket.emit("getStatus", this.id);
-		this.subStatus = this.socket.fromEvent<string>("status").subscribe(value => {
-			this.status = value;
-			console.log(value);
+		this.subStatus = this.socket.fromEvent<any>("status").subscribe((value) => {
+			this.connectedUserList = value;			
+			this.status = this.CurrentConnected();
 		});
 	}
 
 	ngOnDestroy(): void {
-		this.subStatus.unsubscribe();
+		if (this.subStatus)
+			this.subStatus.unsubscribe();
 	}
 
 	CurrentConnected() {
-		for (const user of this.connectedUser)
-			if (user.id ===)
+		if (!this.connectedUserList)
+			return "Reload";
+
+		for (const user of this.connectedUserList)
+			if (user.userId === this.id)
+				return "ONLINE";
+		return "OFFLINE";
 	}
+
 
 	retrieveFriend() {
 	 this.http.get<any>(BACKEND.URL + "users/" + this.id).subscribe(

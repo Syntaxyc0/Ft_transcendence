@@ -17,7 +17,7 @@ model User {
   access_token           String          @default("")
   is2faenabled           Boolean         @default(false)
   is2favalidated         Boolean         @default(false)
-  is_ingame		         Boolean         @default(false)
+  is_ingame              Boolean         @default(false)
   twofacode              String          @default("")
   avatar                 String          @default("")
   default_avatar         String          @default("")

@@ -7,14 +7,15 @@ export class ConnectedUserService{
   constructor(private readonly prisma: PrismaService) {}
 
 	async	create(connectedUserI: ConnectedUserI) {
+		
 		const createdConnectedUser = await this.prisma.connectedUser.create({
 			data: {
-			socketId: connectedUserI.socketId,
-			user: {
-				connect: {
-				id: connectedUserI.user.id,
+				socketId: connectedUserI.socketId,
+				user: {
+					connect: {
+						id: connectedUserI.user.id,
+					},
 				},
-			},
 			},
 		});
 		

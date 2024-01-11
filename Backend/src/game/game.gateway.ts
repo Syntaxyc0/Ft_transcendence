@@ -160,18 +160,12 @@ export class GameGateway implements OnModuleInit{
     const targetRoom = this.connectedPlayers.get(clientId).room;
     if (targetRoom)
     {
-		for (let i = 0; i < 2; i++)
-		{
-			const connectedUser = await this.prisma.connectedUser.findMany();
-			for(const user of connectedUser)
-				this.server.to(user.socketId).emit('status', "ONLINE");
-		}
-
       console.log("Destroying Room " + targetRoom.id)
       targetRoom.destroyRoom()
       this.rooms.splice(targetRoom.id, 1);
     }
   }
+
 
   @SubscribeMessage('loginRequest')
   loginRequest(@ConnectedSocket() client:Socket)
@@ -208,12 +202,9 @@ export class GameGateway implements OnModuleInit{
     if (!invitedPlayer || !currentPlayer || currentPlayer.room || invitedPlayer.room)
       return;
 
-	const connectedUser = await this.prisma.connectedUser.findMany();
-	for(const user of connectedUser)
-		this.server.to(user.socketId).emit('status', "IN GAME");
-
     this.rooms.push(new Room(this.rooms.length , currentPlayer, invitedPlayer, this.gameService, this.prisma))
   }
+
 
   @SubscribeMessage('invite_to_play?')
 	async invite_to_play( socket: Socket, id: number ) {
@@ -305,11 +296,6 @@ export class GameGateway implements OnModuleInit{
     for (const [socketId, player] of this.connectedPlayers) {
       if (player.socket.id != client.id && player.lookingForPlayer)
       {
-
-		const connectedUser = await this.prisma.connectedUser.findMany();
-				for(const user of connectedUser)
-					this.server.to(user.socketId).emit('status', "IN GAME");
-
         this.rooms.push(new Room(this.rooms.length ,matchPlayer, player, this.gameService, this.prisma))
         return;
       }
